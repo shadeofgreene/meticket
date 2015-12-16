@@ -1,0 +1,199 @@
+﻿<!-- Edit Product Modal -->
+<div class="modal fade" id="updateProductModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">{{ updateProduct.productName }}</h4>
+			</div>
+			<form name="updateProductForm" class="form-horizontal style-form" data-ng-submit="updateProduct()" novalidate>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="row">
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-3 control-label">Product Name</label>
+										<div class="col-sm-7">
+											<input data-ng-model="updateProduct.Product.productName" type="text" class="form-control" required />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-3 control-label">Type</label>
+										<div class="col-sm-7">
+											<select data-ng-model="updateProduct.Product.productTypeId" class="form-control" required>
+												<option data-ng-repeat="pt in productTypes" value="{{ pt.productTypeId }}">{{ pt.productTypeName }}</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-3 control-label">Unit</label>
+										<div class="col-sm-7">
+											<select data-ng-model="updateProduct.Product.unitTypeId" class="form-control" required>
+												<option data-ng-repeat="ut in unitTypes" value="{{ ut.unitTypeId }}">{{ ut.unitTypeName }}</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-3 control-label">Price Per Unit</label>
+										<div class="input-group col-sm-7">
+											<span class="input-group-addon">$</span>
+											<input type="number" class="form-control" data-ng-model="updateProduct.Product.pricePerUnitWhole" required>
+											<span class="input-group-addon">.</span>
+											<input type="number" class="form-control" data-ng-model="updateProduct.Product.pricePerUnitDecimal" required>
+										</div>
+										<!--<div class="col-sm-7">
+											    <input data-ng-model="addUser.userNormalTime" type="text" class="form-control" required />
+										    </div>-->
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-3 control-label">Serial</label>
+										<div class="col-sm-7">
+											<input data-ng-model="updateProduct.Product.productSerial" type="text" class="form-control" />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-3 control-label">Vendor</label>
+										<div class="col-sm-7">
+											<input data-ng-model="updateProduct.Product.productVendor" type="text" class="form-control" />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-3 control-label">Model</label>
+										<div class="col-sm-7">
+											<input data-ng-model="updateProduct.Product.productModel" type="text" class="form-control" />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-3 control-label">Description</label>
+										<div class="col-sm-7">
+											<input data-ng-model="updateProduct.Product.productDescription" type="text" class="form-control" />
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button type="submit" data-ng-disabled="updateProductForm.$invalid" class="btn btn-info">Update Product</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<h3><i class="fa fa-angle-right"></i>Add Product</h3>
+<div class="row mt">
+	<div class="col-lg-12">
+		<div class="form-panel">
+			<h4 class="mb">
+				<i class="fa fa-angle-right"></i>New Product Information
+			</h4>
+			<form name="updateProductForm" class="form-horizontal style-form" data-ng-submit="updateProduct()" novalidate>
+				<div class="row">
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Product Name</label>
+							<div class="col-sm-7">
+								<input data-ng-model="updateProduct.Product.productName" type="text" class="form-control" required />
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Type</label>
+							<div class="col-sm-7">
+								<select data-ng-model="updateProduct.Product.productTypeId" class="form-control" required>
+									<option data-ng-repeat="pt in productTypes" value="{{ pt.productTypeId }}">{{ pt.productTypeName }}</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Unit</label>
+							<div class="col-sm-7">
+								<select data-ng-model="updateProduct.Product.unitTypeId" class="form-control" required>
+									<option data-ng-repeat="ut in unitTypes" value="{{ ut.unitTypeId }}">{{ ut.unitTypeName }}</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Price Per Unit</label>
+							<div class="input-group col-sm-7">
+								<span class="input-group-addon">$</span>
+								<input type="number" class="form-control" data-ng-model="updateProduct.Product.pricePerUnitWhole" required>
+								<span class="input-group-addon">.</span>
+								<input type="number" class="form-control" data-ng-model="updateProduct.Product.pricePerUnitDecimal" required>
+							</div>
+							<!--<div class="col-sm-7">
+											    <input data-ng-model="addUser.userNormalTime" type="text" class="form-control" required />
+										    </div>-->
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Serial</label>
+							<div class="col-sm-7">
+								<input data-ng-model="updateProduct.Product.productSerial" type="text" class="form-control" />
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Vendor</label>
+							<div class="col-sm-7">
+								<input data-ng-model="updateProduct.Product.productVendor" type="text" class="form-control" />
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Model</label>
+							<div class="col-sm-7">
+								<input data-ng-model="updateProduct.Product.productModel" type="text" class="form-control" />
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Description</label>
+							<div class="col-sm-7">
+								<input data-ng-model="updateProduct.Product.productDescription" type="text" class="form-control" />
+							</div>
+						</div>
+					</div>
+
+					<div class="col-lg-12">
+						<div class="form-group">
+							<div class="col-sm-12">
+								<a class="btn btn-default" href="#/product-list">Go Back</a>
+								<button type="submit" data-ng-disabled="updateProductForm.$invalid" class="btn btn-info">Update Product</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+

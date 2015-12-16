@@ -1,0 +1,88 @@
+﻿<h3><i class="fa fa-angle-right"></i> New Ticket Item</h3>
+<div class="row mt">
+	<div class="col-lg-12">
+		<form name="updateCreateTicketItemForm" class="form-horizontal style-form" data-ng-submit="addNewTicketItem()" novalidate>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-sm-12">
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Search Product</label>
+										<div class="col-sm-8">
+											<input type="text" class="form-control" placeholder="Search..." />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Product Description</label>
+										<div class="col-sm-8">
+											<input data-ng-model="currentTicketItem.ticketItemDescription" type="text" class="form-control" required />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Price/Unit</label>
+										<div class="col-sm-8">
+											<input data-ng-model="currentTicketItem.ticketItemRate" type="text" class="form-control" required />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Unit Type</label>
+										<div class="col-sm-8">
+											<select data-ng-model="currentTicketItem.ticketItemUnitType"  data-ng-change="updateCustomerInfo()" class="form-control" required >
+												<option>item</option>
+												<option>inch</option>
+												<option>ft</option>
+												<option>mile</option>
+												<option>hr</option>
+												<option>oz</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Is this item for employee labor?</label>
+										<div class="col-sm-8">
+											<select data-ng-model="currentTicketItem.inLaborSection" class="form-control" required >
+												<option value="true">Yes</option>
+												<option value="false">No</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Qty</label>
+										<div class="col-sm-8">
+											<input data-ng-model="currentTicketItem.qtyUnits" type="number" class="form-control" required />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Total:</label>
+										<div class="col-sm-8">
+											<h3 data-ng-if="!currentTicketItem.qtyUnits || !currentTicketItem.ticketItemRate">$0.00</h3>
+											<h3 data-ng-if="currentTicketItem.qtyUnits && currentTicketItem.ticketItemRate">${{ currentTicketItem.qtyUnits * currentTicketItem.ticketItemRate }}</h3>
+										</div>
+									</div>
+								</div>
+								<input type="hidden" data-ng-model="displayOfficeObject.customerId" />
+							</div>
+						</div>
+
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button type="submit" data-ng-disabled="updateCreateTicketItemForm.$invalid" class="btn btn-info">Add Ticket Item</button>
+				</div>
+			</form>
+	</div>
+</div>

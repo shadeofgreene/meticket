@@ -1,0 +1,99 @@
+﻿<h3><i class="fa fa-angle-right"></i> Add User</h3>
+<div class="row mt">
+	<div class="col-lg-12">
+		<div class="form-panel">
+			<h4 class="mb">
+				<i class="fa fa-angle-right"></i> New User Information
+			</h4>
+			<form name="addNewUserForm" class="form-horizontal style-form" novalidate>
+				<div class="row">
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">First Name</label>
+							<div class="col-sm-7">
+								<input data-ng-model="addUser.userFirstName" type="text" class="form-control" required/>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Last Name</label>
+							<div class="col-sm-7">
+								<input data-ng-model="addUser.userLastName" type="text" class="form-control" required />
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Phone</label>
+							<div class="col-sm-7">
+								<input data-ng-model="addUser.userPhoneNumber" type="text" class="form-control" required />
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Email</label>
+							<div class="col-sm-7">
+								<input data-ng-model="addUser.userEmail" type="text" class="form-control" required />
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Cost (Normal)</label>
+							<div class="input-group col-sm-7">
+								<span class="input-group-addon">$</span>
+								<input type="number" class="form-control" data-ng-model="addUser.costNormalWhole" required>
+								<span class="input-group-addon">.</span>
+								<input type="number" class="form-control" data-ng-model="addUser.costNormalDecimal" required>
+							  </div>
+							<!--<div class="col-sm-7">
+								<input data-ng-model="addUser.userNormalTime" type="text" class="form-control" required />
+							</div>-->
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Cost (Overtime)</label>
+							<div class="input-group col-sm-7">
+								<span class="input-group-addon">$</span>
+								<input type="number" class="form-control" data-ng-model="addUser.costOvertimeWhole" required>
+								<span class="input-group-addon">.</span>
+								<input type="number" class="form-control" data-ng-model="addUser.costOvertimeDecimal" required>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Temporary Password</label>
+							<div class="col-sm-7">
+								<input data-ng-model="addUser.userPassword" type="text" class="form-control" required />
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">System User?</label>
+							<div class="col-sm-7 text-center">
+								<input id="systemUserSwitch" type="checkbox" />
+							</div>
+						</div>
+					</div>
+
+					<div class="col-lg-12">
+						<div class="form-group">
+							<div class="col-sm-12">
+								<button data-ng-disabled="addNewUserForm.$invalid" data-ng-click="addNewUser()" class="btn btn-info">Save</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<script>
+	$('#systemUserSwitch').bootstrapSwitch();
+</script>

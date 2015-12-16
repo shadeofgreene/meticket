@@ -1,0 +1,425 @@
+﻿
+<!-- Create Employee Time Modal -->
+<div class="modal fade" id="createEmployeeTimeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">Add Employee Time</h4>
+			</div>
+			<form name="updateAddEmployeeTimeForm" class="form-horizontal style-form" novalidate>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Select Employee</label>
+										<div class="col-sm-8" >
+											<angucomplete-alt id="employeeListAutoComplete"											                  pause="100"
+											                  placeholder="Start Typing..."
+											                  selected-object="updateEmployeeTicketItem"
+											                  local-data="employeeList"
+											                  search-fields="userEmail,userFirstName,userLastName,userPhoneNumber"
+											                  title-field="userFirstName,userLastName"
+											                  minLength="0"
+											                  input-class="form-control" required />
+											<!--<input data-ng-model="employeeDirty.value" mass-autocomplete-item="employeesAutocomplete" class="form-control">-->
+										</div>
+									</div>
+								</div>
+								<!--<div class="col-lg-12">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Product Description</label>
+										<div class="col-sm-8">
+											<input data-ng-model="currentTicketItem.ticketItemDescription" type="text" class="form-control" required />
+										</div>
+									</div>
+								</div>-->
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Hourly<br/> Wage</label>
+										<div class="col-sm-8">
+											<input data-ng-model="currentTicketItem.pricePerUnit" type="text" class="form-control" required />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Unit<br/> Type</label>
+										<div class="col-sm-8">
+											<select data-ng-model="currentTicketItem.ticketItemUnitType" class="form-control" disabled >
+												<option value="hr">hr</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Qty</label>
+										<div class="col-sm-8">
+											<input data-ng-model="currentTicketItem.qtyUnits" type="number" class="form-control" required />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Total:</label>
+										<div class="col-sm-8">
+											<h3 data-ng-if="!currentTicketItem.qtyUnits || !currentTicketItem.pricePerUnit">$0.00</h3>
+											<h3 data-ng-if="currentTicketItem.qtyUnits && currentTicketItem.pricePerUnit">{{ currentTicketItem.qtyUnits * currentTicketItem.pricePerUnit | currency : '$' : 2}}</h3>
+										</div>
+									</div>
+								</div>
+								<input type="hidden" data-ng-model="displayOfficeObject.customerId" />
+							</div>
+						</div>
+
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button data-ng-disabled="updateAddEmployeeTimeForm.$invalid" data-ng-click="addNewTicketItem()" class="btn btn-info">Add Ticket Item</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- Create Ticket Item Modal -->
+<div class="modal fade" id="createTicketItemModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 data-ng-if="isUsingProductType(1005)" class="modal-title">Add Material Item</h4>
+				<h4 data-ng-if="isUsingProductType(1)" class="modal-title">Add Equipment Item</h4>
+			</div>
+			<form name="updateCreateTicketItemForm" class="form-horizontal style-form" novalidate>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-lg-12">
+							<div class="row">
+								<div data-ng-if="isUsingProductType(1005)" class="col-lg-12">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Search Product</label>
+										<div  class="col-sm-8" mass-autocomplete >
+											<angucomplete-alt id="materialProductsAutocomplete"
+											                  pause="100"
+											                  placeholder="Start Typing..."
+											                  selected-object="updateCurrentMaterialProduct"
+											                  local-data="materialProducts"
+											                  search-fields="productName"
+											                  title-field="productName"
+											                  minLength="0"
+											                  input-class="form-control" />
+											<!--<input data-ng-model="materialProductDirty.value" mass-autocomplete-item="materialProductsAutocomplete" class="form-control">-->
+										</div>
+									</div>
+								</div>
+								<div data-ng-if="isUsingProductType(1)" class="col-lg-12">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Search Equipment</label>
+										<div  class="col-sm-8" mass-autocomplete >
+											<angucomplete-alt id="equipmentProductsAutocomplete"
+											                  pause="100"
+											                  placeholder="Start Typing..."
+											                  selected-object="currentTicketItem"
+											                  local-data="equipmentProducts"
+											                  search-fields="productName"
+											                  title-field="productName"
+											                  minLength="0"
+											                  input-class="form-control" />
+											<!--<input data-ng-model="materialProductDirty.value" mass-autocomplete-item="materialProductsAutocomplete" class="form-control">-->
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Product Description</label>
+										<div class="col-sm-8">
+											<input data-ng-model="currentTicketItem.productDescription" type="text" class="form-control" required />
+										</div>
+									</div>
+								</div>
+								<div data-ng-if="isUsingProductType(1005)" class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Cost</label>
+										<div class="col-sm-8">
+											<input data-ng-model="currentTicketItem.productCost" data-ng-change="updatePriceFromCost(currentTicketItem)" type="text" class="form-control" />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Unit Type</label>
+										<div class="col-sm-8">
+											<select data-ng-model="currentTicketItem.ticketItemUnitType" data-ng-change="updateUnitAndPrice(currentTicketItem)" class="form-control" required >
+												<option data-ng-repeat="unitType in unitTypes" value="{{ unitType.unitTypeShortName }}">{{ unitType.unitTypeShortName }}</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Price/E</label>
+										<div class="col-sm-8">
+											<input data-ng-model="currentTicketItem.pricePerUnit" type="text" class="form-control" required />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Qty</label>
+										<div class="col-sm-8">
+											<input data-ng-model="currentTicketItem.qtyUnits" type="number" class="form-control" required />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-4 control-label">Total:</label>
+										<div class="col-sm-8">
+											<h3 data-ng-if="!currentTicketItem.qtyUnits || !currentTicketItem.pricePerUnit">$0.00</h3>
+											<h3 data-ng-if="currentTicketItem.qtyUnits && currentTicketItem.pricePerUnit">{{ currentTicketItem.qtyUnits * currentTicketItem.pricePerUnit | currency : '$' : 2}}</h3>
+										</div>
+									</div>
+								</div>
+								<input type="hidden" data-ng-model="displayOfficeObject.customerId" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button data-ng-disabled="updateCreateTicketItemForm.$invalid" data-ng-click="addNewTicketItem()" class="btn btn-info">Add Ticket Item</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<h3><i class="fa fa-angle-right"></i> Create New Ticket</h3>
+<div class="row mt">
+	<div class="col-lg-12">
+		<div class="form-panel">
+			<h4 class="mb">
+				<i class="fa fa-angle-right"></i> Customer Information
+			</h4>
+			<form name="createNewTicketForm" class="form-horizontal style-form" novalidate>
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="form-group">
+							<!--<label class="col-sm-3 control-label">Choose Customer*</label>
+								<div class="col-sm-7">
+									<select data-ng-model="ticket.officeId" data-ng-change="updateCustomerInfo()" class="form-control" required >
+										<option data-ng-repeat="office in offices" value="{{ office.officeId }}">{{ office.customer.customerName }} - {{ office.officeName }}</option>
+									</select>
+								</div>-->
+							<label class="col-sm-3 control-label">Select Customer</label>
+							<div class="col-sm-7">
+								<angucomplete-alt id="Angucomplete-alt1"
+									pause="100"
+									placeholder="Start Typing..."
+									selected-object="updateTicketOfficeId"
+									local-data="offices"
+									search-fields="officeName"
+									title-field="officeName"
+									minlength="1"
+									input-class="form-control" required />
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-12">
+						<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Customer Name*</label>
+							<div class="col-sm-7">
+								<input data-ng-model="ticket.customerName" type="text" class="form-control" required />
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Phone</label>
+							<div class="col-sm-7">
+								<input data-ng-model="ticket.customerPhone" type="text" class="form-control" />
+							</div>
+						</div>
+					</div>
+					</div>
+					<div class="col-lg-12">
+						<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Address 1</label>
+							<div class="col-sm-7">
+								<input data-ng-model="ticket.customerAddress1" type="text" class="form-control" />
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Address 2</label>
+							<div class="col-sm-7">
+								<input data-ng-model="ticket.customerAddress2" type="text" class="form-control" />
+							</div>
+						</div>
+					</div>
+					</div>
+					
+					<div class="col-lg-12">
+						<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">City</label>
+							<div class="col-sm-7">
+								<input data-ng-model="ticket.customerCity" type="text" class="form-control" />
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">State</label>
+							<div class="col-sm-7">
+								<input data-ng-model="ticket.customerState" type="text" class="form-control" />
+							</div>
+						</div>
+					</div>
+					</div>
+					<div class="col-lg-12">
+						<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Zip</label>
+							<div class="col-sm-7">
+								<input data-ng-model="ticket.customerZip" type="text" class="form-control" />
+							</div>
+						</div>
+					</div>
+					</div>
+					
+					<div class="col-lg-12">
+						<h4 class="mb">
+							<i class="fa fa-angle-right"></i> Job Details
+						</h4>
+					</div>
+					<div class="col-lg-12">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Description*</label>
+							<div class="col-sm-7">
+								<textarea name="jobDescription" id="ticketDescription" data-ng-maxlength="375" data-ng-model="ticket.jobDescription" type="text" class="form-control" style="height:100px" required></textarea>
+							</div>
+							<div data-ng-show="createNewTicketForm.jobDescription.$error.maxlength" class="col-sm-6 col-sm-offset-3" style="color:red">
+								Too many characters!
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-12">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Choose Tax Category*</label>
+							<div class="col-sm-7">
+								<select data-ng-model="ticket.taxCategoryId" data-ng-change="updateTotalPrices()" class="form-control" required >
+									<option data-ng-repeat="cat in taxCategories" value="{{ cat.taxCategoryId }}">{{ cat.taxCategory1 }}</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Location<br/>
+								Number</label>
+							<div class="col-sm-7">
+								<input data-ng-model="ticket.locationNumber" type="text" class="form-control" />
+							</div>
+						</div>
+					</div>
+					<div data-ng-if="ticket.taxCategoryId === '1' || ticket.taxCategoryId === '4' || ticket.taxCategoryId === '5'" class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Rig<br/>Number*</label>
+							<div class="col-sm-7">
+								<input data-ng-model="ticket.rigNumber" type="text" class="form-control" required />
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Customer PO</label>
+							<div class="col-sm-7">
+								<input data-ng-model="ticket.customerPo" type="text" class="form-control" />
+							</div>
+						</div>
+					</div>
+					
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Freight Cost</label>
+							<div class="col-sm-7">
+								<input data-ng-model="ticket.freight" data-ng-change="updateTotalPrices()" type="text" class="form-control" />
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-12">
+						<h4 class="mb">
+							<i class="fa fa-angle-right"></i> Ticket Items <button class="btn btn-warning btn-sm" data-ng-click="openAddTicketItemModal(1005)"><i class="fa fa-plus"></i> Add Material Item</button> <button class="btn btn-warning btn-sm" data-ng-click="openAddEmployeeTimeModal()"><i class="fa fa-plus"></i> Add Employee Time</button> <button class="btn btn-warning btn-sm" data-ng-click="openAddTicketItemModal(1)"><i class="fa fa-plus"></i> Add Equipment</button>
+						</h4>
+					</div>
+					<div data-ng-if="ticket.ticketItems.length === 0" class="col-lg-12" style="margin-bottom: 30px">
+						<h4 style="color: #cccccc">
+							There are no ticket items for this ticket yet.
+						</h4>
+					</div>
+					
+					
+					<div data-ng-if="ticket.ticketItems.length > 0" id="ticketItemsContainer" class="col-lg-12" style="margin-bottom:30px">
+						<div class="content-panel">
+							<section id="unseen">
+								<table class="table table-bordered table-striped table-condensed">
+									<thead>
+										<tr>
+											<th>Description</th>
+											<th>Rate</th>
+											<th>Qty</th>
+											<th>Total</th>
+											<th></th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr data-ng-repeat="item in ticket.ticketItems track by $index">
+											<td>{{ item.productDescription }}</td>
+											<td>{{ item.pricePerUnit | currency : '$' : 2 }}/{{ item.ticketItemUnitType }}</td>
+											<td>{{ item.qtyUnits }}</td>
+											<td>{{ item.qtyUnits * item.pricePerUnit | currency : '$' : 2  }} </td>
+											<td>
+												<a href="javascript:void(0)" data-ng-click="deleteTicketItem($index)" class="btn btn-danger btn-sm"><i class="fa fa-times"></i> Remove</a>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</section>
+						</div>
+					</div>
+					<div class="col-lg-12">
+						<div class="well col-lg-6">
+							Material: {{ ticket.totalSection.materialSubTotal | currency : '$' : 2 }}<br/>
+							Labor/Equipment: {{ ticket.totalSection.laborAndEquipmentSubTotal | currency : '$' : 2 }}<br/>
+							Freight: {{ ticket.freight | currency : '$' : 2}}<br/>
+						</div>
+						<div class="col-lg-1"></div>
+						<div class="well col-lg-5">
+							Taxes: {{ ticket.totalSection.totalTaxes | currency : '$' : 2 }}<br/>
+							<span style="font-size:2em">Total: {{ ticket.totalSection.grandTotal | currency : '$' : 2 }}</span><br/>
+						</div>
+					</div>
+
+					<div class="col-lg-12">
+						<div class="form-group">
+							<div class="col-lg-12">
+								<button data-ng-disabled="createNewTicketForm.$invalid || ticket.ticketItems.length === 0" data-ng-click="updateATicket()" class="btn btn-info">Update Ticket</button>
+								<button data-ng-disabled="createNewTicketForm.$invalid || ticket.ticketItems.length === 0" data-ng-click="createATicket('edit')" class="btn btn-info">Create Ticket</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

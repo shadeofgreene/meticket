@@ -1,0 +1,38 @@
+﻿<h3><i class="fa fa-angle-right"></i> Add Unit Type</h3>
+<div class="row mt">
+	<div class="col-lg-12">
+		<div class="form-panel">
+			<h4 class="mb">
+				<i class="fa fa-angle-right"></i> New Unit Type Information
+			</h4>
+			<form name="addNewUnitTypeForm" class="form-horizontal style-form" data-ng-submit="addNewUnitType()" novalidate>
+				<div class="row">
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Unit Type Name</label>
+							<div class="col-sm-7">
+								<input data-ng-model="newUnitType.unitTypeName" type="text" class="form-control" required />
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="form-group">
+							<label class="col-sm-3 control-label">Unit Type Short Name</label>
+							<div class="col-sm-7">
+								<input data-ng-model="newUnitType.unitTypeShortName" type="text" class="form-control" required />
+							</div>
+						</div>
+					</div>
+
+					<div class="col-lg-12">
+						<div class="form-group">
+							<div class="col-sm-12">
+								<button type="submit" data-ng-disabled="addNewUnitTypeForm.$invalid" class="btn btn-info">Save Unit Type</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

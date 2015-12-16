@@ -1,0 +1,51 @@
+﻿<h3><i class="fa fa-angle-right"></i> Product Types</h3>
+<!-- Modal -->
+<div class="modal fade" id="confirmRemoveProductTypeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">Sure you want to remove this product type "{{ removeProductTypeObject.productTypeName }}"?</h4>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button class="btn btn-success" data-ng-click="makeProductTypeInactive()">Yes</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-sm-12">
+		<a href="#/add-product-type" class="btn btn-info"><i class="fa fa-plus-circle"></i> Add Product Type</a>
+	</div>
+</div>
+<div id="customerListContainer" class="row mt">
+	<div class="col-lg-12">
+		<div class="content-panel">
+			<h4><i class="fa fa-angle-right"></i> Product Type List</h4>
+			<section id="unseen">
+				<table class="table table-bordered table-striped table-condensed">
+					<thead>
+						<tr>
+							<th>Product Type Name</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-ng-repeat="productType in productTypes">
+							<td>{{ productType.productTypeName }}</td>
+						
+							<td>
+								<!--<a href="javascript:void(0)" data-ng-click="editCustomerModal(product)" class="btn btn-success btn-sm"><i class="fa fa-pencil"></i> Edit</a>
+								<button data-ng-click="makeCustomerInactiveModal(customer.customerId, customer.customerName)" class="btn btn-danger btn-sm"><i class="fa fa-times"></i> Remove</button>-->
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</section>
+		</div>
+	</div>
+</div>
+
+

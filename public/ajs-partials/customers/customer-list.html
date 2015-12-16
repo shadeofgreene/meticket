@@ -1,0 +1,158 @@
+﻿<h3><i class="fa fa-angle-right"></i> Customers</h3>
+<!-- Modal -->
+<div class="modal fade" id="confirmMakeCustomerInactiveModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">Sure you want to remove the customer "{{ makeCustomerInactiveObject.customerName }}"?</h4>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button class="btn btn-success" data-ng-click="makeCustomerInactive()">Yes</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="displayOfficeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">{{ displayOfficeObject.officeName }}</h4>
+			</div>
+			<form name="updateOfficeForm" class="form-horizontal style-form" data-ng-submit="updateOffice()" novalidate>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-sm-12">
+
+							<div class="row">
+								<div class="col-lg-12">
+									<div class="form-group">
+										<label class="col-sm-2 control-label">Office Name</label>
+										<div class="col-sm-8">
+											<input data-ng-model="displayOfficeObject.officeName" data-ng-disabled="displayOfficeFormDisabled" type="text" class="form-control" required />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-3 control-label">Address 1</label>
+										<div class="col-sm-7">
+											<input data-ng-model="displayOfficeObject.officeAddress1" data-ng-disabled="displayOfficeFormDisabled" type="text" class="form-control" required />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-3 control-label">Address 2</label>
+										<div class="col-sm-7">
+											<input data-ng-model="displayOfficeObject.officeAddress2" data-ng-disabled="displayOfficeFormDisabled" type="text" class="form-control" />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-3 control-label">City</label>
+										<div class="col-sm-7">
+											<input data-ng-model="displayOfficeObject.officeCity" data-ng-disabled="displayOfficeFormDisabled" type="text" class="form-control" required />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-3 control-label">State</label>
+										<div class="col-sm-7">
+											<input data-ng-model="displayOfficeObject.officeState" data-ng-disabled="displayOfficeFormDisabled" type="text" class="form-control" required />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-3 control-label">Zip</label>
+										<div class="col-sm-7">
+											<input data-ng-model="displayOfficeObject.officeZip" data-ng-disabled="displayOfficeFormDisabled" type="text" class="form-control" required />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-3 control-label">Primary Phone</label>
+										<div class="col-sm-7">
+											<input data-ng-model="displayOfficeObject.officePhonePrimary" data-ng-disabled="displayOfficeFormDisabled" type="text" class="form-control" required />
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label class="col-sm-3 control-label">Secondary Phone</label>
+										<div class="col-sm-7">
+											<input data-ng-model="displayOfficeObject.officePhoneSecondary" data-ng-disabled="displayOfficeFormDisabled" type="text" class="form-control" />
+										</div>
+									</div>
+								</div>
+								<input type="hidden" data-ng-model="displayOfficeObject.customerId" />
+								<div class="col-lg-12">
+									<div class="form-group">
+										<div class="col-sm-12 text-left">
+											<a class="btn btn-default text-left" data-ng-click="toggleEnableDisplayOffice()">Enable/Disable Edit</a>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button type="submit" data-ng-disabled="updateOfficeForm.$invalid" class="btn btn-info">Update Office</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-sm-12">
+		<a href="#/add-customer" class="btn btn-info"><i class="fa fa-plus-circle"></i> Add Customer</a>
+	</div>
+</div>
+<div id="customerListContainer" class="row mt">
+	<div class="col-lg-12">
+		<div class="content-panel">
+			<h4><i class="fa fa-angle-right"></i> Customer List</h4>
+			<section id="unseen">
+				<table class="table table-bordered table-striped table-condensed">
+					<thead>
+						<tr>
+							<th>Customer Name</th>
+							<th>Notes</th>
+							<th class="numeric">Offices</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-ng-repeat="customer in customers | orderBy:'-customerName': true">
+							<td>{{ customer.customerName }}</td>
+							<td>{{ customer.notes }}</td>
+							<td>
+								<button class="btn btn-default btn-xs"
+								        data-ng-repeat="office in customer.offices"
+								        data-ng-click="displayOfficeModal(office.officeId)">
+									{{ office.officeName }}
+								</button>
+								<button class="btn btn-info btn-xs" data-ng-click="addOfficeForThisCustomer(customer.customerId, customer.customerName)">Add Office</button>
+							</td>
+							<td>
+								<a href="javascript:void(0)" data-ng-click="editCustomerModal(product)" class="btn btn-success btn-sm"><i class="fa fa-pencil"></i> Edit</a>
+								<button data-ng-click="makeCustomerInactiveModal(customer.customerId, customer.customerName)" class="btn btn-danger btn-sm"><i class="fa fa-times"></i> Remove</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</section>
+		</div>
+	</div>
+</div>
+
+

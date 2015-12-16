@@ -1,0 +1,60 @@
+﻿<h3><i class="fa fa-angle-right"></i> Products</h3>
+<div class="modal fade" id="removeProductModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">Sure you want to remove the product "{{ removeProductWorking.productName }}"?</h4>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button class="btn btn-success" data-ng-click="removeProduct()">Yes</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-sm-12">
+		<a href="#/add-product" class="btn btn-info"><i class="fa fa-plus-circle"></i> Add Product</a>
+	</div>
+</div>
+<div id="customerListContainer" class="row mt">
+	<div class="col-lg-12">
+		<div class="content-panel">
+			<h4><i class="fa fa-angle-right"></i> Product List</h4>
+			<section id="unseen">
+				<table class="table table-bordered table-striped table-condensed">
+					<thead>
+						<tr>
+							<th>Product Name</th>
+							<th>Type</th>
+							<th>Price</th>
+							<th>Serial #</th>
+							<th>Vendor</th>
+							<th>Model</th>
+							<th>Description</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-ng-repeat="product in products">
+							<td>{{ product.Product.productName }}</td>
+							<td>{{ product.ProductType.productTypeName }}</td>
+							<td><span style="font-weight: bold">${{ product.Product.pricePerUnit }}</span> <span class="text-info" style="font-size: .9em">/{{ product.UnitType.unitTypeShortName }}</span></td>
+							<td>{{ product.Product.productSerial }}</td>
+							<td>{{ product.Product.productVendor }}</td>
+							<td>{{ product.Product.productModel }}</td>
+							<td>{{ product.Product.productDescription }}</td>
+							<td>
+								<a href="javascript:void(0)" data-ng-click="editProductPage(product)" class="btn btn-success btn-sm"><i class="fa fa-pencil"></i> Edit</a>
+								<a href="javascript:void(0)" data-ng-click="removeProductModal(product.Product.productId, product.Product.productName)" class="btn btn-danger btn-sm"><i class="fa fa-times"></i> Remove</a>
+
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</section>
+		</div>
+	</div>
+</div>
