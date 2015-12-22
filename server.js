@@ -10,21 +10,22 @@ app.use(bodyParser.json());
 
 app.post('/TryLoginAndGetUser', function(req, res) {
     var user = req.body;
-    //console.log(user);
+    console.log(user);
     if(user.username && user.password) {
-        var checkUser = db.User.find({ userEmail: user.userEmail, userPassword: user.userPassword}, function(err, user) {
+        db.User.find({ 'userEmail': user.username, 'userPassword': user.password}, function(err, checkUser) {
+            console.log(err);
+            console.log(checkUser);
             if(err || !user) {
-                console.log('Invalid credentials');
+                console.log('user not found');
                 res.json('Invalid Credentials');
             } else {
-                //console.log(res.json(checkUser));
-                res.json(checkUser);
+                console.log('user was found');
+                res.json(user);
             }
         });
     }
 });
 
-// test comment
 app.get('/getTickets', function(req, res) {
     db.meticket.ticket.find(function(err, docs) {
         console.log(docs);
