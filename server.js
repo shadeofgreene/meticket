@@ -1,23 +1,24 @@
 var express = require('express');
 var app = express();
 var mongojs = require('mongojs');
-var db = mongojs('MeTicket', ['MeTicket']);
+var collections = ['ticket', 'User'];
+var db = mongojs('MeTicket', ['Ticket', 'User']);
 var bodyParser = require('body-parser');
 
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 
 app.post('/TryLoginAndGetUser', function(req, res) {
-    console.log(req.body);
     var user = req.body;
-    console.log(user);
+    //console.log(user);
     if(user.username && user.password) {
-        var checkUser = db.meticket.user.find({ username: user.username, password: user.password}, function(err, user) {
+        var checkUser = db.User.find({ userEmail: user.userEmail, userPassword: user.userPassword}, function(err, user) {
             if(err || !user) {
                 console.log('Invalid credentials');
                 res.json('Invalid Credentials');
             } else {
-                res.json(user);
+                //console.log(res.json(checkUser));
+                res.json(checkUser);
             }
         });
     }
