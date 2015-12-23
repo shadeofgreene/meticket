@@ -312,7 +312,7 @@ app.controller('NgTicketController', [
 			$scope.ticket.userId = $scope.user.userId;
 			$scope.ticket.ticketItemObjects = $scope.ticket.ticketItems;
 			
-			$http.post(helper.baseUrl + 'public/TicketView/CreateTicketAndReturnTicket', $scope.ticket).success(function(ticket) {
+			$http.post('/CreateTicketAndReturnTicket', $scope.ticket).success(function(ticket) {
 				
 				$scope.ticket = {};
 				$scope.ticket.ticketItems = [];

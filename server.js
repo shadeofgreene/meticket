@@ -26,6 +26,20 @@ app.post('/TryLoginAndGetUser', function(req, res) {
     }
 });
 
+app.post('CreateTicketAndReturnTicket', function(req, res) {
+   var ticket = req.body;
+    console.log(ticket);
+    if(ticket) {
+        db.Ticket.save(ticket, function(err, ticket) {
+            if(!err) {
+                res.json(ticket);
+            } else {
+                res.json('Invalid');
+            }
+        });
+    }
+});
+
 app.get('/getTickets', function(req, res) {
     db.meticket.ticket.find(function(err, docs) {
         console.log(docs);
