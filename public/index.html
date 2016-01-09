@@ -37,7 +37,7 @@
 	<![endif]-->
 </head>
 
-<body>
+<body data-ng-controller="NgGlobalController">
 
 	<section id="container">
 		<!-- **********************************************************************************************************************************************************
@@ -53,8 +53,8 @@
 			<!--logo end-->
 			<div class="nav notify-row" id="top_menu">
 				<!--  notification start -->
+<!--
 				<ul class="nav top-menu">
-					<!-- settings start -->
 					<li class="dropdown">
 						<a data-toggle="dropdown" class="dropdown-toggle" href="index.html#">
 							<i class="fa fa-tasks"></i>
@@ -122,8 +122,7 @@
 							</li>
 						</ul>
 					</li>
-					<!-- settings end -->
-					<!-- inbox dropdown start-->
+					
 					<li id="header_inbox_bar" class="dropdown">
 						<a data-toggle="dropdown" class="dropdown-toggle" href="index.html#">
 							<i class="fa fa-envelope-o"></i>
@@ -187,8 +186,9 @@
 							</li>
 						</ul>
 					</li>
-					<!-- inbox dropdown end -->
+					
 				</ul>
+-->
 				<!--  notification end -->
 			</div>
 			<div class="top-menu">
@@ -213,7 +213,7 @@
 						<img src="/img/default-image.png" class="image-circle" width="60" alt="" />
 							</a>
 					</p>
-					<h5 id="userName" class="centered"></h5>
+					<h5  class="centered">{{currentUserLoggedIn.userFirstName}} {{currentUserLoggedIn.userLastName}}</h5>
 					
 					<li class="mt">
 						<a href="#/home">
@@ -232,6 +232,17 @@
 							<li><a href="#/ticket-list">Ticket List</a></li>
 						</ul>
 					</li>
+					
+					<li class="sub-menu">
+						<a href="#">
+							<i class="fa fa-list"></i>
+							<span>Data Management</span>
+						</a>
+						<ul>
+							<li><a data-ng-click="syncAllData()">Sync All Data</a></li>
+						</ul>
+					</li>
+<!--
 					<li class="sub-menu">
 						<a href="#">
 							<i class="fa fa-list"></i>
@@ -245,6 +256,7 @@
 							@*<li><a id="addCustomerOfficeLink" href="#/add-customer-office">Add Office</a></li>*@
 						</ul>
 					</li>
+-->
 				</ul>
 				<!-- sidebar menu end-->
 			</div>
@@ -383,6 +395,9 @@
 	<script src="/ajs-controllers/NgProductController.js"></script>
 	
 	<script src="/ajs-controllers/NgTicketController.js"></script>
+	
+	<script src="/ajs-controllers/NgGlobalController.js"></script>
+	
 
 	<script type="application/javascript">
 		$(document).ready(function () {

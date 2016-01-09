@@ -1,6 +1,5 @@
-debugger;
 var app = angular.module('app', ['ngRoute', 'ui.bootstrap', 'angucomplete-alt']);
-
+debugger;
 app.config(function ($routeProvider) {
 	$routeProvider.when('/home', {
 		controller: 'NgHomeController',
@@ -70,6 +69,7 @@ app.config(function ($routeProvider) {
 app.run(['$rootScope', '$location', 'Auth', function ($rootScope, $location, Auth) {
 	$rootScope.$on('$routeChangeStart', function (event) {
 		var user = Auth.isLoggedIn();
+		debugger;
 		if (!user) {
 			
 			console.log('DENY');
@@ -88,30 +88,57 @@ app.run(['$rootScope', '$location', 'Auth', function ($rootScope, $location, Aut
 		}
 	});
 
-	$rootScope.logout = function () {
-		
-		localStorage.clear();
-		$location.path('/login');
-	}
+//	$rootScope.logout = function () {
+//		
+//		localStorage.clear();
+//		$location.path('/login');
+//	}
 }]);
 
-app.factory('Auth', function () {
+app.factory('Auth', function ($rootScope, $location) {
 	
-	var user = null;
-	var localUser = localStorage.getItem('user');
-	if (localUser) {
-		user = JSON.parse(localStorage.getItem('user'));
-	}
+//	var user = null;
+//	var localUser = localStorage.getItem('user');
+//	if (localUser) {
+//		user = JSON.parse(localStorage.getItem('user'));
+//	}
 
 	return {
+		currentUser: {},
 		setUser: function (aUser) {
-			
-			user = aUser;
+			debugger;
+			//user = aUser[0];
+			this.currentUser = aUser;
 			localStorage.setItem('user', JSON.stringify(aUser));
+			$rootScope.$broadcast('currentUserUpdated');
 		},
 		isLoggedIn: function () {
+			debugger;
+			if(this.currentUser.userId) {
+				//this.currentUser = user;
+				$rootScope.$broadcast('currentUserUpdated');
+				return this.currentUser;
+			} else if(localStorage.getItem('user')) {
+				var localUser = JSON.parse(localStorage.getItem('user'));
+				if(localUser.userId) {
+					this.currentUser = localUser;
+					$rootScope.$broadcast('currentUserUpdated');
+					return this.currentUser;
+				}
+
+			} else {
+				this.currentUser = {};
+				$rootScope.$broadcast('currentUserUpdated');
+				return false;
+			}
+		},
+		removeUser: function() {
+			debugger;
+			this.currentUser = {};
+			localStorage.removeItem('user');
 			
-			return(user) ? user : false;
+			$rootScope.$broadcast('currentUserUpdated');
+			$location.path('/login');
 		}
 	}
 });

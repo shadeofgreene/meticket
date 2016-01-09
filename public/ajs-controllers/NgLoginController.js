@@ -29,39 +29,27 @@ app.controller('NgLoginController', ['$scope', '$http', '$location', 'Auth', fun
 		var password = $scope.loginPassword;
 
 		var data = {
-			'username': username,
-			'password': password
+			'userEmail': username,
+			'userPassword': password
 		}
 		debugger;
 		$http.post('/TryLoginAndGetUser', data).success(function(user) {
 			debugger;
-			Auth.setUser(user);
-			$location.path('/home');
-
+			if(user) {
+				Auth.setUser(user);
+				$location.path('/home');
+			} else {
+				toastr.error('Invalid credentials');
+			}
 		}).error(function(err, error) {
 			debugger;
+			if(err.error) {
+				toastr.error(err.error);
+			}
 		});
 
 		setTimeout(function () {
 			$('#loadingModal').modal('hide');
-		}, 2000);
-
-		debugger;
-
-		//$.ajax({
-		//	url: helper.baseUrl + 'TicketSystem/LoginView/TryLoginAndGetUser',
-		//	contentType: 'application/json',
-		//	type: 'POST',
-		//	data: JSON.stringify(data)
-		//}).done(function (user) {
-		//	debugger;
-		//	Auth.setUser(user);
-		//	localStorage.setItem('user', JSON.stringify(user));
-		//}).fail(function(error, err) {
-		//	debugger;
-		//});
-		//setTimeout(function() {
-		//	$('#loadingModal').modal('hide');
-		//}, 2000);
+		}, 3000);
 	};
 }]);

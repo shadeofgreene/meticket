@@ -4,7 +4,7 @@ app.controller('NgTicketController', [
 		$scope.tickets = [];
 		$scope.ticketsForCurrentUser = [];
 		$scope.getTicketList = function() {
-			var url = helper.baseUrl + 'public/TicketView/GetTickets';
+			var url = '/GetTickets';
 			$http.get(url).success(function (tickets) {
 				$scope.tickets = tickets;
 				$scope.initializeTicketsForCurrentUser(tickets);
