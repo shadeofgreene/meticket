@@ -96,12 +96,15 @@ app.post('/SyncAllData', function (req, res) {
     console.log('#############################################################')
     console.log('#############################################################')
     console.log('#############################################################')
+	
+	var hostConstant = 'meticket.briangreenedev.com';
+	
     var user = req.body;
     if (user.userId) {
         console.log('userId: ' + user.userId);
 
         ///////// GET TICKETS /////////////
-        ///////////////////////////////////
+        ///////////////////////////////////		
         var userTickets = '';
         var options = {
             host: 'meticket.briangreenedev.com',
@@ -136,49 +139,63 @@ app.post('/SyncAllData', function (req, res) {
                     }
                 });
 
-                ///////// GET CUSTOMERS ///////////
+                ///////// GET DATA ////////////////
                 ///////////////////////////////////
-                var customerOptions = {
-                    host: 'meticket.briangreenedev.com',
-                    path: '/TicketSystem/CustomerView/GetCustomers',
-                    method: 'GET'
-                }
-                var customersString = '';
-                http.get(options, function (customerRes) {
-                    customerRes.setEncoding('utf8');
-                    customerRes.on('data', function (chunk) {
-                        customersString += chunk;
-                    });
-                    customerRes.on('end', function (data) {
-                        db.Customer.find(function (err, customersLocal) {
-                            if (!err) {
-                                // get customers from server
-                                var serverCustomers = JSON.parse(customersString);
-
-                                // update local with server customers
-                                _.each(serverCustomers, function (customer) {
-                                    var existingCustomer = _.find(customersLocal, function (localCustomer) {
-                                        return parseInt(ticket.ticketId) === parseInt(locTicket.ticketId);
-                                    })
-                                    if (!existingTicket) {
-                                        // save ticket to local
-                                        console.log(ticket);
-                                        db.Ticket.save(ticket);
-                                    }
-                                });
-                            }
-                        });
-
-                        ///////// GET CUSTOMERS ///////////
-                        ///////////////////////////////////
-                    })
-                });
+				syncRecords(db, hostConstant, '/TicketSystem/CustomerView/GetCustomers', 'GET', 'Customer', 'customerId',
+						   syncRecords(db, hostConstant, '/TicketSystem/CustomerView/GetCustomers', 'GET', 'Customer', 'customerId',
+						   syncRecords(db, hostConstant, '/TicketSystem/CustomerView/GetAllOffices', 'GET', 'Customer', 'customerId',
+						   syncRecords(db, hostConstant, '/TicketSystem/TicketView/GetEmployeeList', 'POST', 'Customer', 'customerId',
+						   syncRecords(db, hostConstant, '/TicketSystem/ProductView/GetProductsByType/1005', 'GET', 'Customer', 'customerId',
+						   syncRecords(db, hostConstant, '/TicketSystem/ProductView/GetProductsByType/1', 'GET', 'Customer', 'customerId',
+						   syncRecords(db, hostConstant, '/TicketSystem/TicketView/GetTaxCategories', 'POST', 'Customer', 'customerId',
+						   syncRecords(db, hostConstant, '/TicketSystem/ProductView/GetProductTypes', 'POST', 'Customer', 'customerId',
+						   syncRecords(db, hostConstant, '/TicketSystem/ProductView/GetUnitTypes', 'POST', 'Customer', 'customerId',
+						   syncRecords(db, hostConstant, '/TicketSystem/ProductView/GetProductsByType/1005', 'POST', 'Customer', 'customerId',
+						   function() {
+					console.log('Finished syncing data...');
+				}))))))))));
+				
+//                var customerOptions = {
+//                    host: 'meticket.briangreenedev.com',
+//                    path: '/TicketSystem/CustomerView/GetCustomers',
+//                    method: 'GET'
+//                }
+//                var customersString = '';
+//                http.get(options, function (customerRes) {
+//                    customerRes.setEncoding('utf8');
+//                    customerRes.on('data', function (chunk) {
+//                        customersString += chunk;
+//                    });
+//                    customerRes.on('end', function (data) {
+//                        db.Customer.find(function (err, customersLocal) {
+//                            if (!err) {
+//                                // get customers from server
+//                                var serverCustomers = JSON.parse(customersString);
+//
+//                                // update local with server customers
+//                                _.each(serverCustomers, function (customer) {
+//                                    var existingCustomer = _.find(customersLocal, function (localCustomer) {
+//                                        return parseInt(ticket.ticketId) === parseInt(locTicket.ticketId);
+//                                    })
+//                                    if (!existingTicket) {
+//                                        // save ticket to local
+//                                        console.log(ticket);
+//                                        db.Ticket.save(ticket);
+//                                    }
+//                                });
+//                            }
+//                        });
+//
+//                        ///////// GET CUSTOMERS ///////////
+//                        ///////////////////////////////////
+//                    })
+//                });
             })
         });
     }
 })
 
-function syncRecords(host, path, method, collection, collectionIdKey, callback) {
+function syncRecords(db, host, path, method, collection, collectionIdKey, callback) {
     var options = {
         host: host,
         path: path,
@@ -191,6 +208,8 @@ function syncRecords(host, path, method, collection, collectionIdKey, callback) 
             recordString += chunk;
         });
         serverRes.on('end', function (data) {
+			console.log(recordString);
+			console.log(db);
             db.getCollection(collection).find(function (err, localRecords) {
                 if (!err) {
                     // get customers from server
