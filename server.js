@@ -96,9 +96,9 @@ app.post('/SyncAllData', function (req, res) {
     console.log('#############################################################')
     console.log('#############################################################')
     console.log('#############################################################')
-	
-	var hostConstant = 'meticket.briangreenedev.com';
-	
+
+    var hostConstant = 'meticket.briangreenedev.com';
+
     var user = req.body;
     if (user.userId) {
         console.log('userId: ' + user.userId);
@@ -112,6 +112,7 @@ app.post('/SyncAllData', function (req, res) {
             method: 'GET'
         };
         http.get(options, function (ticketRes) {
+
             ticketRes.setEncoding('utf8');
             ticketRes.on('data', function (chunk) {
                 userTickets += chunk;
@@ -139,99 +140,316 @@ app.post('/SyncAllData', function (req, res) {
                     }
                 });
 
-                ///////// GET DATA ////////////////
+                ///////// GET CUSTOMERS ///////////
                 ///////////////////////////////////
-				syncRecords(db, hostConstant, '/TicketSystem/CustomerView/GetCustomers', 'GET', 'Customer', 'customerId',
-						   syncRecords(db, hostConstant, '/TicketSystem/CustomerView/GetCustomers', 'GET', 'Customer', 'customerId',
-						   syncRecords(db, hostConstant, '/TicketSystem/CustomerView/GetAllOffices', 'GET', 'Customer', 'customerId',
-						   syncRecords(db, hostConstant, '/TicketSystem/TicketView/GetEmployeeList', 'POST', 'Customer', 'customerId',
-						   syncRecords(db, hostConstant, '/TicketSystem/ProductView/GetProductsByType/1005', 'GET', 'Customer', 'customerId',
-						   syncRecords(db, hostConstant, '/TicketSystem/ProductView/GetProductsByType/1', 'GET', 'Customer', 'customerId',
-						   syncRecords(db, hostConstant, '/TicketSystem/TicketView/GetTaxCategories', 'POST', 'Customer', 'customerId',
-						   syncRecords(db, hostConstant, '/TicketSystem/ProductView/GetProductTypes', 'POST', 'Customer', 'customerId',
-						   syncRecords(db, hostConstant, '/TicketSystem/ProductView/GetUnitTypes', 'POST', 'Customer', 'customerId',
-						   syncRecords(db, hostConstant, '/TicketSystem/ProductView/GetProductsByType/1005', 'POST', 'Customer', 'customerId',
-						   function() {
-					console.log('Finished syncing data...');
-				}))))))))));
-				
-//                var customerOptions = {
-//                    host: 'meticket.briangreenedev.com',
-//                    path: '/TicketSystem/CustomerView/GetCustomers',
-//                    method: 'GET'
-//                }
-//                var customersString = '';
-//                http.get(options, function (customerRes) {
-//                    customerRes.setEncoding('utf8');
-//                    customerRes.on('data', function (chunk) {
-//                        customersString += chunk;
-//                    });
-//                    customerRes.on('end', function (data) {
-//                        db.Customer.find(function (err, customersLocal) {
-//                            if (!err) {
-//                                // get customers from server
-//                                var serverCustomers = JSON.parse(customersString);
-//
-//                                // update local with server customers
-//                                _.each(serverCustomers, function (customer) {
-//                                    var existingCustomer = _.find(customersLocal, function (localCustomer) {
-//                                        return parseInt(ticket.ticketId) === parseInt(locTicket.ticketId);
-//                                    })
-//                                    if (!existingTicket) {
-//                                        // save ticket to local
-//                                        console.log(ticket);
-//                                        db.Ticket.save(ticket);
-//                                    }
-//                                });
-//                            }
-//                        });
-//
-//                        ///////// GET CUSTOMERS ///////////
-//                        ///////////////////////////////////
-//                    })
-//                });
-            })
+                var customerOptions = { //-*
+                    host: hostConstant,
+                    path: '/TicketSystem/CustomerView/GetCustomers', //-*
+                    method: 'GET' //-*
+                }
+                http.get(customerOptions, function (sResponse) { //-*
+                    var chunks = '';
+                    sResponse.setEncoding('utf8');
+                    sResponse.on('data', function (chunk) {
+                        chunks += chunk;
+                    });
+                    sResponse.on('end', function () {
+                        db.Customer.find(function (err, lCustomers) { //-*
+                            if (!err) {
+                                // get records from server
+                                var sCustomers = JSON.parse(chunks); //-*
+
+                                // update local with server records
+                                _.each(sCustomers, function (sCustomer) { //-*
+                                    var existingLocalRecord = _.find(lCustomers, function (lCustomer) { //-*
+                                        return parseInt(sCustomer.customerId) === parseInt(lCustomer.customerId); //-*
+                                    })
+                                    if (!existingLocalRecord) {
+                                        // save record to local
+                                        console.log(existingLocalRecord);
+                                        db.Customer.save(existingLocalRecord); //-*
+                                    }
+                                });
+                            }
+                        });
+
+                        ///////// GET OFFICES ///////////
+                        ///////////////////////////////////
+                        var officeOptions = { //-*
+                            host: hostConstant,
+                            path: 'TicketSystem/CustomerView/GetAllOffices', //-*
+                            method: 'GET' //-*
+                        }
+                        http.get(officeOptions, function (sResponse) { //-*
+                            var chunks = '';
+                            sResponse.setEncoding('utf8');
+                            sResponse.on('data', function (chunk) {
+                                chunks += chunk;
+                            });
+                            sResponse.on('end', function () {
+                                db.Office.find(function (err, lOffices) { //-*
+                                    if (!err) {
+                                        // get records from server
+                                        var sOffices = JSON.parse(chunks); //-*
+
+                                        // update local with server records
+                                        _.each(sOffices, function (sOffice) { //-*
+                                            var existingLocalRecord = _.find(lOffices, function (lOffice) { //-*
+                                                return parseInt(sOffice.officeId) === parseInt(lOffice.officeId); //-*
+                                            })
+                                            if (!existingLocalRecord) {
+                                                // save record to local
+                                                console.log(existingLocalRecord);
+                                                db.Office.save(existingLocalRecord); //-*
+                                            }
+                                        });
+                                    }
+                                });
+
+                                ///////// GET EMPLOYEES ///////////
+                                ///////////////////////////////////
+                                var employeeOptions = {
+                                    host: hostConstant,
+                                    path: '/TicketSystem/TicketView/GetEmployeeList',
+                                    method: 'POST'
+                                }
+
+                                http.get(employeeOptions, function (sResponse) { //-*
+                                    var chunks = '';
+                                    sResponse.setEncoding('utf8');
+                                    sResponse.on('data', function (chunk) {
+                                        chunks += chunk;
+                                    });
+                                    sResponse.on('end', function () {
+                                        db.User.find(function (err, lEmployees) { //-*
+                                            if (!err) {
+                                                // get records from server
+                                                var sEmployees = JSON.parse(chunks); //-*
+
+                                                // update local with server records
+                                                _.each(sEmployees, function (sEmployee) { //-*
+                                                    var existingLocalRecord = _.find(lEmployees, function (lEmployee) { //-*
+                                                        return parseInt(lEmployee.userId) === parseInt(sEmployee.userId); //-*
+                                                    })
+                                                    if (!existingLocalRecord) {
+                                                        // save record to local
+                                                        console.log(existingLocalRecord);
+                                                        db.User.save(existingLocalRecord); //-*
+                                                    }
+                                                });
+                                            }
+                                        });
+
+                                        ///////// GET PRODUCTS BY 1005 ///////
+                                        //////////////////////////////////////
+                                        var product1005Options = { //-*
+                                            host: hostConstant,
+                                            path: '/TicketSystem/ProductView/GetProductsByType/1005', //-*
+                                            method: 'GET' //-*
+                                        }
+                                        http.get(product1005Options, function (sResponse) { //-*
+                                            var chunks = '';
+                                            sResponse.setEncoding('utf8');
+                                            sResponse.on('data', function (chunk) {
+                                                chunks += chunk;
+                                            });
+                                            sResponse.on('end', function () {
+                                                db.Product.find(function (err, lProducts) { //-*
+                                                    if (!err) {
+                                                        // get records from server
+                                                        var sProducts = JSON.parse(chunks); //-*
+
+                                                        // update local with server records
+                                                        _.each(sProducts, function (sProduct) { //-*
+                                                            var existingLocalRecord = _.find(lProducts, function (lProduct) { //-*
+                                                                return parseInt(sProduct.productId) === parseInt(lProduct.productId); //-*
+                                                            })
+                                                            if (!existingLocalRecord) {
+                                                                // save record to local
+                                                                console.log(existingLocalRecord);
+                                                                db.Product.save(existingLocalRecord); //-*
+                                                            }
+                                                        });
+                                                    }
+                                                });
+
+                                                ///////// GET PRODUCTS BY 1 ///////
+                                                //////////////////////////////////////
+                                                var product1Options = { //-*
+                                                    host: hostConstant,
+                                                    path: '/TicketSystem/ProductView/GetProductsByType/1', //-*
+                                                    method: 'GET' //-*
+                                                }
+                                                http.get(product1Options, function (sResponse) { //-*
+                                                    var chunks = '';
+                                                    sResponse.setEncoding('utf8');
+                                                    sResponse.on('data', function (chunk) {
+                                                        chunks += chunk;
+                                                    });
+                                                    sResponse.on('end', function () {
+                                                        db.Product.find(function (err, lProducts) { //-*
+                                                            if (!err) {
+                                                                // get records from server
+                                                                var sProducts = JSON.parse(chunks); //-*
+
+                                                                // update local with server records
+                                                                _.each(sProducts, function (sProduct) { //-*
+                                                                    var existingLocalRecord = _.find(lProducts, function (lProduct) { //-*
+                                                                        return parseInt(sProduct.productId) === parseInt(lProduct.productId); //-*
+                                                                    })
+                                                                    if (!existingLocalRecord) {
+                                                                        // save record to local
+                                                                        console.log(existingLocalRecord);
+                                                                        db.Product.save(existingLocalRecord); //-*
+                                                                    }
+                                                                });
+                                                            }
+                                                        });
+
+                                                        ///////// GET TAX CATEGORIES ///////////
+                                                        ////////////////////////////////////////
+                                                        var taxCatOptions = { //-*
+                                                            host: hostConstant,
+                                                            path: '/TicketSystem/TicketView/GetTaxCategories', //-*
+                                                            method: 'POST' //-*
+                                                        }
+                                                        http.get(taxCatOptions, function (sResponse) { //-*
+                                                            var chunks = '';
+                                                            sResponse.setEncoding('utf8');
+                                                            sResponse.on('data', function (chunk) {
+                                                                chunks += chunk;
+                                                            });
+                                                            sResponse.on('end', function () {
+                                                                db.TaxCategory.find(function (err, lTaxCats) { //-*
+                                                                    if (!err) {
+                                                                        // get records from server
+                                                                        var sTaxCats = JSON.parse(chunks); //-*
+
+                                                                        // update local with server records
+                                                                        _.each(sTaxCats, function (sTaxCat) { //-*
+                                                                            var existingLocalRecord = _.find(lTaxCats, function (lTaxCat) { //-*
+                                                                                return parseInt(sTaxCat.taxCategoryId) === parseInt(lTaxCat.taxCategoryId); //-*
+                                                                            })
+                                                                            if (!existingLocalRecord) {
+                                                                                // save record to local
+                                                                                console.log(existingLocalRecord);
+                                                                                db.TaxCategory.save(existingLocalRecord); //-*
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                });
+                                                            });
+
+                                                            ///////// GET PRODUCT TYPES ///////
+                                                            ///////////////////////////////////
+                                                            var productTypeOptions = { //-*
+                                                                host: hostConstant,
+                                                                path: '/TicketSystem/ProductView/GetProductTypes', //-*
+                                                                method: 'POST' //-*
+                                                            }
+                                                            http.get(productTypeOptions, function (sResponse) { //-*
+                                                                var chunks = '';
+                                                                sResponse.setEncoding('utf8');
+                                                                sResponse.on('data', function (chunk) {
+                                                                    chunks += chunk;
+                                                                });
+                                                                sResponse.on('end', function () {
+                                                                    db.ProductType.find(function (err, lProductTypes) { //-*
+                                                                        if (!err) {
+                                                                            // get records from server
+                                                                            var sProductTypes = JSON.parse(chunks); //-*
+
+                                                                            // update local with server records
+                                                                            _.each(sProductTypes, function (sProductType) { //-*
+                                                                                var existingLocalRecord = _.find(lProductTypes, function (lProductType) { //-*
+                                                                                    return parseInt(sProductType.productTypeId) === parseInt(lProductType.productTypeId); //-*
+                                                                                })
+                                                                                if (!existingLocalRecord) {
+                                                                                    // save record to local
+                                                                                    console.log(existingLocalRecord);
+                                                                                    db.ProductType.save(existingLocalRecord); //-*
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    });
+
+                                                                    ///////// GET UNIT TYPES ///////////
+                                                                    ///////////////////////////////////
+                                                                    var unitTypeOptions = { //-*
+                                                                        host: hostConstant,
+                                                                        path: '/TicketSystem/ProductView/GetUnitTypes', //-*
+                                                                        method: 'POST' //-*
+                                                                    }
+                                                                    http.get(unitTypeOptions, function (sResponse) { //-*
+                                                                        var chunks = '';
+                                                                        sResponse.setEncoding('utf8');
+                                                                        sResponse.on('data', function (chunk) {
+                                                                            chunks += chunk;
+                                                                        });
+                                                                        sResponse.on('end', function () {
+                                                                            db.UnitType.find(function (err, lUnitTypes) { //-*
+                                                                                if (!err) {
+                                                                                    // get records from server
+                                                                                    var sUnitTypes = JSON.parse(chunks); //-*
+
+                                                                                    // update local with server records
+                                                                                    _.each(sUnitTypes, function (sUnitType) { //-*
+                                                                                        var existingLocalRecord = _.find(lUnitTypes, function (lUnitType) { //-*
+                                                                                            return parseInt(sUnitType.unitTypeId) === parseInt(lUnitType.unitTypeId); //-*
+                                                                                        })
+                                                                                        if (!existingLocalRecord) {
+                                                                                            // save record to local
+                                                                                            console.log(existingLocalRecord);
+                                                                                            db.UnitType.save(existingLocalRecord); //-*
+                                                                                        }
+                                                                                    });
+                                                                                }
+                                                                            });
+
+                                                                            /////////////////////
+                                                                            ////// FINISHED /////
+                                                                            /////////////////////
+                                                                            
+                                                                            res.status(200).json('perfect!');
+
+                                                                        });
+                                                                    });
+                                                                });
+                                                            });
+                                                        });
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+                        });
+
+
+                        //                        ///////// GET DATA ////////////////
+                        //                        ///////////////////////////////////
+                        //                        syncRecords(db, hostConstant, '/TicketSystem/CustomerView/GetCustomers', 'GET', 'Customer', 'customerId',
+                        //                            syncRecords(db, hostConstant, '/TicketSystem/CustomerView/GetCustomers', 'GET', 'Customer', 'customerId',
+                        //                                syncRecords(db, hostConstant, '/TicketSystem/CustomerView/GetAllOffices', 'GET', 'Customer', 'customerId',
+                        //                                    syncRecords(db, hostConstant, '/TicketSystem/TicketView/GetEmployeeList', 'POST', 'Customer', 'customerId',
+                        //                                        syncRecords(db, hostConstant, '/TicketSystem/ProductView/GetProductsByType/1005', 'GET', 'Customer', 'customerId',
+                        //                                            syncRecords(db, hostConstant, '/TicketSystem/ProductView/GetProductsByType/1', 'GET', 'Customer', 'customerId',
+                        //                                                syncRecords(db, hostConstant, '/TicketSystem/TicketView/GetTaxCategories', 'POST', 'Customer', 'customerId',
+                        //                                                    syncRecords(db, hostConstant, '/TicketSystem/ProductView/GetProductTypes', 'POST', 'Customer', 'customerId',
+                        //                                                        syncRecords(db, hostConstant, '/TicketSystem/ProductView/GetUnitTypes', 'POST', 'Customer', 'customerId',
+                        //                                                            syncRecords(db, hostConstant, '/TicketSystem/ProductView/GetProductsByType/1005', 'POST', 'Customer', 'customerId',
+                        //                                                                function () {
+                        //                                                                    console.log('Finished syncing data...');
+                        //                                                                }))))))))));
+
+                    });
+                });
+            });
         });
     }
-})
+});
 
-function syncRecords(db, host, path, method, collection, collectionIdKey, callback) {
-    var options = {
-        host: host,
-        path: path,
-        method: method
-    };
-    var recordString = '';
-    http.get(options, function (serverRes) {
-        serverRes.setEncoding('utf8');
-        serverRes.on('data', function (chunk) {
-            recordString += chunk;
-        });
-        serverRes.on('end', function (data) {
-			console.log(recordString);
-			console.log(db);
-            db.getCollection(collection).find(function (err, localRecords) {
-                if (!err) {
-                    // get customers from server
-                    var serverRecords = JSON.parse(recordString);
-
-                    // update local with server customers
-                    _.each(serverRecords, function (serverRecord) {
-                        var existingRecord = _.find(localRecords, function (localRecord) {
-                            return parseInt(localRecord[collectionIdKey]) === parseInt(serverRecord[collectionIdKey]);
-                        })
-                        if (!existingRecord) {
-                            // save record to local
-                            console.log(ticket);
-                            db.getCollection(collection).save(serverRecord);
-                        }
-                    });
-                }
-            });
-            callback();
-        })
-    });
-}
 
 app.listen(3000);
 console.log('Server running on port 3000');
