@@ -154,6 +154,9 @@ app.post('/SyncAllData', function (req, res) {
                         chunks += chunk;
                     });
                     sResponse.on('end', function () {
+                        if(!db.Customer) {
+                            db.createCollection('Customer');
+                        }
                         db.Customer.find(function (err, lCustomers) { //-*
                             if (!err) {
                                 // get records from server
