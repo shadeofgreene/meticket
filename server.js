@@ -133,10 +133,9 @@ app.post('/SyncCollection', function (req, res) {
                                 var existingLocalRecord = _.find(lOffices, function (lOffice) { //-*
                                     return parseInt(sOffice.officeId) === parseInt(lOffice.officeId); //-*
                                 })
-                                if (!existingLocalRecord) {
+                                if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
                                     // save record to local
-                                    console.log(existingLocalRecord);
-                                    offices.save(existingLocalRecord); //-*
+                                    offices.save(sOffice); //-*
                                 }
                             });
                         }
@@ -170,10 +169,9 @@ app.post('/SyncCollection', function (req, res) {
                                 var existingLocalRecord = _.find(lEmployees, function (lEmployee) { //-*
                                     return parseInt(lEmployee.userId) === parseInt(sEmployee.userId); //-*
                                 })
-                                if (!existingLocalRecord) {
+                                if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
                                     // save record to local
-                                    console.log(existingLocalRecord);
-                                    users.save(existingLocalRecord); //-*
+                                    users.save(sEmployee); //-*
                                 }
                             });
                         }
@@ -191,32 +189,38 @@ app.post('/SyncCollection', function (req, res) {
                 path: '/TicketSystem/TicketView/GetTickets',
                 method: 'GET'
             };
-            http.get(options, function (ticketRes) {
-
-                ticketRes.setEncoding('utf8');
-                ticketRes.on('data', function (chunk) {
-                    userTickets += chunk;
+            http.get(options, function (sResponse) {
+                var chunks = '';
+                sResponse.setEncoding('utf8');
+                sResponse.on('data', function (chunk) {
+                    chunks += chunk;
                 });
-                ticketRes.on('end', function (data) {
-                    db.Ticket.find(function (err, userTicketsLocal) {
+                sResponse.on('end', function (data) {
+                    var tickets = db.collection('Ticket');
+                    tickets.find(function (err, lTickets) {
                         if (!err) {
                             // get tickets from server
                             var records = JSON.parse(userTickets);
-                            var userTicketsServer = _.filter(records, function (record) {
+                            var sTickets = _.filter(records, function (record) {
                                 return record.userId === user.userId;
                             });
 
                             // update local with server tickets
-                            _.each(userTicketsServer, function (ticket) {
-                                var existingTicket = _.find(userTicketsLocal, function (locTicket) {
-                                    return parseInt(ticket.ticketId) === parseInt(locTicket.ticketId);
+                            _.each(sTickets, function (sTicket) {
+                                var existingLocalRecord = _.find(lTickets, function (lTicket) {
+                                    return parseInt(sTicket.ticketId) === parseInt(lTicket.ticketId);
                                 })
-                                if (!existingTicket) {
-                                    // save ticket to local
-                                    console.log(ticket);
-                                    db.Ticket.save(ticket);
+                                if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
+                                    // save record to local
+                                    tickets.save(sTicket); //-*
                                 }
                             });
+                            
+                            // update server with local tickets
+                            _.each(lTickets, function(lTicket) {
+                                
+                            });
+                            
                         }
                     });
                     res.status(200).json({ message: request.collection + ' was synced.'});
@@ -248,10 +252,9 @@ app.post('/SyncCollection', function (req, res) {
                                 var existingLocalRecord = _.find(lProducts, function (lProduct) { //-*
                                     return parseInt(sProduct.productId) === parseInt(lProduct.productId); //-*
                                 })
-                                if (!existingLocalRecord) {
+                                if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
                                     // save record to local
-                                    console.log(existingLocalRecord);
-                                    products.save(existingLocalRecord); //-*
+                                    products.save(sProduct); //-*
                                 }
                             });
                         }
@@ -283,10 +286,9 @@ app.post('/SyncCollection', function (req, res) {
                                 var existingLocalRecord = _.find(lProducts, function (lProduct) { //-*
                                     return parseInt(sProduct.productId) === parseInt(lProduct.productId); //-*
                                 })
-                                if (!existingLocalRecord) {
+                                if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
                                     // save record to local
-                                    console.log(existingLocalRecord);
-                                    products.save(existingLocalRecord); //-*
+                                    products.save(sProduct); //-*
                                 }
                             });
                         }
@@ -301,7 +303,7 @@ app.post('/SyncCollection', function (req, res) {
             var taxCatOptions = { //-*
                 host: hostConstant,
                 path: '/TicketSystem/TicketView/GetTaxCategories', //-*
-                method: 'POST' //-*
+                method: 'GET' //-*
             }
             http.get(taxCatOptions, function (sResponse) { //-*
                 var chunks = '';
@@ -321,10 +323,9 @@ app.post('/SyncCollection', function (req, res) {
                                 var existingLocalRecord = _.find(lTaxCats, function (lTaxCat) { //-*
                                     return parseInt(sTaxCat.taxCategoryId) === parseInt(lTaxCat.taxCategoryId); //-*
                                 })
-                                if (!existingLocalRecord) {
+                                if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
                                     // save record to local
-                                    console.log(existingLocalRecord);
-                                    taxCategories.save(existingLocalRecord); //-*
+                                    taxCategories.save(sTaxCat); //-*
                                 }
                             });
                         }
@@ -333,12 +334,13 @@ app.post('/SyncCollection', function (req, res) {
                 });
             });
         } else if (request.collection === 'UnitType') {
+            console.log('found it');
             ///////// GET UNIT TYPES ///////////
             ///////////////////////////////////
             var unitTypeOptions = { //-*
                 host: hostConstant,
                 path: '/TicketSystem/ProductView/GetUnitTypes', //-*
-                method: 'POST' //-*
+                method: 'GET' //-*
             }
             http.get(unitTypeOptions, function (sResponse) { //-*
                 var chunks = '';
@@ -352,16 +354,14 @@ app.post('/SyncCollection', function (req, res) {
                         if (!err) {
                             // get records from server
                             var sUnitTypes = JSON.parse(chunks); //-*
-
                             // update local with server records
                             _.each(sUnitTypes, function (sUnitType) { //-*
                                 var existingLocalRecord = _.find(lUnitTypes, function (lUnitType) { //-*
                                     return parseInt(sUnitType.unitTypeId) === parseInt(lUnitType.unitTypeId); //-*
                                 })
-                                if (!existingLocalRecord) {
+                                if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
                                     // save record to local
-                                    console.log(existingLocalRecord);
-                                    unitTypes.save(existingLocalRecord); //-*
+                                    unitTypes.save(sUnitType); //-*
                                 }
                             });
                         }
@@ -372,6 +372,7 @@ app.post('/SyncCollection', function (req, res) {
                 });
             });
         } else if (request.collection === 'Customer') {
+            console.log('start');
             ///////// GET CUSTOMERS ///////////
             ///////////////////////////////////
             var customerOptions = { //-*
@@ -380,6 +381,7 @@ app.post('/SyncCollection', function (req, res) {
                 method: 'GET' //-*
             }
             http.get(customerOptions, function (sResponse) { //-*
+                console.log('http start');
                 var chunks = '';
                 sResponse.setEncoding('utf8');
                 sResponse.on('data', function (chunk) {
@@ -393,14 +395,14 @@ app.post('/SyncCollection', function (req, res) {
                             var sCustomers = JSON.parse(chunks); //-*
 
                             // update local with server records
+                            console.log('sCustomer length: ' + sCustomers.length);
                             _.each(sCustomers, function (sCustomer) { //-*
                                 var existingLocalRecord = _.find(lCustomers, function (lCustomer) { //-*
                                     return parseInt(sCustomer.customerId) === parseInt(lCustomer.customerId); //-*
                                 })
-                                if (!existingLocalRecord) {
+                                if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
                                     // save record to local
-                                    console.log(existingLocalRecord);
-                                    customers.save(existingLocalRecord); //-*
+                                    customers.save(sCustomer); //-*
                                 }
                             });
                         }
@@ -435,10 +437,9 @@ app.post('/SyncCollection', function (req, res) {
                                 var existingLocalRecord = _.find(lProductTypes, function (lProductType) { //-*
                                     return parseInt(sProductType.productTypeId) === parseInt(lProductType.productTypeId); //-*
                                 })
-                                if (!existingLocalRecord) {
+                                if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
                                     // save record to local
-                                    console.log(existingLocalRecord);
-                                    productTypes.save(existingLocalRecord); //-*
+                                    productTypes.save(sProductType); //-*
                                 }
                             });
                         }

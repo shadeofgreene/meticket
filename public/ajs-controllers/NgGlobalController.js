@@ -13,28 +13,23 @@ app.controller('NgGlobalController', ['$scope', '$http', '$location', 'Auth', fu
     $scope.syncAllData = function () {
         debugger;
         if ($scope.currentUserLoggedIn) {
-            $('#loadingModal').modal('show');
+            //$('#loadingModal').modal('show');
             debugger;
 
             var userLoggedIn = $scope.currentUserLoggedIn;
-
-            $scope.syncCollection(userLoggedIn, 'Office', function () {
-                $scope.syncCollection(userLoggedIn, 'Customer', function () {
-                    $scope.syncCollection(userLoggedIn, 'Product', function () {
-                        $scope.syncCollection(userLoggedIn, 'ProductType', function () {
-                            $scope.syncCollection(userLoggedIn, 'UnitType', function () {
-                                $scope.syncCollection(userLoggedIn, 'User', function () {
-                                    $scope.syncCollection(userLoggedIn, 'TaxCategory');
-                                });
-                            });
-                        });
-                    });
-                });
-            });
+            
+            $scope.syncCollection(userLoggedIn, 'Office');
+            $scope.syncCollection(userLoggedIn, 'Customer');
+            $scope.syncCollection(userLoggedIn, 'Product');
+            $scope.syncCollection(userLoggedIn, 'ProductType');
+            $scope.syncCollection(userLoggedIn, 'UnitType');
+            $scope.syncCollection(userLoggedIn, 'User');
+            $scope.syncCollection(userLoggedIn, 'TaxCategory');
         }
     };
 
-    $scope.syncCollection = function (user, collectionName, callback, isEnd) {
+    $scope.syncCollection = function (user, collectionName) {
+        debugger;
         var data = {
             'user': user,
             'collection': collectionName
@@ -46,13 +41,6 @@ app.controller('NgGlobalController', ['$scope', '$http', '$location', 'Auth', fu
             debugger;
             if (err.error) {
                 toastr.error(err.error);
-            }
-        }).finally(function () {
-            debugger;
-            if(callback) {
-                callback();
-            } else {
-                $('#loadingModal').modal('hide');
             }
         });
     }
