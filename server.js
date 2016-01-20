@@ -112,7 +112,7 @@ app.post('/SyncCollection', function (req, res) {
                 path: '/TicketSystem/CustomerView/GetAllOffices', //-*
                 method: 'GET' //-*
             }
-            
+
             http.get(officeOptions, function (sResponse) { //-*
                 console.log('start');
                 var chunks = '';
@@ -140,7 +140,9 @@ app.post('/SyncCollection', function (req, res) {
                             });
                         }
                     });
-                    res.status(200).json({ message: request.collection + ' was synced.'});
+                    res.status(200).json({
+                        message: request.collection + ' was synced.'
+                    });
                 });
             });
         } else if (request.collection === 'User') {
@@ -176,7 +178,9 @@ app.post('/SyncCollection', function (req, res) {
                             });
                         }
                     });
-                    res.status(200).json({ message: request.collection + ' was synced.'});
+                    res.status(200).json({
+                        message: request.collection + ' was synced.'
+                    });
 
                 });
             });
@@ -205,6 +209,26 @@ app.post('/SyncCollection', function (req, res) {
                                 return record.userId === user.userId;
                             });
 
+
+                            // update server with local tickets
+                            var data = JSON.stringify({
+                                'username': user.userEmail,
+                                'password': user.userPassword
+                            });
+                            var saveTicketsOptions = {
+                                host: hostConstant,
+                                path: '/TicketSystem/TicketView/TryLoginAndGetUser',
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json;charset=UTF-8',
+                                    'Content-Length': Buffer.byteLength(data)
+                                }
+                            };
+                            http.get(saveTicketsOptions, function (sRes) {
+
+                            });
+
+
                             // update local with server tickets
                             _.each(sTickets, function (sTicket) {
                                 var existingLocalRecord = _.find(lTickets, function (lTicket) {
@@ -215,15 +239,14 @@ app.post('/SyncCollection', function (req, res) {
                                     tickets.save(sTicket); //-*
                                 }
                             });
-                            
-                            // update server with local tickets
-                            _.each(lTickets, function(lTicket) {
-                                
-                            });
-                            
+
+
+
                         }
                     });
-                    res.status(200).json({ message: request.collection + ' was synced.'});
+                    res.status(200).json({
+                        message: request.collection + ' was synced.'
+                    });
                 });
             });
         } else if (request.collection === 'Product') {
@@ -293,7 +316,9 @@ app.post('/SyncCollection', function (req, res) {
                             });
                         }
                     });
-                    res.status(200).json({ message: request.collection + ' was synced.'});
+                    res.status(200).json({
+                        message: request.collection + ' was synced.'
+                    });
 
                 });
             });
@@ -330,7 +355,9 @@ app.post('/SyncCollection', function (req, res) {
                             });
                         }
                     });
-                    res.status(200).json({ message: request.collection + ' was synced.'});
+                    res.status(200).json({
+                        message: request.collection + ' was synced.'
+                    });
                 });
             });
         } else if (request.collection === 'UnitType') {
@@ -367,7 +394,9 @@ app.post('/SyncCollection', function (req, res) {
                         }
                     });
 
-                    res.status(200).json({ message: request.collection + ' was synced.'});
+                    res.status(200).json({
+                        message: request.collection + ' was synced.'
+                    });
 
                 });
             });
@@ -407,8 +436,10 @@ app.post('/SyncCollection', function (req, res) {
                             });
                         }
                     });
-                    
-                    res.status(200).json({ message: request.collection + ' was synced.'});
+
+                    res.status(200).json({
+                        message: request.collection + ' was synced.'
+                    });
                 });
             });
         } else if (request.collection === 'ProductType') {
@@ -444,16 +475,22 @@ app.post('/SyncCollection', function (req, res) {
                             });
                         }
                     });
-                    res.status(200).json({ message: request.collection + ' was synced.'});
+                    res.status(200).json({
+                        message: request.collection + ' was synced.'
+                    });
                 });
             });
         } else {
-            res.status(500).json({ error: request.collection + ' collection does not exist.' })
+            res.status(500).json({
+                error: request.collection + ' collection does not exist.'
+            })
         }
     } else {
-        res.status(500).json({ error: 'Insufficient input. Unable to complete the request'});
+        res.status(500).json({
+            error: 'Insufficient input. Unable to complete the request'
+        });
     }
-    
+
 });
 
 
