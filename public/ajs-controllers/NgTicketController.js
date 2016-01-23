@@ -259,7 +259,7 @@ app.controller('NgTicketController', [
 
 		$scope.productTypes = [];
 		$scope.getProductTypes = function() {
-			var url = helper.baseUrl + 'public/productView/GetProductTypes';
+			var url = '/GetProductTypes';
 			$http.get(url).success(function(productTypes) {
 				$scope.productTypes = productTypes;
 			}).error(function(error, err) {
@@ -456,15 +456,12 @@ app.controller('NgTicketController', [
 		}
 
 		$scope.initiateEditTicket = function () {
-			
 			if (helper.currentTicketId) {
-				var url = helper.baseUrl + 'public/TicketView/GetTicket';
+				var url = '/GetTicket';
 				var data = {
 					'ticketId': helper.currentTicketId
 				};
 				$http.post(url, data).success(function (ticket) {
-					
-					
 					_.each(ticket.ticketItems, function (item) {
 						item.pricePerUnit = item.ticketItemRate;
 						item.productDescription = item.ticketItemDescription;
@@ -551,9 +548,9 @@ app.controller('NgTicketController', [
 		// Get Customers for customer dropdown
 		$scope.customers = [];
 		$scope.getCustomersAndOffices = function() {
-			$http.get(helper.baseUrl + 'public/CustomerView/GetCustomers').success(function(customers) {
+			$http.get('/GetCustomers').success(function(customers) {
 				$scope.customers = [];
-				$http.get(helper.baseUrl + 'public/CustomerView/GetAllOffices').success(function(offices) {
+				$http.get('/GetAllOffices').success(function(offices) {
 					_.each(customers, function(customer) {
 						var officesForThisCustomer = _.filter(offices, function(office) {
 							return office.customerId === customer.customerId;
@@ -577,9 +574,9 @@ app.controller('NgTicketController', [
 		}; // Get offices for customer dropdown
 		$scope.offices = [];
 		$scope.getOffices = function() {
-			$http.get(helper.baseUrl + 'public/CustomerView/GetAllOffices').success(function(offices) {
+			$http.get('/GetAllOffices').success(function(offices) {
 				$scope.offices = [];
-				$http.get(helper.baseUrl + 'public/CustomerView/GetCustomers').success(function(customers) {
+				$http.get('/GetCustomers').success(function(customers) {
 					_.each(offices, function(office) {
 						var customerForThisOffice = _.find(customers, function(customer) {
 							return office.customerId === customer.customerId;
@@ -600,7 +597,7 @@ app.controller('NgTicketController', [
 		$scope.equipmentProducts = [];
 		$scope.getEquipmentProducts = function () {
 			
-			var url = helper.baseUrl + 'public/ProductView/GetProductsByType/' + helper.enums.productTypes.Equipment;
+			var url = '/GetProductsByType/' + helper.enums.productTypes.Equipment;
 			$http.get(url).success(function (data) {
 				
 				$scope.equipmentProducts = data;
@@ -610,7 +607,7 @@ app.controller('NgTicketController', [
 		}
 		$scope.getMaterialProducts = function () {
 			
-			var url = helper.baseUrl + 'public/ProductView/GetProductsByType/' + helper.enums.productTypes.Item;
+			var url = '/GetProductsByType/' + helper.enums.productTypes.Item;
 			$http.get(url).success(function (data) {
 				
 				$scope.materialProducts = data;

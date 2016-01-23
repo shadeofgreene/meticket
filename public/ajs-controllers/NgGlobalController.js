@@ -25,6 +25,8 @@ app.controller('NgGlobalController', ['$scope', '$http', '$location', 'Auth', fu
             $scope.syncCollection(userLoggedIn, 'UnitType');
             $scope.syncCollection(userLoggedIn, 'User');
             $scope.syncCollection(userLoggedIn, 'TaxCategory');
+			$scope.syncCollection(userLoggedIn, 'TicketItem');
+			$scope.syncCollection(userLoggedIn, 'Ticket');
         }
     };
 
