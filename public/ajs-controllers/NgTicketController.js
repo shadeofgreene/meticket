@@ -43,7 +43,7 @@ app.controller('NgTicketController', [
 
 		$scope.ticketItems = [];
 		$scope.getTicketItems = function() {
-			var url = helper.baseUrl + 'public/TicketView/GetTicketItems';
+			var url = '/GetTicketItems';
 			$http.get(url).success(function (items) {
 				$scope.ticketItems = items;
 			}).error(function (error, err) {
@@ -491,7 +491,7 @@ app.controller('NgTicketController', [
 
 		$scope.unitTypes = [];
 		$scope.getUnitTypes = function() {
-			var url = helper.baseUrl + 'public/ProductView/GetUnitTypes';
+			var url = '/GetUnitTypes';
 			$http.get(url).success(function(unitTypes) {
 				$scope.unitTypes = unitTypes;
 			}).error(function() {
@@ -512,7 +512,7 @@ app.controller('NgTicketController', [
 		$scope.taxCategory = {};
 		$scope.taxCategories = [];
 		$scope.getTaxCategories = function() {
-			var url = helper.baseUrl + 'public/TicketView/GetTaxCategories';
+			var url = '/GetTaxCategories';
 			$http.get(url).success(function(taxCategories) {
 				$scope.taxCategories = taxCategories;
 				
@@ -537,7 +537,7 @@ app.controller('NgTicketController', [
 		$scope.employeeList = [];
 		$scope.getEmployeeList = function () {
 			
-			$http.post(helper.baseUrl + 'TicketView/GetEmployeeList').success(function (employees) {
+			$http.get('/GetEmployeeList').success(function (employees) {
 				
 				$scope.employeeList = employees;
 			}).error(function(error, err) {
@@ -596,9 +596,11 @@ app.controller('NgTicketController', [
 		$scope.materialProducts = [];
 		$scope.equipmentProducts = [];
 		$scope.getEquipmentProducts = function () {
-			
-			var url = '/GetProductsByType/' + helper.enums.productTypes.Equipment;
-			$http.get(url).success(function (data) {
+			var productType = {
+                'productTypeId': helper.enums.productTypes.Equipment
+            }
+			var url = '/GetProductsByType/';
+			$http.post(url, productType).success(function (data) {
 				
 				$scope.equipmentProducts = data;
 			}).error(function() {
@@ -606,9 +608,11 @@ app.controller('NgTicketController', [
 			});
 		}
 		$scope.getMaterialProducts = function () {
-			
-			var url = '/GetProductsByType/' + helper.enums.productTypes.Item;
-			$http.get(url).success(function (data) {
+			var productType = {
+                'productTypeId': helper.enums.productTypes.Item
+            }
+			var url = '/GetProductsByType/';
+			$http.post(url, productType).success(function (data) {
 				
 				$scope.materialProducts = data;
 			}).error(function () {

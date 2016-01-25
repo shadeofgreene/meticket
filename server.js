@@ -79,51 +79,51 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
 });
 
 // GET CUSTOMERS
-app.get('/GetCustomers', function(req, res) {
-	var customers = db.collection('Customer');
-	customers.find(function(err, customers) {
-		if(!err) {
-			res.json(customers);
-		} else {
-			res.status(500).json({
-				error: 'Problem getting customers'
-			});
-		}
-	});
+app.get('/GetCustomers', function (req, res) {
+    var customers = db.collection('Customer');
+    customers.find(function (err, customers) {
+        if (!err) {
+            res.json(customers);
+        } else {
+            res.status(500).json({
+                error: 'Problem getting customers'
+            });
+        }
+    });
 });
 
 // GET ALL OFFICES
-app.get('/GetAllOffices', function(req, res) {
-	var offices = db.collection('Office');
-	offices.find(function(err, offices) {
-		if(!err) {
-			res.json(offices);
-		} else {
-			res.status(500).json({
-				error: 'Problem getting offices'
-			});
-		}
-	});
+app.get('/GetAllOffices', function (req, res) {
+    var offices = db.collection('Office');
+    offices.find(function (err, offices) {
+        if (!err) {
+            res.json(offices);
+        } else {
+            res.status(500).json({
+                error: 'Problem getting offices'
+            });
+        }
+    });
 });
 
 // TODO!
 // GET PRODUCTS BY TYPE
-app.get('/GetProductsByType/', function(req, res) {
-	var products = db.collection('Product');
-	products.find(function(err, products) {
-		if(!err) {
-			res.json(products);
-		} else {
-			res.status(500).json({
-				error: 'Problem getting products'
-			});
-		}
-	})
+app.get('/GetProductsByType/', function (req, res) {
+    var products = db.collection('Product');
+    products.find(function (err, products) {
+        if (!err) {
+            res.json(products);
+        } else {
+            res.status(500).json({
+                error: 'Problem getting products'
+            });
+        }
+    })
 });
 
 // GET TICKETS
 app.get('/GetTickets', function (req, res) {
-	var tickets = db.collection('Ticket');
+    var tickets = db.collection('Ticket');
     tickets.find(function (err, tickets) {
         if (!err) {
             res.json(tickets);
@@ -137,11 +137,13 @@ app.get('/GetTickets', function (req, res) {
 
 // GET TICKET
 app.get('/GetTicket', function (req, res) {
-	var data = req.body;
-	if(data.ticketId) {
-		var tickets = db.collection('Ticket');
-		tickets.findOne({ 'ticketId': parseInt(data.ticketId) }, function (err, ticket) {
-			if (err) {
+    var data = req.body;
+    if (data.ticketId) {
+        var tickets = db.collection('Ticket');
+        tickets.findOne({
+            'ticketId': parseInt(data.ticketId)
+        }, function (err, ticket) {
+            if (err) {
                 console.log('error');
                 res.status(500).json({
                     error: err
@@ -150,13 +152,13 @@ app.get('/GetTicket', function (req, res) {
                 console.log('user was found');
                 res.status(200).json(ticket);
             }
-		});
-	}
+        });
+    }
 });
 
 // GET PRODUCT TYPES
 app.get('/GetProductTypes', function (req, res) {
-	var productTypes = db.collection('ProductType');
+    var productTypes = db.collection('ProductType');
     productTypes.find(function (err, productTypes) {
         if (!err) {
             res.json(productTypes);
@@ -168,22 +170,83 @@ app.get('/GetProductTypes', function (req, res) {
     })
 });
 
+// GET TICKET ITEMS
+app.get('/GetTicketItems', function (req, res) {
+    var ticketItems = db.collection('TicketItem');
+    ticketItems.find(function (err, ticketItems) {
+        if (!err) {
+            res.status(200).json(ticketItems);
+        } else {
+            res.status(500).json({
+                error: 'Problem getting ticket items'
+            })
+        }
+    })
+});
 
+// GET EMPLOYEES
+app.get('/GetEmployeeList', function (req, res) {
+    var employees = db.collection('User');
+    employees.find(function (err, employees) {
+        if (!err) {
+            res.status(200).json(employees);
+        } else {
+            res.status(500).json({
+                error: 'Problem getting employees'
+            })
+        }
+    })
+});
 
+// GET TAX CATEGORIES
+app.get('/GetTaxCategories', function (req, res) {
+    var taxCats = db.collection('TaxCategory');
+    taxCats.find(function (err, taxCats) {
+        if (!err) {
+            res.status(200).json(taxCats);
+        } else {
+            res.status(500).json({
+                error: 'Problem getting tax categories'
+            })
+        }
+    })
+});
 
+// GET UNIT TYPES
+app.get('/GetUnitTypes', function (req, res) {
+    var unitTypes = db.collection('UnitType');
+    unitTypes.find(function (err, unitTypes) {
+        if (!err) {
+            res.status(200).json(unitTypes);
+        } else {
+            res.status(500).json({
+                error: 'Problem getting unit types'
+            })
+        }
+    })
+});
 
-
-
-
-
-
-
-
-
-
-
-
-
+// GET PRODUCTS BY TYPE
+app.post('/GetProductsByType', function (req, res) {
+    var productType = req.body;
+    if (productType) {
+        var products = db.collection('Product');
+        products.find({
+            'productTypeId': productType.productTypeId
+        }, function (err, products) {
+            if (!err) {
+                res.status(200).json(products);
+            } else {
+                res.status(500).json({
+                    error: 'Problem getting products'
+                })
+            }
+        })
+    }
+    res.status(500).json({
+        error: 'Problem getting products'
+    })
+})
 
 
 
@@ -314,22 +377,22 @@ app.post('/SyncCollection', function (req, res) {
 
 
                             // update server with local tickets
-//                            var data = JSON.stringify({
-//                                'username': user.userEmail,
-//                                'password': user.userPassword
-//                            });
-//                            var saveTicketsOptions = {
-//                                host: hostConstant,
-//                                path: '/TicketSystem/TicketView/TryLoginAndGetUser',
-//                                method: 'POST',
-//                                headers: {
-//                                    'Content-Type': 'application/json;charset=UTF-8',
-//                                    'Content-Length': Buffer.byteLength(data)
-//                                }
-//                            };
-//                            http.get(saveTicketsOptions, function (sRes) {
-//
-//                            });
+                            //                            var data = JSON.stringify({
+                            //                                'username': user.userEmail,
+                            //                                'password': user.userPassword
+                            //                            });
+                            //                            var saveTicketsOptions = {
+                            //                                host: hostConstant,
+                            //                                path: '/TicketSystem/TicketView/TryLoginAndGetUser',
+                            //                                method: 'POST',
+                            //                                headers: {
+                            //                                    'Content-Type': 'application/json;charset=UTF-8',
+                            //                                    'Content-Length': Buffer.byteLength(data)
+                            //                                }
+                            //                            };
+                            //                            http.get(saveTicketsOptions, function (sRes) {
+                            //
+                            //                            });
 
 
                             // update local with server tickets
@@ -349,8 +412,8 @@ app.post('/SyncCollection', function (req, res) {
                     });
                 });
             });
-        } else if(request.collection === 'TicketItem') {
-			///////// GET TICKET ITEMS ///////////
+        } else if (request.collection === 'TicketItem') {
+            ///////// GET TICKET ITEMS ///////////
             //////////////////////////////////////
             var ticketItemOptions = { //-*
                 host: hostConstant,
@@ -384,7 +447,7 @@ app.post('/SyncCollection', function (req, res) {
                     });
                 });
             });
-		} else if (request.collection === 'Product') {
+        } else if (request.collection === 'Product') {
             ///////// GET PRODUCTS BY 1005 ///////
             //////////////////////////////////////
             var product1005Options = { //-*
