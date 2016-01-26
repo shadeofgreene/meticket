@@ -20,7 +20,8 @@ app.controller('NgGlobalController', ['$scope', '$http', '$location', 'Auth', fu
             
             $scope.syncCollection(userLoggedIn, 'Office');
             $scope.syncCollection(userLoggedIn, 'Customer');
-            $scope.syncCollection(userLoggedIn, 'Product');
+            $scope.syncCollection(userLoggedIn, 'MaterialProduct');
+			$scope.syncCollection(userLoggedIn, 'EquipmentProduct');
             $scope.syncCollection(userLoggedIn, 'ProductType');
             $scope.syncCollection(userLoggedIn, 'UnitType');
             $scope.syncCollection(userLoggedIn, 'User');

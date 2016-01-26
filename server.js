@@ -226,27 +226,72 @@ app.get('/GetUnitTypes', function (req, res) {
     })
 });
 
-// GET PRODUCTS BY TYPE
-app.post('/GetProductsByType', function (req, res) {
-    var productType = req.body;
-    if (productType) {
-        var products = db.collection('Product');
-        products.find({
-            'productTypeId': productType.productTypeId
-        }, function (err, products) {
-            if (!err) {
-                res.status(200).json(products);
-            } else {
-                res.status(500).json({
-                    error: 'Problem getting products'
-                })
-            }
-        })
-    }
-    res.status(500).json({
-        error: 'Problem getting products'
+// GET EQUIPMENT PRODUCTS
+app.get('/GetEquipmentProducts', function (req, res) {
+    var equipmentProducts = db.collection('EquipmentProduct');
+    equipmentProducts.find(function (err, equipmentProducts) {
+        if (!err) {
+            res.status(200).json(equipmentProducts);
+        } else {
+            res.status(500).json({
+                error: 'Problem getting equipment products.'
+            })
+        }
     })
-})
+});
+
+// GET MATERIAL PRODUCTS
+app.get('/GetMaterialProducts', function (req, res) {
+    var materialProducts = db.collection('MaterialProduct');
+    materialProducts.find(function (err, materialProducts) {
+        if (!err) {
+            res.status(200).json(materialProducts);
+        } else {
+            res.status(500).json({
+                error: 'Problem getting material products.'
+            })
+        }
+    })
+});
+
+app.post('/CreateTicketAndReturnTicket', function(req, res) {
+	var tickets = db.collection('Ticket');
+	var ticketItems = db.collection('TicketItem');
+	var newTicket = req.body;
+	if(newTicket) {
+		// TODO!
+		tickets.save({}, function(err, ticket) {
+			if(!err) {
+				ticketItems.insert(newTicket.ticketItems, function(err, ) {
+					
+				})
+			}
+		});
+	}
+});
+
+// GET PRODUCTS BY TYPE
+//app.post('/GetProductsByType', function (req, res) {
+//    var productType = req.body;
+//    if (productType) {
+//        var products = db.collection('Product');
+//        products.find({
+//            'productTypeId': productType.productTypeId
+//        }, function (err, products) {
+//            if (!err) {
+//                res.status(200).json(products);
+//            } else {
+//                res.status(500).json({
+//                    error: 'Problem getting products'
+//                })
+//            }
+//        })
+//    } else {
+//		res.status(500).json({
+//			error: 'Problem getting products'
+//		})
+//	}
+//})
 
 
 
@@ -447,8 +492,8 @@ app.post('/SyncCollection', function (req, res) {
                     });
                 });
             });
-        } else if (request.collection === 'Product') {
-            ///////// GET PRODUCTS BY 1005 ///////
+		} else if(request.collection === 'MaterialProduct') {
+			///////// GET PRODUCTS BY 1005 ///////
             //////////////////////////////////////
             var product1005Options = { //-*
                 host: hostConstant,
@@ -462,7 +507,7 @@ app.post('/SyncCollection', function (req, res) {
                     chunks += chunk;
                 });
                 sResponse.on('end', function () {
-                    var products = db.collection('Product');
+                    var products = db.collection('MaterialProduct');
                     products.find(function (err, lProducts) { //-*
                         if (!err) {
                             // get records from server
@@ -482,6 +527,7 @@ app.post('/SyncCollection', function (req, res) {
                     });
                 });
             });
+        } else if (request.collection === 'EquipmentProduct') {
             ///////// GET PRODUCTS BY 1 ///////
             //////////////////////////////////////
             var product1Options = { //-*
@@ -496,7 +542,7 @@ app.post('/SyncCollection', function (req, res) {
                     chunks += chunk;
                 });
                 sResponse.on('end', function () {
-                    var products = db.collection('Product');
+                    var products = db.collection('EquipmentProduct');
                     products.find(function (err, lProducts) { //-*
                         if (!err) {
                             // get records from server

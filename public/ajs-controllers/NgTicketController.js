@@ -596,24 +596,22 @@ app.controller('NgTicketController', [
 		$scope.materialProducts = [];
 		$scope.equipmentProducts = [];
 		$scope.getEquipmentProducts = function () {
-			var productType = {
-                'productTypeId': helper.enums.productTypes.Equipment
-            }
-			var url = '/GetProductsByType/';
-			$http.post(url, productType).success(function (data) {
-				
+//			var productType = {
+//                'productTypeId': helper.enums.productTypes.Equipment
+//            }
+			var url = '/GetEquipmentProducts/';
+			$http.get(url).success(function (data) {
 				$scope.equipmentProducts = data;
 			}).error(function() {
 				
 			});
 		}
 		$scope.getMaterialProducts = function () {
-			var productType = {
-                'productTypeId': helper.enums.productTypes.Item
-            }
-			var url = '/GetProductsByType/';
-			$http.post(url, productType).success(function (data) {
-				
+//			var productType = {
+//                'productTypeId': helper.enums.productTypes.Item
+//            }
+			var url = '/GetMaterialProducts/';
+			$http.get(url).success(function (data) {
 				$scope.materialProducts = data;
 			}).error(function () {
 				
@@ -626,9 +624,7 @@ app.controller('NgTicketController', [
 			var office = _.find($scope.offices, function(thisOffice) {
 				
 				return thisOffice.officeId === parseInt($scope.ticket.officeId);
-			});
-
-			
+			});			
 
 			if (office) {
 				$scope.ticket.customerName = office.customer.customerName;
