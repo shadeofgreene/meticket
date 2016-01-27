@@ -312,7 +312,13 @@ app.controller('NgTicketController', [
 			$scope.ticket.userId = $scope.user.userId;
 			$scope.ticket.ticketItemObjects = $scope.ticket.ticketItems;
 			
-			$http.post('/CreateTicketAndReturnTicket', $scope.ticket).success(function(ticket) {
+			var request = {
+				user: $scope.user,
+				ticket: $scope.ticket,
+				postObject: postObject
+			}
+			
+			$http.post('/CreateTicketAndReturnTicket', request).success(function(ticket) {
 				
 				$scope.ticket = {};
 				$scope.ticket.ticketItems = [];
@@ -506,6 +512,7 @@ app.controller('NgTicketController', [
 				$scope.user.userId = user.userId;
 				$scope.user.userFirstName = user.userFirstName;
 				$scope.user.userLastName = user.userFirstName;
+				$scope.user.workTicketCode = user.workTicketCode
 			}
 		};
 

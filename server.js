@@ -254,16 +254,75 @@ app.get('/GetMaterialProducts', function (req, res) {
     })
 });
 
+// CREATE AND RETURN TICKET
 app.post('/CreateTicketAndReturnTicket', function(req, res) {
 	var tickets = db.collection('Ticket');
 	var ticketItems = db.collection('TicketItem');
-	var newTicket = req.body;
+	var request = req.body;
+	var newTicket = request.ticket;
+	var user = request.user;	
+	
 	if(newTicket) {
-		// TODO!
-		tickets.save({}, function(err, ticket) {
+		// first generate new work ticket number (BJG150006)
+		var newWorkTicketNumber = '';
+		tickets.find({ 'userId': user.userId }, function(err, ticketsForThisUser) {
 			if(!err) {
-				ticketItems.insert(newTicket.ticketItems, function(err, ) {
-					
+				var numberPattern = /\d+/g;
+				var highTicketNumber = 0;
+				_.each(ticketsForThisUser, function(ticket) {
+					var ticketNumber = ticket.workTicketNumber.match(numberPattern);
+					if(ticketNumber) {
+						if(parseInt(ticketNumber) > highTicketNumber) {
+							highTicketNumber = ticketNumber;
+						}i
+					}
+				});
+				var newTicketNumber = highTicketNumber++;
+				newWorkTicketNumber = user.workTicketCode + String(newTicketNumber);
+				newTicket.workTicketNumber = newWorkTicketNumber;
+			}
+		});
+		console.log(newTicket.workTicketNumber);
+		// create new ticket item if freight exists
+		if(newTicket.freight) {
+			newTicket.ticketItems.push({
+				ticketItemDescription: 'Freight charge',
+				productTypeId: 1008,
+				userId: user.userId,
+				ticketItemRate: parseFloat(newTicket.freight),
+				ticketItemName: 'Freight charge',
+				qtyUnits: 1
+			});
+		}
+		
+		// get current date
+		var dateTime = new Date();
+		newTicket.ticketCreationDate = dateTime;
+		
+		
+		// Save ticket and ticket items
+		// TODO!
+		tickets.save({
+			'ticketItemDescription':newTicket.ticketItemDescription,
+			'productId':newTicket.ticketItemDescription,
+			'':newTicket.ticketItemDescription,
+			'ticketItemDescription':newTicket.ticketItemDescription,
+			'ticketItemDescription':newTicket.ticketItemDescription,
+			'ticketItemDescription':newTicket.ticketItemDescription,
+			'ticketItemDescription':newTicket.ticketItemDescription,
+			'ticketItemDescription':newTicket.ticketItemDescription
+		}, function(err, ticket) {
+			
+			if(!err) {
+				// assign ticket items to this ticket
+				_.each(newTicket.ticketItems, function(ticketItem) {
+					ticketItem._ticketId = ticket._id;	
+				});
+				
+				ticketItems.insert(newTicket.ticketItems, function(err, savedTicketItems) {
+					if(!err) {
+						console.log(savedTicketItems);
+					}
 				})
 			}
 		});
