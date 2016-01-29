@@ -1,4 +1,4 @@
-﻿<div class="row mt">
+<div class="row mt">
 	<div class="col-sm-12">
 		<a href="#/create-ticket" class="btn btn-info"><i class="fa fa-plus-circle"></i> Create Ticket</a>
 	</div>
@@ -42,7 +42,7 @@
 											<div class="col-sm-3">Rate</div>
 										</div>
 										<hr/>
-										<div style="border-bottom:1px solid #dddddd" class="col-sm-12" ng-repeat="item in getTicketItemsForTicket(ticket.ticketId)">
+										<div style="border-bottom:1px solid #dddddd" class="col-sm-12" ng-repeat="item in ticket.ticketItems">
 											<div class="col-sm-6">{{item.ticketItemDescription}}</div>
 											<div class="col-sm-3">{{item.qtyUnits}}</div>
 											<div class="col-sm-3">{{item.ticketItemRate}}</div>

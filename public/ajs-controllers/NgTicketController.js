@@ -5,20 +5,36 @@ app.controller('NgTicketController', [
 		$scope.tickets = [];
 		$scope.ticketsForCurrentUser = [];
 		$scope.getTicketList = function () {
+			debugger;
 			var url = '/GetTickets';
 			$http.get(url).success(function (tickets) {
+				debugger;
 				$scope.tickets = tickets;
-				$scope.initializeTicketsForCurrentUser(tickets);
+				$scope.initializeTicketsForCurrentUser(tickets, function () {
+					var url = '/GetTicketItems';
+					$http.get(url).success(function (items) {
+						$scope.ticketItems = items;
+						_.each($scope.ticketsForCurrentUser, function(ticket) {
+							var ticketItemsForThisTicket = $scope.getTicketItemsForTicket(ticket.ticketId, ticket._id);
+							ticket.ticketItems = ticketItemsForThisTicket;
+						});
+					}).error(function (error, err) {
+
+					});
+				});
 			}).error(function (error, err) {
 
 			});
 		}
-		$scope.initializeTicketsForCurrentUser = function (tickets) {
+		$scope.initializeTicketsForCurrentUser = function (tickets, cb) {
 			var user = JSON.parse(localStorage.getItem('user'));
 			if (user) {
 				$scope.ticketsForCurrentUser = _.filter(tickets, function (userTicket) {
 					return userTicket.userId === user.userId;
 				});
+			}
+			if(cb) {
+				cb();
 			}
 		}
 		$scope.getTicketList();
@@ -51,6 +67,7 @@ app.controller('NgTicketController', [
 
 			});
 		}
+
 		$scope.getTicketItems();
 
 		$scope.getTicketItemsForTicket = function (ticketId, _ticketId) {
@@ -93,7 +110,7 @@ app.controller('NgTicketController', [
 					if (parseInt(ticket.ticketId) === parseInt(item.ticketId)) {
 						ticket.ticketItems.push(item);
 					}
-				} else if(ticket._id) {
+				} else if (ticket._id) {
 					if (parseInt(ticket._id) === parseInt(item._ticketId)) {
 						ticket.ticketItems.push(item);
 					}
@@ -317,13 +334,13 @@ app.controller('NgTicketController', [
 		}
 
 		$scope.createATicket = function () {
-
 			Alert.showLoading();
 			var postObject = {
 				Token: GlobalUser.getToken()
 			};
 			$scope.ticket.workTicketNumber = null;
 			$scope.ticket.ticketId = null;
+			$scope.ticket._id = null;
 			$scope.ticket.postObject = postObject;
 			$scope.ticket.userId = $scope.user.userId;
 			$scope.ticket.ticketItemObjects = $scope.ticket.ticketItems;
@@ -472,20 +489,27 @@ app.controller('NgTicketController', [
 		}
 
 		$scope.editTicket = function (ticket) {
-
-			var ticketId = ticket.ticketId;
-			// initialize current ticket and go to ticket edit page
-			helper.currentTicketId = ticketId;
+			debugger;
+			if (ticket.ticketId) {
+				// initialize current ticket and go to ticket edit page
+				helper.currentTicketId = ticket.ticketId;
+			} else if (ticket._id) {
+				// initialize current ticket and go to ticket edit page
+				helper.currentTicketId = ticket._id;
+			}
 			$location.path('edit-ticket');
 		}
 
 		$scope.initiateEditTicket = function () {
+			debugger;
 			if (helper.currentTicketId) {
+				debugger;
 				var url = '/GetTicket';
 				var data = {
 					'ticketId': helper.currentTicketId
 				};
 				$http.post(url, data).success(function (ticket) {
+					debugger;
 					_.each(ticket.ticketItems, function (item) {
 						item.pricePerUnit = item.ticketItemRate;
 						item.productDescription = item.ticketItemDescription;

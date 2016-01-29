@@ -5,6 +5,7 @@ var mongojs = require('mongojs');
 var collections = ['ticket', 'User'];
 var db = mongojs('MeTicket', ['Ticket', 'User']);
 var bodyParser = require('body-parser');
+var ObjectId = require('mongodb').ObjectID;
 var http = require('http');
 var _ = require('underscore');
 
@@ -106,7 +107,7 @@ app.get('/GetAllOffices', function (req, res) {
 	});
 });
 
-// TODO!
+
 // GET PRODUCTS BY TYPE
 app.get('/GetProductsByType/', function (req, res) {
 	var products = db.collection('Product');
@@ -254,6 +255,65 @@ app.get('/GetMaterialProducts', function (req, res) {
 	})
 });
 
+// GET TICKET (by ticketId)
+app.post('/GetTicket', function (req, res) {
+	var request = req.body;
+	if (request) {
+		var ticketId = request.ticketId;
+		if (ticketId) {
+			//console.log(ticketId);
+			var tickets = db.collection('Ticket');
+			tickets.findOne({
+				'ticketId': ticketId
+			}, function (err, ticket) {
+				//console.log(ticket);
+				if (!err && ticket) {
+					var ticketItems = db.collection('TicketItem');
+					ticketItems.find({
+						'ticketId': ticket.ticketId
+					}, function (err, ticketItems) {
+						if (!err) {
+							ticket.ticketItems = ticketItems;
+							res.status(200).json(ticket);
+						}
+					});
+				} else {
+					var newObjectIdObject = new ObjectId.createFromHexString(ticketId);
+					tickets.findOne({
+						'_id': newObjectIdObject
+					}, function (err, ticket) {
+						//console.log(ticket);
+						if (!err && ticket) {
+							var ticketItems = db.collection('TicketItem');
+							ticketItems.find({
+								'_ticketId': ticket._id
+							}, function (err, ticketItems) {
+								if (!err) {
+									ticket.ticketItems = ticketItems;
+									res.status(200).json(ticket);
+								}
+							});
+						} else {
+							res.status(500).json({
+								error: 'There was a problem'
+							})
+						}
+					});
+				}
+			});
+		} else {
+			res.status(500).json({
+				error: 'There was a problem'
+			})
+		}
+	} else {
+		res.status(500).json({
+			error: 'There was a problem'
+		})
+	}
+});
+
+
 // CREATE AND RETURN TICKET
 app.post('/CreateTicketAndReturnTicket', function (req, res) {
 	console.log('started');
@@ -319,6 +379,9 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
 				var newTicketItems = newTicket.ticketItems;
 				newTicket.ticketItems = null;
 				newTicket.ticketItemObjects = null;
+
+				// set grand total
+				newTicket.grandTotal = newTicket.totalSection.grandTotal;
 
 
 				// Save ticket and ticket items
