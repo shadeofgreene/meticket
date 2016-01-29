@@ -363,6 +363,7 @@ app.controller('NgTicketController', [
 				// server
 				//$window.location.href = helper.baseUrl + 'Goodies/Content/Goodies/Tickets/Generated/ticket-' + ticket.ticketId + '.pdf';
 				toastr.success('The ticket was created successfully', 'Success');
+                $location.path('ticket-list');
 			}).error(function (error, err) {
 
 				toastr.error('Something went wrong while trying to save', 'Error');
