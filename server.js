@@ -8,6 +8,11 @@ var bodyParser = require('body-parser');
 var ObjectId = require('mongodb').ObjectID;
 var http = require('http');
 var _ = require('underscore');
+var Pdf = require('pdfkit');
+var fs = require('fs');
+var serverPathToSiteRoot = '/CodeNode/meticket/public/';
+var moment = require('moment');
+var accounting = require('accounting');
 
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
@@ -324,10 +329,16 @@ app.post('/EditTicketAndReturnTicket', function(req, res) {
         if(ticket.ticketId) {
             tickets.findOne({'ticketId': ticket.ticketId}, function(err, thisTicket) {
                 // TODO: now edit this ticket
+				if(!err && thisTicket) {
+					
+				}
             })
         } else if(ticket._id) {
             tickets.findOne({'_id': ticket._id}, function(err, thisTicket) {
                 // TODO: not edit this ticket
+				if(!err && thisTicket) {
+					
+				}
             })
         }
     }
@@ -438,6 +449,64 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
 
                         ticketItems.insert(newTicketItemsToSave, function(err, savedTicketItems) {
                             if (!err) {
+								// create PDF
+								var doc = new Pdf({
+									margin: 25
+								});
+								var contentWidth = doc.page.width - 50;
+								
+								doc.pipe(fs.createWriteStream(serverPathToSiteRoot + 'content/Tickets/Generated/' + ticket._id.toHexString() + '.pdf'));
+
+								doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template.jpg', {width: contentWidth});
+								
+								// work ticket number
+								doc.text(ticket.workTicketNumber, 425, 65, { lineBreak:false});
+								// po number
+								if(ticket.customerPo) {
+									doc.text('PO #' + ticket.customerPo, 425, 90, { lineBreak:false});
+								}
+								// creation date
+								console.log(ticket.ticketCreationDate);
+								var formattedDate = moment(ticket.ticketCreationDate).format('M/D/YYYY');
+								doc.text(formattedDate, 425, 105, { lineBreak:false});
+								// ticket to:
+								doc.text('TICKET TO:', 25, 145, { lineBreak:false});
+								// customer info
+								doc.text(ticket.customerName, 25, 160, { lineBreak:false});
+								// job description:
+								doc.text('JOB DESCRIPTION:', 325, 145, { lineBreak:false});
+								// customer info
+								doc.text(ticket.jobDescription, 325, 160, { lineBreak:false, width:contentWidth-325});
+								// ticket item header
+								doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-itemheading.jpg', 25, null, {width: contentWidth});
+								// ticket items
+								_.each(savedTicketItems, function(ti) {
+									doc.text(ti.ticketItemDescription, 25, null, {width: 250});
+									doc.text(accounting.formatMoney(ti.ticketItemRate), 275, null, {width: 70});
+									doc.text(ti.qtyUnits, 345, null, {width: 60});
+									doc.text(ti.ticketItemDescription, 405, null, {width: 90});
+								});
+								
+								var values = [
+									50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+								];
+								var vals = [
+									50, 100, 150, 200, 250, 300, 350, 400, 450, 500
+								];
+								
+								doc.fillColor('red');
+								_.each(values, function(v) {
+									doc.text(v, 0, v, { lineBreak:false});
+								});
+								doc.fillColor('green');
+								_.each(vals, function(x) {
+									doc.text(x, x, 0, { lineBreak:false});
+								});
+								
+								
+								doc.text('')
+								doc.end();
+								
                                 res.status(200).json('Ticket has been saved!');
                             } else {
                                 res.status(201).json('Ticket was saved, but ticket items were not saved');
