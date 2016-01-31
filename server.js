@@ -320,15 +320,167 @@ app.post('/EditTicketAndReturnTicket', function(req, res) {
     var tickets = db.collection('Ticket');
     var ticketItems = db.collection('TicketItem');
     var ticket = req.body;
-    if(request) {
-        if(ticket.ticketId) {
-            tickets.findOne({'ticketId': ticket.ticketId}, function(err, thisTicket) {
-                // TODO: now edit this ticket
-            })
-        } else if(ticket._id) {
-            tickets.findOne({'_id': ticket._id}, function(err, thisTicket) {
-                // TODO: not edit this ticket
-            })
+    if (request) {
+        if (ticket.ticketId) {
+
+            tickets.findAndModify({
+                query: {
+                    ticketId: ticket.ticketId
+                },
+                update: {
+                    officeId: ticket.officeId,
+                    customerName: ticket.customerName,
+                    customerPhone: ticket.customerPhone,
+                    customerAddress1: ticket.customerAddress1,
+                    customerAddress2: ticket.customerAddress2,
+                    customerCity: ticket.customerCity,
+                    customerOfficeId: ticket.customerOfficeId,
+                    customerState: ticket.customerState,
+                    customerZip: ticket.customerZip,
+                    userId: ticket.userId,
+                    locationNumber: ticket.locationNumber,
+                    rigNumber: ticket.rigNumber,
+                    customerPo: ticket.customerPo,
+                    freight: ticket.freight,
+                    taxCategory: ticket.taxCategory,
+                    jobDescription: ticket.jobDescription
+                },
+                new: true
+            }, function(err, updatedTicket, lastErrorObject) {
+                if (!err) {
+                    ticketItems.find({
+                        'ticketId': updatedTicket.ticketId
+                    }, function(err, theseTicketItems) {
+                        if (!err) {
+                            // TODO!
+                            // delete ticket items
+                            ticketItems.remove({
+                                'ticketId': ticket.ticketId
+                            }, function(err, removedTicketItems) {
+                                if (!err) {
+                                    // create new of these items
+                                    var newTicketItemsToSave = [];
+                                    // create new ticket item if freight exists
+                                    if (newTicket.freight) {
+                                        newTicket.ticketItems.push({
+                                            ticketItemDescription: 'Freight charge',
+                                            productTypeId: 1008,
+                                            userId: user.userId,
+                                            ticketItemRate: parseFloat(newTicket.freight),
+                                            ticketItemName: 'Freight charge',
+                                            qtyUnits: 1,
+                                            ticketItemUnitType: 'E'
+                                        });
+                                    }
+                                    _.each(newTicketItems, function(ticketItem) {
+                                        if (parseInt(ticketItem.productTypeId) === 1008) {
+                                            ticketItem._ticketId = ticket._id;
+                                            newTicketItemsToSave.push(ticketItem);
+                                        } else {
+                                            var newTicketItem = {
+                                                ticketItemDescription: ticketItem.productDescription,
+                                                productTypeId: ticketItem.productTypeId,
+                                                productId: ticketItem.productId,
+                                                userId: user.userId,
+                                                ticketItemRate: parseFloat(ticketItem.pricePerUnit),
+                                                ticketItemName: ticketItem.productDescription,
+                                                qtyUnits: parseInt(ticketItem.qtyUnits),
+                                                _ticketId: ticket._id,
+                                                ticketItemUnitType: ticketItem.ticketItemUnitType
+                                            }
+                                            newTicketItemsToSave.push(newTicketItem);
+                                        }
+                                    });
+                                    // insert list of ticket items
+                                    ticketItems.insert(newTicketItemsToSave, function(err, savedTicketItems) {
+
+                                    });
+                                }
+                            })
+                        }
+                    });
+                }
+            });
+        } else if (ticket._id) {
+            tickets.findAndModify({
+                query: {
+                    ticketId: ticket._id
+                },
+                update: {
+                    officeId: ticket.officeId,
+                    customerName: ticket.customerName,
+                    customerPhone: ticket.customerPhone,
+                    customerAddress1: ticket.customerAddress1,
+                    customerAddress2: ticket.customerAddress2,
+                    customerCity: ticket.customerCity,
+                    customerOfficeId: ticket.customerOfficeId,
+                    customerState: ticket.customerState,
+                    customerZip: ticket.customerZip,
+                    userId: ticket.userId,
+                    locationNumber: ticket.locationNumber,
+                    rigNumber: ticket.rigNumber,
+                    customerPo: ticket.customerPo,
+                    freight: ticket.freight,
+                    taxCategory: ticket.taxCategory,
+                    jobDescription: ticket.jobDescription
+                },
+                new: true
+            }, function(err, updatedTicket, lastErrorObject) {
+                if (!err) {
+                    ticketItems.find({
+                        '_ticketId': updatedTicket._id
+                    }, function(err, theseTicketItems) {
+                        if (!err) {
+                            // TODO!
+                            // delete ticket items
+                            ticketItems.remove({
+                                '_ticketId': ticket._id
+                            }, function(err, ticketItemsRemoved) {
+                                if (!err) {
+                                    // create new of these items
+                                    var newTicketItemsToSave = [];
+                                    // create new ticket item if freight exists
+                                    if (newTicket.freight) {
+                                        newTicket.ticketItems.push({
+                                            ticketItemDescription: 'Freight charge',
+                                            productTypeId: 1008,
+                                            userId: user.userId,
+                                            ticketItemRate: parseFloat(newTicket.freight),
+                                            ticketItemName: 'Freight charge',
+                                            qtyUnits: 1,
+                                            ticketItemUnitType: 'E'
+                                        });
+                                    }
+                                    _.each(newTicketItems, function(ticketItem) {
+                                        if (parseInt(ticketItem.productTypeId) === 1008) {
+                                            ticketItem._ticketId = ticket._id;
+                                            newTicketItemsToSave.push(ticketItem);
+                                        } else {
+                                            var newTicketItem = {
+                                                ticketItemDescription: ticketItem.productDescription,
+                                                productTypeId: ticketItem.productTypeId,
+                                                productId: ticketItem.productId,
+                                                userId: user.userId,
+                                                ticketItemRate: parseFloat(ticketItem.pricePerUnit),
+                                                ticketItemName: ticketItem.productDescription,
+                                                qtyUnits: parseInt(ticketItem.qtyUnits),
+                                                _ticketId: ticket._id,
+                                                ticketItemUnitType: ticketItem.ticketItemUnitType
+                                            }
+                                            newTicketItemsToSave.push(newTicketItem);
+                                        }
+                                    });
+                                    // insert list of ticket items
+                                    ticketItems.insert(newTicketItemsToSave, function(err, savedTicketItems) {
+
+                                    });
+                                }
+                            })
+
+                        }
+                    });
+                }
+            });
         }
     }
 });
@@ -336,7 +488,6 @@ app.post('/EditTicketAndReturnTicket', function(req, res) {
 
 // CREATE AND RETURN TICKET
 app.post('/CreateTicketAndReturnTicket', function(req, res) {
-    console.log('started');
     var tickets = db.collection('Ticket');
     var ticketItems = db.collection('TicketItem');
     var request = req.body;
@@ -350,10 +501,7 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
             'userId': user.userId
         }, function(err, ticketsForThisUser) {
             if (!err) {
-                console.log('no error getting existing tickets');
                 if (ticketsForThisUser && ticketsForThisUser.length > 0) {
-                    console.log('tickets for this user exist');
-                    console.log('ticket qty:' + ticketsForThisUser.length);
                     var numberPattern = /\d+/g;
                     var highTicketNumber = 0;
                     var counter = 1;
@@ -363,7 +511,6 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                             if (ticketNumber) {
 
                                 if (parseInt(ticketNumber) > highTicketNumber) {
-                                    console.log(counter + ': ' + ticketNumber + ' vs ' + highTicketNumber);
                                     highTicketNumber = parseInt(ticketNumber);
                                 }
                             }
@@ -371,13 +518,10 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                         }
                     });
                     var newTicketNumber = highTicketNumber + 1;
-                    console.log('New work ticket number:' + newTicketNumber);
                     newWorkTicketNumber = user.workTicketCode + String(newTicketNumber);
                 } else {
-                    console.log('tickets for this user DO NOT exist');
                     newWorkTicketNumber = user.workTicketCode + '150000';
                 }
-                console.log(newWorkTicketNumber);
                 newTicket.workTicketNumber = newWorkTicketNumber;
 
                 var newTicketItemsToSave = [];
@@ -407,10 +551,8 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
 
 
                 // Save ticket and ticket items
-                // TODO!
                 tickets.save(newTicket, function(err, ticket) {
                     if (!err) {
-                        console.log(ticket._id);
                         // assign ticket items to this ticket and add ticketItemDescription and ticketItemName
 
                         _.each(newTicketItems, function(ticketItem) {
@@ -431,10 +573,8 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                                 }
                                 newTicketItemsToSave.push(newTicketItem);
                             }
-
                         });
 
-                        console.log(newTicketItemsToSave);
 
                         ticketItems.insert(newTicketItemsToSave, function(err, savedTicketItems) {
                             if (!err) {
