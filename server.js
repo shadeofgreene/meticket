@@ -264,6 +264,10 @@ app.get('/GetMaterialProducts', function(req, res) {
 
 // GET TICKET (by ticketId)
 app.post('/GetTicket', function(req, res) {
+    console.log('started');
+    console.log('**************************');
+    console.log('**************************');
+    console.log('**************************');
     var request = req.body;
     if (request) {
         var ticketId = request.ticketId;
@@ -285,6 +289,7 @@ app.post('/GetTicket', function(req, res) {
                         }
                     });
                 } else {
+                    console.log(ticketId);
                     var newObjectIdObject = new ObjectId.createFromHexString(ticketId);
                     tickets.findOne({
                         '_id': newObjectIdObject
@@ -579,7 +584,11 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                                 var doc = new Pdf({
                                     margin: 25
                                 });
+                                var defaultFontSize = 12;
                                 var contentWidth = doc.page.width - 50;
+
+                                doc.fillColor('#4f4f4f');
+                                doc.fontSize(defaultFontSize);
 
                                 doc.pipe(fs.createWriteStream(serverPathToSiteRoot + 'content/Tickets/Generated/' + ticket._id.toHexString() + '.pdf'));
 
@@ -587,10 +596,16 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                                     width: contentWidth
                                 });
 
+                                doc.fontSize(defaultFontSize + 3);
+                                doc.fillColor('#56abc0');
                                 // work ticket number
                                 doc.text(ticket.workTicketNumber, 425, 65, {
                                     lineBreak: false
                                 });
+
+                                doc.fillColor('#4f4f4f');
+                                doc.fontSize(defaultFontSize);
+
                                 // po number
                                 if (ticket.customerPo) {
                                     doc.text('PO #' + ticket.customerPo, 425, 90, {
@@ -603,52 +618,111 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                                 doc.text(formattedDate, 425, 105, {
                                     lineBreak: false
                                 });
+
+                                doc.fillColor('#56abc0');
+
                                 // ticket to:
                                 doc.text('TICKET TO:', 25, 145, {
                                     lineBreak: false
                                 });
+
+                                doc.fillColor('#4f4f4f');
+
                                 // customer info
-                                doc.text(ticket.customerName, 25, 160, {
-                                    lineBreak: false
-                                });
+                                var currentCustomerInfoSpot = 160;
+                                doc.text(ticket.customerName, 25, currentCustomerInfoSpot);
+                                currentCustomerInfoSpot += 13;
+                                doc.text(newTicket.customerAddress1, 25, currentCustomerInfoSpot);
+                                if (newTicket.customerAddress2) {
+                                    currentCustomerInfoSpot += 13;
+                                    doc.text(newTicket.customerAddress2, 25, currentCustomerInfoSpot);
+                                }
+                                currentCustomerInfoSpot += 13;
+                                doc.text(newTicket.customerAddress1, 25, currentCustomerInfoSpot);
+                                currentCustomerInfoSpot += 13;
+                                if (!newTicket.customerZip) {
+                                    newTicket.customerZip = '';
+                                }
+                                if (!newTicket.customerState) {
+                                    newTicket.customerState = '';
+                                }
+                                if (newTicket.customerState === '' && newTicket.customerZip === '') {
+                                    doc.text(newTicket.customerCity, 25, currentCustomerInfoSpot);
+                                } else {
+                                    doc.text(newTicket.customerCity + ', ' + newTicket.customerState + ' ' + newTicket.customerZip, 25, currentCustomerInfoSpot);
+                                }
+                                doc.text(newTicket.customerCity + ', ' + newTicket.customerState + ' ' + newTicket.customerZip, 25, currentCustomerInfoSpot);
+
+                                if (newTicket.locationNumber) {
+                                    currentCustomerInfoSpot += 20;
+                                    // location:
+                                    doc.fillColor('#56abc0');
+                                    doc.text('LOCATION:', 25, currentCustomerInfoSpot, {
+                                        lineBreak: false
+                                    });
+                                    // location
+                                    doc.fillColor('#4f4f4f');
+                                    doc.text(newTicket.locationNumber, 95, currentCustomerInfoSpot, {
+                                        lineBreak: false
+                                    });
+                                }
+
+                                if (newTicket.rigNumber) {
+                                    currentCustomerInfoSpot += 20;
+                                    // rig:
+                                    doc.fillColor('#56abc0');
+                                    doc.text('RIG:', 25, currentCustomerInfoSpot, {
+                                        lineBreak: false
+                                    });
+                                    // rig
+                                    doc.fillColor('#4f4f4f');
+                                    doc.text(newTicket.rigNumber, 58, currentCustomerInfoSpot, {
+                                        lineBreak: false
+                                    });
+                                }
+
+                                doc.fillColor('#56abc0');
                                 // job description:
                                 doc.text('JOB DESCRIPTION:', 325, 145, {
                                     lineBreak: false
                                 });
-                                // customer info
+
+                                var currentJobDescriptionSpot = 160;
+
+                                doc.fillColor('#4f4f4f');
+                                doc.fontSize(defaultFontSize - 2);
+
+                                // description
                                 doc.text(ticket.jobDescription, 325, 160, {
                                     lineBreak: false,
                                     width: contentWidth - 325
                                 });
+
+                                currentJobDescriptionSpot = doc.y;
+
+                                var currentSpotTicketItems;
+                                if (currentJobDescriptionSpot > currentCustomerInfoSpot) {
+                                    currentSpotTicketItems = currentJobDescriptionSpot;
+                                } else {
+                                    currentSpotTicketItems = currentCustomerInfoSpot;
+                                }
+
+                                currentSpotTicketItems += 8;
+
                                 // ticket item header
-                                doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-itemheading.jpg', 25, null, {
+                                doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-itemheading.jpg', 25, currentSpotTicketItems, {
                                     width: contentWidth
                                 });
 
+                                currentSpotTicketItems += 30;
 
-                                // ticket items
-                                //                                doc.text('test1', 25, doc.y, {
-                                //                                    width: 250,
-                                //                                    lineBreak: false
-                                //                                });
-                                //                                doc.text('test2', 25 + 250, doc.y, {
-                                //                                    width: 70
-                                //                                });
-                                //                                doc.text('test3', 25 + 250 + 70, doc.y, {
-                                //                                    width: 60
-                                //                                });
-                                //                                doc.text('test4', 25 + 250 + 70 + 90, doc.y, {
-                                //                                    width: 90
-                                //                                });
-                                //                                doc.moveDown();
-                                
                                 var laborItems = _.filter(savedTicketItems, function(sti) {
                                     return parseInt(sti.productTypeId) === 1006;
                                 });
                                 var otherItems = _.reject(savedTicketItems, function(sti) {
                                     return parseInt(sti.productTypeId) === 1006;
                                 });
-                                var startOfTicketItems = doc.y + 10;
+                                var startOfTicketItems = currentSpotTicketItems;
 
                                 if (laborItems.length > 0) {
                                     _.each(laborItems, function(ti) {
@@ -674,16 +748,25 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                                 _.each(otherItems, function(ti) {
                                     var endOfPage = 750;
 
-                                    if (startOfTicketItems > endOfPage - 100) {
+                                    if (startOfTicketItems > endOfPage - 30) {
                                         doc.addPage();
+                                        doc.fillColor('#4f4f4f');
+                                        doc.fontSize(defaultFontSize);
+
                                         doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template.jpg', {
                                             width: contentWidth
                                         });
 
+                                        doc.fontSize(defaultFontSize + 3);
+                                        doc.fillColor('#56abc0');
                                         // work ticket number
                                         doc.text(ticket.workTicketNumber, 425, 65, {
                                             lineBreak: false
                                         });
+
+                                        doc.fillColor('#4f4f4f');
+                                        doc.fontSize(defaultFontSize);
+
                                         // po number
                                         if (ticket.customerPo) {
                                             doc.text('PO #' + ticket.customerPo, 425, 90, {
@@ -697,12 +780,18 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                                             lineBreak: false
                                         });
 
+                                        doc.fillColor('#4f4f4f');
+                                        doc.fontSize(defaultFontSize);
+
+                                        var startOfItemHeadingImage = 145;
+
                                         // ticket item header
                                         doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-itemheading.jpg', 25, 145, {
                                             width: contentWidth
                                         });
+                                        startOfItemHeadingImage += 35;
 
-                                        startOfTicketItems = 155;
+                                        startOfTicketItems = startOfItemHeadingImage;
                                     }
                                     doc.text(ti.ticketItemDescription, 25, startOfTicketItems, {
                                         width: 280
@@ -719,39 +808,82 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                                     startOfTicketItems += 20;
                                 });
 
+
+                                var startOfTotalSection = 595;
+                                if (startOfTicketItems > startOfTotalSection - 30) {
+                                    doc.addPage();
+                                    doc.fillColor('#4f4f4f');
+                                    doc.fontSize(defaultFontSize);
+
+                                    doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template.jpg', {
+                                        width: contentWidth
+                                    });
+
+                                    doc.fontSize(defaultFontSize + 3);
+                                    doc.fillColor('#56abc0');
+                                    // work ticket number
+                                    doc.text(ticket.workTicketNumber, 425, 65, {
+                                        lineBreak: false
+                                    });
+
+                                    doc.fillColor('#4f4f4f');
+                                    doc.fontSize(defaultFontSize);
+
+                                    // po number
+                                    if (ticket.customerPo) {
+                                        doc.text('PO #' + ticket.customerPo, 425, 90, {
+                                            lineBreak: false
+                                        });
+                                    }
+                                    // creation date
+                                    console.log(ticket.ticketCreationDate);
+                                    var formattedDate = moment(ticket.ticketCreationDate).format('M/D/YYYY');
+                                    doc.text(formattedDate, 425, 105, {
+                                        lineBreak: false
+                                    });
+
+                                    doc.fillColor('#4f4f4f');
+                                    doc.fontSize(defaultFontSize);
+                                }
+
+                                doc.fontSize(defaultFontSize);
+
                                 // total section
                                 doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-totalsection.jpg', 275, 595, {
                                     width: contentWidth - 250
                                 });
-                                
-                                doc.text(accounting.formatMoney(newTicket.totalSection.materialSubTotal), 275 + 50, 595 + 50);
-                                doc.text(accounting.formatMoney(newTicket.totalSection.laborAndEquipmentSubTotal), 275 + 50, 595 + 50 + 30);
-                                doc.text(accounting.formatMoney(newTicket.freight), 275 + 50, 595 + 50 + 30 + 30);
-                                doc.text(accounting.formatMoney(newTicket.totalSection.totalTaxes), 275 + 50, 595 + 50 + 30 + 30 + 30);
-                                doc.text(accounting.formatMoney(newTicket.totalSection.grandTotal), 275 + 50, 595 + 50 + 30 + 30 + 30 + 30);
 
-                                var values = [
-                                    50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
-                                ];
-                                var vals = [
-                                    50, 100, 150, 200, 250, 300, 350, 400, 450, 500
-                                ];
+                                var incrementAmount = 26;
+                                var yStart = 618;
+                                doc.text(accounting.formatMoney(newTicket.totalSection.materialSubTotal), 460, yStart);
+                                doc.text(accounting.formatMoney(newTicket.totalSection.laborAndEquipmentSubTotal), 460, yStart + incrementAmount);
+                                doc.text(accounting.formatMoney(newTicket.freight), 460, yStart + incrementAmount + incrementAmount);
+                                doc.text(accounting.formatMoney(newTicket.totalSection.totalTaxes), 460, yStart + incrementAmount + incrementAmount + incrementAmount);
 
-                                doc.fillColor('red');
-                                _.each(values, function(v) {
-                                    doc.text(v, 0, v, {
-                                        lineBreak: false
-                                    });
-                                });
-                                doc.fillColor('green');
-                                _.each(vals, function(x) {
-                                    doc.text(x, x, 0, {
-                                        lineBreak: false
-                                    });
-                                });
+                                doc.fontSize(defaultFontSize + 4);
 
+                                doc.text(accounting.formatMoney(newTicket.totalSection.grandTotal), 460, yStart + incrementAmount + incrementAmount + incrementAmount + incrementAmount - 2);
 
-                                doc.text('')
+                                //                                var values = [
+                                //                                    50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+                                //                                ];
+                                //                                var vals = [
+                                //                                    50, 100, 150, 200, 250, 300, 350, 400, 450, 500
+                                //                                ];
+                                //
+                                //                                doc.fillColor('red');
+                                //                                _.each(values, function(v) {
+                                //                                    doc.text(v, 0, v, {
+                                //                                        lineBreak: false
+                                //                                    });
+                                //                                });
+                                //                                doc.fillColor('green');
+                                //                                _.each(vals, function(x) {
+                                //                                    doc.text(x, x, 0, {
+                                //                                        lineBreak: false
+                                //                                    });
+                                //                                });
+
                                 doc.end();
 
                                 res.status(200).json('Ticket has been saved!');
