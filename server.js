@@ -8,6 +8,11 @@ var bodyParser = require('body-parser');
 var ObjectId = require('mongodb').ObjectID;
 var http = require('http');
 var _ = require('underscore');
+var Pdf = require('pdfkit');
+var fs = require('fs');
+var serverPathToSiteRoot = '/CodeNode/meticket/public/';
+var moment = require('moment');
+var accounting = require('accounting');
 
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
@@ -348,57 +353,53 @@ app.post('/EditTicketAndReturnTicket', function(req, res) {
                 new: true
             }, function(err, updatedTicket, lastErrorObject) {
                 if (!err) {
-                    ticketItems.find({
-                        'ticketId': updatedTicket.ticketId
-                    }, function(err, theseTicketItems) {
+                    // delete ticket items
+                    ticketItems.remove({
+                        'ticketId': ticket.ticketId
+                    }, function(err, removedTicketItems) {
                         if (!err) {
-                            // TODO!
-                            // delete ticket items
-                            ticketItems.remove({
-                                'ticketId': ticket.ticketId
-                            }, function(err, removedTicketItems) {
-                                if (!err) {
-                                    // create new of these items
-                                    var newTicketItemsToSave = [];
-                                    // create new ticket item if freight exists
-                                    if (newTicket.freight) {
-                                        newTicket.ticketItems.push({
-                                            ticketItemDescription: 'Freight charge',
-                                            productTypeId: 1008,
-                                            userId: user.userId,
-                                            ticketItemRate: parseFloat(newTicket.freight),
-                                            ticketItemName: 'Freight charge',
-                                            qtyUnits: 1,
-                                            ticketItemUnitType: 'E'
-                                        });
+                            // create new of these items
+                            var newTicketItemsToSave = [];
+                            // create new ticket item if freight exists
+                            if (newTicket.freight) {
+                                newTicket.ticketItems.push({
+                                    ticketItemDescription: 'Freight charge',
+                                    productTypeId: 1008,
+                                    userId: user.userId,
+                                    ticketItemRate: parseFloat(newTicket.freight),
+                                    ticketItemName: 'Freight charge',
+                                    qtyUnits: 1,
+                                    ticketItemUnitType: 'E'
+                                });
+                            }
+                            _.each(newTicketItems, function(ticketItem) {
+                                if (parseInt(ticketItem.productTypeId) === 1008) {
+                                    ticketItem._ticketId = ticket._id;
+                                    newTicketItemsToSave.push(ticketItem);
+                                } else {
+                                    var newTicketItem = {
+                                        ticketItemDescription: ticketItem.productDescription,
+                                        productTypeId: ticketItem.productTypeId,
+                                        productId: ticketItem.productId,
+                                        userId: user.userId,
+                                        ticketItemRate: parseFloat(ticketItem.pricePerUnit),
+                                        ticketItemName: ticketItem.productDescription,
+                                        qtyUnits: parseInt(ticketItem.qtyUnits),
+                                        _ticketId: ticket._id,
+                                        ticketItemUnitType: ticketItem.ticketItemUnitType
                                     }
-                                    _.each(newTicketItems, function(ticketItem) {
-                                        if (parseInt(ticketItem.productTypeId) === 1008) {
-                                            ticketItem._ticketId = ticket._id;
-                                            newTicketItemsToSave.push(ticketItem);
-                                        } else {
-                                            var newTicketItem = {
-                                                ticketItemDescription: ticketItem.productDescription,
-                                                productTypeId: ticketItem.productTypeId,
-                                                productId: ticketItem.productId,
-                                                userId: user.userId,
-                                                ticketItemRate: parseFloat(ticketItem.pricePerUnit),
-                                                ticketItemName: ticketItem.productDescription,
-                                                qtyUnits: parseInt(ticketItem.qtyUnits),
-                                                _ticketId: ticket._id,
-                                                ticketItemUnitType: ticketItem.ticketItemUnitType
-                                            }
-                                            newTicketItemsToSave.push(newTicketItem);
-                                        }
-                                    });
-                                    // insert list of ticket items
-                                    ticketItems.insert(newTicketItemsToSave, function(err, savedTicketItems) {
-
-                                    });
+                                    newTicketItemsToSave.push(newTicketItem);
                                 }
-                            })
+                            });
+                            // insert list of ticket items
+                            ticketItems.insert(newTicketItemsToSave, function(err, savedTicketItems) {
+                                if (!err) {
+                                    ticketItem.ticketItems = savedTicketItems;
+                                    res.status(200).json(ticketItem);
+                                }
+                            });
                         }
-                    });
+                    })
                 }
             });
         } else if (ticket._id) {
@@ -427,60 +428,56 @@ app.post('/EditTicketAndReturnTicket', function(req, res) {
                 new: true
             }, function(err, updatedTicket, lastErrorObject) {
                 if (!err) {
-                    ticketItems.find({
-                        '_ticketId': updatedTicket._id
-                    }, function(err, theseTicketItems) {
+                    // delete ticket items
+                    ticketItems.remove({
+                        '_ticketId': ticket._id
+                    }, function(err, ticketItemsRemoved) {
                         if (!err) {
-                            // TODO!
-                            // delete ticket items
-                            ticketItems.remove({
-                                '_ticketId': ticket._id
-                            }, function(err, ticketItemsRemoved) {
-                                if (!err) {
-                                    // create new of these items
-                                    var newTicketItemsToSave = [];
-                                    // create new ticket item if freight exists
-                                    if (newTicket.freight) {
-                                        newTicket.ticketItems.push({
-                                            ticketItemDescription: 'Freight charge',
-                                            productTypeId: 1008,
-                                            userId: user.userId,
-                                            ticketItemRate: parseFloat(newTicket.freight),
-                                            ticketItemName: 'Freight charge',
-                                            qtyUnits: 1,
-                                            ticketItemUnitType: 'E'
-                                        });
+                            // create new of these items
+                            var newTicketItemsToSave = [];
+                            // create new ticket item if freight exists
+                            if (newTicket.freight) {
+                                newTicket.ticketItems.push({
+                                    ticketItemDescription: 'Freight charge',
+                                    productTypeId: 1008,
+                                    userId: user.userId,
+                                    ticketItemRate: parseFloat(newTicket.freight),
+                                    ticketItemName: 'Freight charge',
+                                    qtyUnits: 1,
+                                    ticketItemUnitType: 'E'
+                                });
+                            }
+                            _.each(newTicketItems, function(ticketItem) {
+                                if (parseInt(ticketItem.productTypeId) === 1008) {
+                                    ticketItem._ticketId = ticket._id;
+                                    newTicketItemsToSave.push(ticketItem);
+                                } else {
+                                    var newTicketItem = {
+                                        ticketItemDescription: ticketItem.productDescription,
+                                        productTypeId: ticketItem.productTypeId,
+                                        productId: ticketItem.productId,
+                                        userId: user.userId,
+                                        ticketItemRate: parseFloat(ticketItem.pricePerUnit),
+                                        ticketItemName: ticketItem.productDescription,
+                                        qtyUnits: parseInt(ticketItem.qtyUnits),
+                                        _ticketId: ticket._id,
+                                        ticketItemUnitType: ticketItem.ticketItemUnitType
                                     }
-                                    _.each(newTicketItems, function(ticketItem) {
-                                        if (parseInt(ticketItem.productTypeId) === 1008) {
-                                            ticketItem._ticketId = ticket._id;
-                                            newTicketItemsToSave.push(ticketItem);
-                                        } else {
-                                            var newTicketItem = {
-                                                ticketItemDescription: ticketItem.productDescription,
-                                                productTypeId: ticketItem.productTypeId,
-                                                productId: ticketItem.productId,
-                                                userId: user.userId,
-                                                ticketItemRate: parseFloat(ticketItem.pricePerUnit),
-                                                ticketItemName: ticketItem.productDescription,
-                                                qtyUnits: parseInt(ticketItem.qtyUnits),
-                                                _ticketId: ticket._id,
-                                                ticketItemUnitType: ticketItem.ticketItemUnitType
-                                            }
-                                            newTicketItemsToSave.push(newTicketItem);
-                                        }
-                                    });
-                                    // insert list of ticket items
-                                    ticketItems.insert(newTicketItemsToSave, function(err, savedTicketItems) {
-
-                                    });
+                                    newTicketItemsToSave.push(newTicketItem);
                                 }
-                            })
-
+                            });
+                            // insert list of ticket items
+                            ticketItems.insert(newTicketItemsToSave, function(err, savedTicketItems) {
+                                if (!err) {
+                                    ticketItem.ticketItems = savedTicketItems;
+                                    res.status(200).json(ticketItem);
+                                }
+                            });
                         }
-                    });
+                    })
                 }
             });
+
         }
     }
 });
@@ -578,6 +575,185 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
 
                         ticketItems.insert(newTicketItemsToSave, function(err, savedTicketItems) {
                             if (!err) {
+                                // create PDF
+                                var doc = new Pdf({
+                                    margin: 25
+                                });
+                                var contentWidth = doc.page.width - 50;
+
+                                doc.pipe(fs.createWriteStream(serverPathToSiteRoot + 'content/Tickets/Generated/' + ticket._id.toHexString() + '.pdf'));
+
+                                doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template.jpg', {
+                                    width: contentWidth
+                                });
+
+                                // work ticket number
+                                doc.text(ticket.workTicketNumber, 425, 65, {
+                                    lineBreak: false
+                                });
+                                // po number
+                                if (ticket.customerPo) {
+                                    doc.text('PO #' + ticket.customerPo, 425, 90, {
+                                        lineBreak: false
+                                    });
+                                }
+                                // creation date
+                                console.log(ticket.ticketCreationDate);
+                                var formattedDate = moment(ticket.ticketCreationDate).format('M/D/YYYY');
+                                doc.text(formattedDate, 425, 105, {
+                                    lineBreak: false
+                                });
+                                // ticket to:
+                                doc.text('TICKET TO:', 25, 145, {
+                                    lineBreak: false
+                                });
+                                // customer info
+                                doc.text(ticket.customerName, 25, 160, {
+                                    lineBreak: false
+                                });
+                                // job description:
+                                doc.text('JOB DESCRIPTION:', 325, 145, {
+                                    lineBreak: false
+                                });
+                                // customer info
+                                doc.text(ticket.jobDescription, 325, 160, {
+                                    lineBreak: false,
+                                    width: contentWidth - 325
+                                });
+                                // ticket item header
+                                doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-itemheading.jpg', 25, null, {
+                                    width: contentWidth
+                                });
+
+
+                                // ticket items
+                                //                                doc.text('test1', 25, doc.y, {
+                                //                                    width: 250,
+                                //                                    lineBreak: false
+                                //                                });
+                                //                                doc.text('test2', 25 + 250, doc.y, {
+                                //                                    width: 70
+                                //                                });
+                                //                                doc.text('test3', 25 + 250 + 70, doc.y, {
+                                //                                    width: 60
+                                //                                });
+                                //                                doc.text('test4', 25 + 250 + 70 + 90, doc.y, {
+                                //                                    width: 90
+                                //                                });
+                                //                                doc.moveDown();
+                                
+                                var laborItems = _.filter(savedTicketItems, function(sti) {
+                                    return parseInt(sti.productTypeId) === 1006;
+                                });
+                                var otherItems = _.reject(savedTicketItems, function(sti) {
+                                    return parseInt(sti.productTypeId) === 1006;
+                                });
+                                var startOfTicketItems = doc.y + 10;
+
+                                if (laborItems.length > 0) {
+                                    _.each(laborItems, function(ti) {
+                                        doc.text(ti.ticketItemDescription, 25, startOfTicketItems, {
+                                            width: 280
+                                        });
+                                        doc.text(accounting.formatMoney(ti.ticketItemRate), 25 + 280, startOfTicketItems, {
+                                            width: 103
+                                        });
+                                        doc.text(ti.qtyUnits, 25 + 280 + 103, startOfTicketItems, {
+                                            width: 80
+                                        });
+                                        doc.text(accounting.formatMoney(parseFloat(ti.ticketItemRate) * parseInt(ti.qtyUnits)), 25 + 280 + 103 + 80, startOfTicketItems, {
+                                            width: 100
+                                        });
+                                        startOfTicketItems += 20;
+                                    });
+
+                                    startOfTicketItems += 20;
+                                }
+
+
+                                _.each(otherItems, function(ti) {
+                                    var endOfPage = 750;
+
+                                    if (startOfTicketItems > endOfPage - 100) {
+                                        doc.addPage();
+                                        doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template.jpg', {
+                                            width: contentWidth
+                                        });
+
+                                        // work ticket number
+                                        doc.text(ticket.workTicketNumber, 425, 65, {
+                                            lineBreak: false
+                                        });
+                                        // po number
+                                        if (ticket.customerPo) {
+                                            doc.text('PO #' + ticket.customerPo, 425, 90, {
+                                                lineBreak: false
+                                            });
+                                        }
+                                        // creation date
+                                        console.log(ticket.ticketCreationDate);
+                                        var formattedDate = moment(ticket.ticketCreationDate).format('M/D/YYYY');
+                                        doc.text(formattedDate, 425, 105, {
+                                            lineBreak: false
+                                        });
+
+                                        // ticket item header
+                                        doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-itemheading.jpg', 25, 145, {
+                                            width: contentWidth
+                                        });
+
+                                        startOfTicketItems = 155;
+                                    }
+                                    doc.text(ti.ticketItemDescription, 25, startOfTicketItems, {
+                                        width: 280
+                                    });
+                                    doc.text(accounting.formatMoney(ti.ticketItemRate), 25 + 280, startOfTicketItems, {
+                                        width: 103
+                                    });
+                                    doc.text(ti.qtyUnits, 25 + 280 + 103, startOfTicketItems, {
+                                        width: 80
+                                    });
+                                    doc.text(accounting.formatMoney(parseFloat(ti.ticketItemRate) * parseInt(ti.qtyUnits)), 25 + 280 + 103 + 80, startOfTicketItems, {
+                                        width: 100
+                                    });
+                                    startOfTicketItems += 20;
+                                });
+
+                                // total section
+                                doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-totalsection.jpg', 275, 595, {
+                                    width: contentWidth - 250
+                                });
+                                
+                                doc.text(accounting.formatMoney(newTicket.totalSection.materialSubTotal), 275 + 50, 595 + 50);
+                                doc.text(accounting.formatMoney(newTicket.totalSection.laborAndEquipmentSubTotal), 275 + 50, 595 + 50 + 30);
+                                doc.text(accounting.formatMoney(newTicket.freight), 275 + 50, 595 + 50 + 30 + 30);
+                                doc.text(accounting.formatMoney(newTicket.totalSection.totalTaxes), 275 + 50, 595 + 50 + 30 + 30 + 30);
+                                doc.text(accounting.formatMoney(newTicket.totalSection.grandTotal), 275 + 50, 595 + 50 + 30 + 30 + 30 + 30);
+
+                                var values = [
+                                    50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+                                ];
+                                var vals = [
+                                    50, 100, 150, 200, 250, 300, 350, 400, 450, 500
+                                ];
+
+                                doc.fillColor('red');
+                                _.each(values, function(v) {
+                                    doc.text(v, 0, v, {
+                                        lineBreak: false
+                                    });
+                                });
+                                doc.fillColor('green');
+                                _.each(vals, function(x) {
+                                    doc.text(x, x, 0, {
+                                        lineBreak: false
+                                    });
+                                });
+
+
+                                doc.text('')
+                                doc.end();
+
                                 res.status(200).json('Ticket has been saved!');
                             } else {
                                 res.status(201).json('Ticket was saved, but ticket items were not saved');
