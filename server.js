@@ -651,7 +651,7 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                                 } else {
                                     doc.text(newTicket.customerCity + ', ' + newTicket.customerState + ' ' + newTicket.customerZip, 25, currentCustomerInfoSpot);
                                 }
-                                doc.text(newTicket.customerCity + ', ' + newTicket.customerState + ' ' + newTicket.customerZip, 25, currentCustomerInfoSpot);
+                                
                                 doc.fontSize(defaultFontSize);
                                 if (newTicket.locationNumber) {
                                     currentCustomerInfoSpot += 20;
@@ -707,7 +707,7 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                                     currentSpotTicketItems = currentCustomerInfoSpot;
                                 }
 
-                                currentSpotTicketItems += 8;
+                                currentSpotTicketItems += 16;
 
                                 // ticket item header
                                 doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-itemheading.jpg', 25, currentSpotTicketItems, {
@@ -743,8 +743,7 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
 
                                     startOfTicketItems += 20;
                                 }
-
-
+								
                                 _.each(otherItems, function(ti) {
                                     var endOfPage = 750;
 
@@ -863,6 +862,8 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                                 doc.fontSize(defaultFontSize + 4);
 
                                 doc.text(accounting.formatMoney(newTicket.totalSection.grandTotal), 460, yStart + incrementAmount + incrementAmount + incrementAmount + incrementAmount - 2);
+								 doc.text(accounting.formatMoney(newTicket.totalSection.grandTotal), 460, yStart + incrementAmount + incrementAmount + incrementAmount + incrementAmount - 2);
+								 doc.text(accounting.formatMoney(newTicket.totalSection.grandTotal), 460, yStart + incrementAmount + incrementAmount + incrementAmount + incrementAmount - 2);
 
                                 //                                var values = [
                                 //                                    50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950

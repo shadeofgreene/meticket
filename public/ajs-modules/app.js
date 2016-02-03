@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ngRoute', 'ui.bootstrap', 'angucomplete-alt']);
+var app = angular.module('app', ['ngRoute', 'ui.bootstrap', 'angucomplete-alt', 'swd.inspector-gadget']);
 debugger;
 app.config(function ($routeProvider) {
 	$routeProvider.when('/home', {
