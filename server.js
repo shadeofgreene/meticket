@@ -19,7 +19,6 @@ app.use(bodyParser.json());
 
 app.post('/TryLoginAndGetUser', function(req, res) {
     var user = req.body;
-    console.log(user);
     if (user.userEmail && user.userPassword) {
         db.User.findOne({
             'userEmail': user.userEmail,
@@ -330,9 +329,9 @@ app.post('/EditTicketAndReturnTicket', function(req, res) {
     var tickets = db.collection('Ticket');
     var ticketItems = db.collection('TicketItem');
     var ticket = req.body;
-    if (request) {
+    if (ticket) {
+        console.log(ticket);
         if (ticket.ticketId) {
-
             tickets.findAndModify({
                 query: {
                     ticketId: ticket.ticketId
@@ -360,37 +359,37 @@ app.post('/EditTicketAndReturnTicket', function(req, res) {
                 if (!err) {
                     // delete ticket items
                     ticketItems.remove({
-                        'ticketId': ticket.ticketId
+                        'ticketId': updatedTicket.ticketId
                     }, function(err, removedTicketItems) {
                         if (!err) {
                             // create new of these items
                             var newTicketItemsToSave = [];
                             // create new ticket item if freight exists
-                            if (newTicket.freight) {
-                                newTicket.ticketItems.push({
+                            if (updatedTicket.freight) {
+                                updatedTicket.ticketItems.push({
                                     ticketItemDescription: 'Freight charge',
                                     productTypeId: 1008,
-                                    userId: user.userId,
-                                    ticketItemRate: parseFloat(newTicket.freight),
+                                    userId: updatedTicket.userId,
+                                    ticketItemRate: parseFloat(ticket.freight),
                                     ticketItemName: 'Freight charge',
                                     qtyUnits: 1,
                                     ticketItemUnitType: 'E'
                                 });
                             }
-                            _.each(newTicketItems, function(ticketItem) {
+                            _.each(updatedTicket.ticketItems, function(ticketItem) {
                                 if (parseInt(ticketItem.productTypeId) === 1008) {
-                                    ticketItem._ticketId = ticket._id;
+                                    ticketItem.ticketId = updatedTicket.ticketId;
                                     newTicketItemsToSave.push(ticketItem);
                                 } else {
                                     var newTicketItem = {
                                         ticketItemDescription: ticketItem.productDescription,
                                         productTypeId: ticketItem.productTypeId,
                                         productId: ticketItem.productId,
-                                        userId: user.userId,
+                                        userId: updatedTicket.userId,
                                         ticketItemRate: parseFloat(ticketItem.pricePerUnit),
                                         ticketItemName: ticketItem.productDescription,
                                         qtyUnits: parseInt(ticketItem.qtyUnits),
-                                        _ticketId: ticket._id,
+                                        ticketId: updatedTicket.ticketId,
                                         ticketItemUnitType: ticketItem.ticketItemUnitType
                                     }
                                     newTicketItemsToSave.push(newTicketItem);
@@ -399,8 +398,8 @@ app.post('/EditTicketAndReturnTicket', function(req, res) {
                             // insert list of ticket items
                             ticketItems.insert(newTicketItemsToSave, function(err, savedTicketItems) {
                                 if (!err) {
-                                    ticketItem.ticketItems = savedTicketItems;
-                                    res.status(200).json(ticketItem);
+                                    updatedTicket.ticketItems = savedTicketItems;
+                                    res.status(200).json(updatedTicket);
                                 }
                             });
                         }
@@ -435,37 +434,37 @@ app.post('/EditTicketAndReturnTicket', function(req, res) {
                 if (!err) {
                     // delete ticket items
                     ticketItems.remove({
-                        '_ticketId': ticket._id
+                        '_ticketId': updatedTicket._id
                     }, function(err, ticketItemsRemoved) {
                         if (!err) {
                             // create new of these items
                             var newTicketItemsToSave = [];
                             // create new ticket item if freight exists
-                            if (newTicket.freight) {
-                                newTicket.ticketItems.push({
+                            if (updatedTicket.freight) {
+                                updatedTicket.ticketItems.push({
                                     ticketItemDescription: 'Freight charge',
                                     productTypeId: 1008,
-                                    userId: user.userId,
-                                    ticketItemRate: parseFloat(newTicket.freight),
+                                    userId: updatedTicket.userId,
+                                    ticketItemRate: parseFloat(updatedTicket.freight),
                                     ticketItemName: 'Freight charge',
                                     qtyUnits: 1,
                                     ticketItemUnitType: 'E'
                                 });
                             }
-                            _.each(newTicketItems, function(ticketItem) {
+                            _.each(updatedTicket.ticketItems, function(ticketItem) {
                                 if (parseInt(ticketItem.productTypeId) === 1008) {
-                                    ticketItem._ticketId = ticket._id;
+                                    ticketItem._ticketId = updatedTicket._id;
                                     newTicketItemsToSave.push(ticketItem);
                                 } else {
                                     var newTicketItem = {
                                         ticketItemDescription: ticketItem.productDescription,
                                         productTypeId: ticketItem.productTypeId,
                                         productId: ticketItem.productId,
-                                        userId: user.userId,
+                                        userId: updatedTicket.userId,
                                         ticketItemRate: parseFloat(ticketItem.pricePerUnit),
                                         ticketItemName: ticketItem.productDescription,
                                         qtyUnits: parseInt(ticketItem.qtyUnits),
-                                        _ticketId: ticket._id,
+                                        _ticketId: updatedTicket._id,
                                         ticketItemUnitType: ticketItem.ticketItemUnitType
                                     }
                                     newTicketItemsToSave.push(newTicketItem);
@@ -474,15 +473,14 @@ app.post('/EditTicketAndReturnTicket', function(req, res) {
                             // insert list of ticket items
                             ticketItems.insert(newTicketItemsToSave, function(err, savedTicketItems) {
                                 if (!err) {
-                                    ticketItem.ticketItems = savedTicketItems;
-                                    res.status(200).json(ticketItem);
+                                    updatedTicket.ticketItems = savedTicketItems;
+                                    res.status(200).json(updatedTicket);
                                 }
                             });
                         }
                     })
                 }
             });
-
         }
     }
 });
@@ -631,14 +629,16 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                                 // customer info
                                 var currentCustomerInfoSpot = 160;
                                 doc.text(ticket.customerName, 25, currentCustomerInfoSpot);
-                                currentCustomerInfoSpot += 13;
+                                currentCustomerInfoSpot += 15;
+                                
+                                doc.fontSize(defaultFontSize - 2);
+                                
                                 doc.text(newTicket.customerAddress1, 25, currentCustomerInfoSpot);
                                 if (newTicket.customerAddress2) {
                                     currentCustomerInfoSpot += 13;
                                     doc.text(newTicket.customerAddress2, 25, currentCustomerInfoSpot);
                                 }
-                                currentCustomerInfoSpot += 13;
-                                doc.text(newTicket.customerAddress1, 25, currentCustomerInfoSpot);
+
                                 currentCustomerInfoSpot += 13;
                                 if (!newTicket.customerZip) {
                                     newTicket.customerZip = '';
@@ -652,7 +652,7 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                                     doc.text(newTicket.customerCity + ', ' + newTicket.customerState + ' ' + newTicket.customerZip, 25, currentCustomerInfoSpot);
                                 }
                                 doc.text(newTicket.customerCity + ', ' + newTicket.customerState + ' ' + newTicket.customerZip, 25, currentCustomerInfoSpot);
-
+                                doc.fontSize(defaultFontSize);
                                 if (newTicket.locationNumber) {
                                     currentCustomerInfoSpot += 20;
                                     // location:

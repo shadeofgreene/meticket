@@ -26,7 +26,9 @@
 					</thead>
 					<tbody>
 						<tr data-ng-repeat="ticket in ticketsForCurrentUser | filter:searchTicket">
-							<td><a href="{{baseUrl}}Goodies/Tickets/Generated/ticket-{{ticket.ticketId}}.pdf">{{ticket.workTicketNumber}}</a></td>
+							<td>
+                                <a data-ng-if="ticket._id" href="{{baseUrl}}content/Tickets/Generated/{{ticket._id}}.pdf">{{ticket.workTicketNumber}}</a>
+                                <a data-ng-if="ticket.ticketId" href="http://meticket.briangreenedev.com/Goodies/Tickets/Generated/ticket-{{ticket.ticketId}}.pdf">{{ticket.workTicketNumber}}</a></td>
 							<td>{{ ticket.customerName }}</td>
 							<td>{{ ticket.jobDescription }}</td>
 							<td>

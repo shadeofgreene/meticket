@@ -23,25 +23,30 @@ app.controller('NgTicketController', [
                         });
                         _.each(userTickets, function(userTicket) {
                             debugger;
+                            userTicket.ticketItems = [];
                             if (userTicket.ticketId) {
-                                userTicket.ticketItems = _.filter(items, function(item) {
+                                _.each(items, function(item) {
                                     debugger;
-                                    return parseInt(userTicket.ticketId) === parseInt(item.ticketId);
+                                    if (userTicket.ticketId === item.ticketId) {
+                                        userTicket.ticketItems.push(item);
+                                    }
                                 });
                             } else if (userTicket._id) {
-                                userTicket._id = _.filter(items, function(item) {
+                                _.each(items, function(item) {
                                     debugger;
-                                    return parseInt(userTicket._id) === parseInt(item._ticketId);
+                                    if (userTicket._id === item._ticketId) {
+                                        userTicket.ticketItems.push(item);
+                                    }
                                 });
                             }
                         });
                         $scope.ticketsForCurrentUser = userTickets;
                     }
-//                    _.each($scope.ticketsForCurrentUser, function(ticket) {
-//                        debugger;
-//                        var ticketItemsForThisTicket = $scope.getTicketItemsForTicket(ticket.ticketId, ticket._id);
-//                        ticket.ticketItems = ticketItemsForThisTicket;
-//                    });
+                    //                    _.each($scope.ticketsForCurrentUser, function(ticket) {
+                    //                        debugger;
+                    //                        var ticketItemsForThisTicket = $scope.getTicketItemsForTicket(ticket.ticketId, ticket._id);
+                    //                        ticket.ticketItems = ticketItemsForThisTicket;
+                    //                    });
                 }).error(function(error, err) {
 
                 });
@@ -369,19 +374,19 @@ app.controller('NgTicketController', [
             $scope.ticket.ticketItemObjects = $scope.ticket.ticketItems;
             $scope.updateTotalPrices();
 
-            $http.post(helper.baseUrl + 'public/TicketView/EditTicketAndReturnTicket', $scope.ticket).success(function(ticket) {
-
+            $http.post('/EditTicketAndReturnTicket', $scope.ticket).success(function(ticket) {
                 $scope.ticket = {};
                 $scope.ticket.ticketItems = [];
                 Alert.hideLoading();
 
                 // local
-                $window.location.href = helper.baseUrl + 'Goodies/Tickets/Generated/ticket-' + ticket.ticketId + '.pdf';
+                //$window.location.href = helper.baseUrl + 'Goodies/Tickets/Generated/ticket-' + ticket.ticketId + '.pdf';
                 // server
-                //$window.location.href = helper.baseUrl + 'Goodies/Content/Goodies/Tickets/Generated/ticket-' + ticket.ticketId + '.pdf';
+                //$window.location.href = helper.baseUrl + 'Goodies/Content/Goodies/Tickets/Generated/ticket-' + ticket.ticketId + '.pdf';                
                 toastr.success('The ticket was updated successfully', 'Success');
+                $location.path('ticket-list');
             }).error(function(error, err) {
-
+                Alert.hideLoading();
                 toastr.error('Something went wrong while trying to save', 'Error');
             });
         }
@@ -419,7 +424,7 @@ app.controller('NgTicketController', [
                 toastr.success('The ticket was created successfully', 'Success');
                 $location.path('ticket-list');
             }).error(function(error, err) {
-
+                Alert.hideLoading();
                 toastr.error('Something went wrong while trying to save', 'Error');
             });
         };
