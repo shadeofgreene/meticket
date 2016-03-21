@@ -36,6 +36,7 @@ app.post('/TryLoginAndGetUser', function(req, res) {
                     'username': user.userEmail,
                     'password': user.userPassword
                 });
+                console.log(data);
                 var options = {
                     host: 'meticket.briangreenedev.com',
                     path: '/TicketSystem/LoginView/TryLoginAndGetUser',
@@ -45,22 +46,25 @@ app.post('/TryLoginAndGetUser', function(req, res) {
                         'Content-Length': Buffer.byteLength(data)
                     }
                 };
+                console.log(options);
 
                 var userString = '';
                 http.request(options, function(userRes) {
+                    console.log(userRes);
                     userRes.setEncoding('utf8');
                     userRes.on('data', function(chunk) {
-                        //console.log(chunk);
+                        console.log(chunk);
                         userString += chunk;
                     });
                     userRes.on('end', function(data) {
+                        console.log(userString);
                         var userToSave = JSON.parse(userString);
                         userToSave.userPassword = user.userPassword;
-                        console.log(userToSave);
+                        //console.log(userToSave);
                         db.User.save(userToSave);
+                        res.json(userToSave);
                     });
                 }).write(data);
-
             } else {
                 console.log('user was found');
                 res.json(checkUser);

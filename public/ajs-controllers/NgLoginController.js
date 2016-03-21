@@ -46,10 +46,8 @@ app.controller('NgLoginController', ['$scope', '$http', '$location', 'Auth', fun
 			if(err.error) {
 				toastr.error(err.error);
 			}
-		});
-
-		setTimeout(function () {
-			$('#loadingModal').modal('hide');
-		}, 3000);
+		}).finally(function(error, err) {
+            $('#loadingModal').modal('hide');
+        });
 	};
 }]);
