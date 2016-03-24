@@ -55,8 +55,7 @@ app.post('/TryLoginAndGetUser', function (req, res) {
 					userRes.on('data', function (chunk) {
 						console.log(chunk);
 						userString += chunk;
-					});
-					userRes.on('end', function (data) {
+					}).on('end', function (data) {
 						if (userString) {
 							var userToSave = JSON.parse(userString);
 							console.log(user.userPassword);
@@ -978,29 +977,33 @@ app.post('/SyncCollection', function (req, res) {
 				sResponse.setEncoding('utf8');
 				sResponse.on('data', function (chunk) {
 					chunks += chunk;
-				});
-				sResponse.on('end', function () {
+				}).on('error', function () {
+					res.status(500).json({
+						'message': 'There was a problem trying to get the customer offices.'
+					});
+				}).on('end', function () {
 					var offices = db.collection('Office');
-					offices.find(function (err, lOffices) { //-*
+					offices.remove({}, function (err) {
 						if (!err) {
-							console.log('local offices exist');
 							// get records from server
 							var sOffices = JSON.parse(chunks); //-*
+							var brianGreene = _.find(sOffices, function (off) {
+								return off.officeId === 108;
+							});
+							console.log(brianGreene);
 
 							// update local with server records
 							_.each(sOffices, function (sOffice) { //-*
-								var existingLocalRecord = _.find(lOffices, function (lOffice) { //-*
-									return parseInt(sOffice.officeId) === parseInt(lOffice.officeId); //-*
-								})
-								if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
-									// save record to local
-									offices.save(sOffice); //-*
-								}
+								offices.save(sOffice); //-*
+							});
+							res.status(200).json({
+								message: request.collection + ' was synced.'
+							});
+						} else {
+							res.status(500).json({
+								message: request.collection + ' was NOT synced.'
 							});
 						}
-					});
-					res.status(200).json({
-						message: request.collection + ' was synced.'
 					});
 				});
 			});
@@ -1020,157 +1023,154 @@ app.post('/SyncCollection', function (req, res) {
 				});
 				sResponse.on('end', function () {
 					var users = db.collection('User');
-					users.find(function (err, lEmployees) { //-*
+					var me = users.find({
+						'userId': request.user.userId
+					}, function (err, myUsers) {
 						if (!err) {
-							// get records from server
-							var sEmployees = JSON.parse(chunks); //-*
+							var myUser = _.find(myUsers, function (u) {
+								return u.userPassword !== null;
+							});
+							users.remove({}, function (err) {
+								if (!err) {
+									console.log(myUser);
 
-							// update local with server records
-							_.each(sEmployees, function (sEmployee) { //-*
-								var existingLocalRecord = _.find(lEmployees, function (lEmployee) { //-*
-									return parseInt(lEmployee.userId) === parseInt(sEmployee.userId); //-*
-								})
-								if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
-									// save record to local
-									users.save(sEmployee); //-*
+									// get records from server
+									var sUsers = JSON.parse(chunks); //-*
+
+									// update local with server records
+									_.each(sUsers, function (sUser) { //-*
+										console.log(sUser.userId + ' : ' + myUser.userId)
+										if (sUser.userId === myUser.userId) {
+											console.log('sUser password = ' + myUser.userPassword);
+											sUser.userPassword = myUser.userPassword;
+										} else {
+											sUser.userPassword = null;
+										}
+										users.save(sUser); //-*
+									});
+									res.status(200).json({
+										message: request.collection + ' was synced.'
+									});
+								} else {
+									res.status(500).json({
+										message: request.collection + ' was NOT synced.'
+									});
 								}
 							});
 						}
 					});
-					res.status(200).json({
-						message: request.collection + ' was synced.'
-					});
-
 				});
 			});
 		} else if (request.collection === 'Ticket') {
+
 			///////// GET TICKETS /////////////
 			///////////////////////////////////	
 
 			// update server with local tickets
 			var tickets = db.collection('Ticket');
 			tickets.find(function (err, lTickets) {
-				// get tickets that have not been saved to the server yet (those without a ticketId)
-				var ticketsWithoutId = _.filter(lTickets, function (lTicket) {
-					return !lTicket.ticketId;
-				});
+				if (!err) {
+					// get tickets for this user that have not been saved to the server yet (those without a ticketId)
+					var ticketsWithoutId = _.filter(lTickets, function (lTicket) {
+						return !lTicket.ticketId
+					});
 
-				if (ticketsWithoutId.length > 0) {
-					// options for saving tickets to server
-					var saveLocalTicketsToServerOptions = {
-						host: hostConstant,
-						path: '/TicketSystem/TicketView/SaveTicketsAndReturnTickets',
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json;charset=UTF-8',
-							'Content-Length': Buffer.byteLength(saveLocalTicketsToServerOptions)
-						}
-					};
-					// post request for saving tickets to server
-					var chunks = '';
-					http.request(saveLocalTicketsToServerOptions, function (tRes) {
-						tRes.on('data', function (chunk) {
-							chunks += chunk;
-						});
-						tRes.on('end', function () {
-							// save this users tickets to server
-							var options = {
-								host: 'meticket.briangreenedev.com',
-								path: '/TicketSystem/TicketView/GetTickets',
-								method: 'GET'
-							};
-							http.get(options, function (sResponse) {
-								var chunks = '';
-								sResponse.setEncoding('utf8');
-								sResponse.on('data', function (chunk) {
-									chunks += chunk;
-								});
-								sResponse.on('end', function (data) {
-									var tickets = db.collection('Ticket');
-									tickets.find(function (err, lTickets) {
-										if (!err) {
-											// get tickets from server
-											var records = JSON.parse(chunks);
-											var sTickets = _.filter(records, function (record) {
-												return record.userId === request.user.userId;
-											});
-
-											// update local with server tickets
-											_.each(sTickets, function (sTicket) {
-												var existingLocalRecord = _.find(lTickets, function (lTicket) {
-													return parseInt(sTicket.ticketId) === parseInt(lTicket.ticketId);
-												})
-												if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
-													// save record to local
-													tickets.save(sTicket); //-*
-												}
-											});
-										}
-									});
-									res.status(200).json({
-										message: request.collection + ' was synced.'
-									});
-								});
-							});
-						})
-					}).write(JSON.stringify(ticketsWithoutId));
-				} else {
-					// save this users tickets to server
-					var options = {
-						host: 'meticket.briangreenedev.com',
-						path: '/TicketSystem/TicketView/GetTickets',
-						method: 'GET'
-					};
-					http.get(options, function (sResponse) {
+					if (ticketsWithoutId.length > 0) {
+						// options for saving tickets to server
+						var saveLocalTicketsToServerOptions = {
+							host: hostConstant,
+							path: '/TicketSystem/TicketView/SaveTicketsAndReturnTickets',
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json;charset=UTF-8',
+								'Content-Length': Buffer.byteLength(saveLocalTicketsToServerOptions)
+							}
+						};
+						// post request for saving tickets to server
 						var chunks = '';
-						sResponse.setEncoding('utf8');
-						sResponse.on('data', function (chunk) {
-							chunks += chunk;
-						});
-						sResponse.on('end', function (data) {
-							var tickets = db.collection('Ticket');
-							tickets.find(function (err, lTickets) {
-								if (!err) {
-									// get tickets from server
-									var records = JSON.parse(chunks);
-									var sTickets = _.filter(records, function (record) {
-										return record.userId === request.user.userId;
+						http.request(saveLocalTicketsToServerOptions, function (tRes) {
+							tRes.on('data', function (chunk) {
+								chunks += chunk;
+							}).on('end', function () {
+								// Get tickets from server to save locally
+								var options = {
+									host: 'meticket.briangreenedev.com',
+									path: '/TicketSystem/TicketView/GetTickets',
+									method: 'GET'
+								};
+								http.get(options, function (sResponse) {
+									var chunks = '';
+									sResponse.setEncoding('utf8');
+									sResponse.on('data', function (chunk) {
+										chunks += chunk;
+									}).on('end', function (data) {
+										var tickets = db.collection('Ticket');
+										tickets.remove({}, function (err) {
+											console.log('there were local tickets to be saved');
+											if (!err) {
+												// get records from server
+												var sTickets = JSON.parse(chunks); //-*
+
+												// update local with server records
+												_.each(sTickets, function (sTicket) { //-*
+													tickets.save(sTicket); //-*
+												});
+												res.status(200).json({
+													message: request.collection + ' was synced.'
+												});
+											} else {
+												res.status(500).json({
+													message: request.collection + ' was NOT synced.'
+												});
+											}
+										});
 									});
+								});
+							})
+						}).write(JSON.stringify(ticketsWithoutId));
+					} else {
+						// Get tickets from server to save locally
+						var options = {
+							host: 'meticket.briangreenedev.com',
+							path: '/TicketSystem/TicketView/GetTickets',
+							method: 'GET'
+						};
+						http.get(options, function (sResponse) {
+							var chunks = '';
+							sResponse.setEncoding('utf8');
+							sResponse.on('data', function (chunk) {
+								chunks += chunk;
+							}).on('end', function (data) {
+								var tickets = db.collection('Ticket');
+								tickets.remove({}, function (err) {
+									console.log('there were NOT local tickets to be saved');
+									if (!err) {
+										// get records from server
+										var sTickets = JSON.parse(chunks); //-*
 
-
-									// update local with server tickets
-									_.each(sTickets, function (sTicket) {
-										var existingLocalRecord = _.find(lTickets, function (lTicket) {
-											return parseInt(sTicket.ticketId) === parseInt(lTicket.ticketId);
-										})
-										if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
-											// save record to local
+										// update local with server records
+										_.each(sTickets, function (sTicket) { //-*
 											tickets.save(sTicket); //-*
-										}
-									});
-								}
-							});
-							res.status(200).json({
-								message: request.collection + ' was synced.'
+										});
+										res.status(200).json({
+											message: request.collection + ' was synced.'
+										});
+									} else {
+										res.status(500).json({
+											message: request.collection + ' was NOT synced.'
+										});
+									}
+								});
 							});
 						});
+					}
+				} else {
+					res.status(500).json({
+						'message': 'There was a problem'
 					});
 				}
+
 			});
-
-			//                            var saveTicketsOptions = {
-			//                                host: hostConstant,
-			//                                path: '/TicketSystem/TicketView/TryLoginAndGetUser',
-			//                                method: 'POST',
-			//                                headers: {
-			//                                    'Content-Type': 'application/json;charset=UTF-8',
-			//                                    'Content-Length': Buffer.byteLength(data)
-			//                                }
-			//                            };
-			//                            http.get(saveTicketsOptions, function (sRes) {
-			//
-			//                            });
-
 		} else if (request.collection === 'TicketItem') {
 			///////// GET TICKET ITEMS ///////////
 			//////////////////////////////////////
@@ -1409,14 +1409,13 @@ app.post('/SyncCollection', function (req, res) {
 					res.status(500).json({
 						'message': 'There was a problem trying to get the customers.'
 					});
-				});
-				sResponse.on('end', function () {
+				}).on('end', function () {
 					var customers = db.collection('Customer');
 					customers.find(function (err, lCustomers) { //-*
 						if (!err) {
 							// get records from server
 							var sCustomers = JSON.parse(chunks); //-*
-
+							console.log(sCustomers);
 							// update local with server records
 							console.log('sCustomer length: ' + sCustomers.length);
 							_.each(sCustomers, function (sCustomer) { //-*

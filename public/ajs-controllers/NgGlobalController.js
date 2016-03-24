@@ -18,15 +18,15 @@ app.controller('NgGlobalController', ['$scope', '$http', '$location', 'Auth', fu
 
             var userLoggedIn = $scope.currentUserLoggedIn;
             
-            $scope.syncCollection(userLoggedIn, 'Office');
-            $scope.syncCollection(userLoggedIn, 'Customer');
-            $scope.syncCollection(userLoggedIn, 'MaterialProduct');
-			$scope.syncCollection(userLoggedIn, 'EquipmentProduct');
-            $scope.syncCollection(userLoggedIn, 'ProductType');
-            $scope.syncCollection(userLoggedIn, 'UnitType');
-            $scope.syncCollection(userLoggedIn, 'User');
-            $scope.syncCollection(userLoggedIn, 'TaxCategory');
-			$scope.syncCollection(userLoggedIn, 'TicketItem');
+            //$scope.syncCollection(userLoggedIn, 'Office');
+            //$scope.syncCollection(userLoggedIn, 'Customer');
+            //$scope.syncCollection(userLoggedIn, 'MaterialProduct');
+			//$scope.syncCollection(userLoggedIn, 'EquipmentProduct');
+            //$scope.syncCollection(userLoggedIn, 'ProductType');
+            //$scope.syncCollection(userLoggedIn, 'UnitType');
+            //$scope.syncCollection(userLoggedIn, 'User');
+            //$scope.syncCollection(userLoggedIn, 'TaxCategory');
+			//$scope.syncCollection(userLoggedIn, 'TicketItem');
 			$scope.syncCollection(userLoggedIn, 'Ticket');
         }
     };
