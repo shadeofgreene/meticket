@@ -944,7 +944,38 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
 
 
 
+app.post('/SaveTicketOnServer', function (req, res) {
+	var hostConstant = 'meticket.briangreenedev.com';
+	var ticket = req.body;
+	if (ticket._id) {
+		console.log(ticket);
 
+		// remove freight value so that another ticket item doesn't get created.
+		ticket.freight = null;
+		var saveTicketOnServerOptions = {
+			host: hostConstant,
+			path: '/TicketSystem/TicketView/SaveTicketAndReturnTicket',
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json;charset=UTF-8',
+				'Content-Length': Buffer.byteLength(ticket)
+			}
+		}
+
+		http.request(saveTicketOnServerOptions, function (res) {
+			var chunks = '';
+			res.on('data', function (chunk) {
+				chunks += chunk;
+			}).on('end', function () {
+				var tickets = db.collection('Ticket');
+				console.log(ticket._id);
+				tickets.remove({ '_id': ticket._id }, function(err) {
+					console.log('YES!');
+				});
+			});
+		}).write(querystring.stringify(ticket));
+	}
+});
 
 
 // SYNC DATA
@@ -1074,15 +1105,48 @@ app.post('/SyncCollection', function (req, res) {
 					var ticketsWithoutId = _.filter(lTickets, function (lTicket) {
 						return !lTicket.ticketId
 					});
+					var ticketsChanged = _.each(ticketsWithoutId, function (twi) {
+						twi._id = null;
+					});
 
-					if (ticketsWithoutId.length > 0) {
+					var ticketsChanged = [];
+					_.each(ticketsWithoutId, function (twi) {
+						var newTicket = {
+							officeId: twi.officeId,
+							officeName: twi.officeName,
+							customerName: twi.customerName,
+							customerPhone: twi.customerPhone,
+							customerAddress: twi.customerAddress,
+							customerAddress2: twi.customerAddress2,
+							customerCity: twi.customerCity,
+							customerState: twi.customerState,
+							customerZip: twi.customerZip,
+							userId: twi.userId,
+							priceRuleGeneralId: twi.priceRuleGeneralId,
+							locationNumber: twi.locationNumber,
+							rigNumber: twi.rigNumber,
+							customerPo: twi.customerPo,
+							freight: twi.freight,
+							taxCategoryId: twi.taxCategoryId,
+							ticketCreationDate: twi.ticketCreationDate,
+							grandTotal: twi.grandTotal
+						}
+						ticketsChanged.push(newTicket);
+					});
+
+					console.log(ticketsChanged);
+
+					if (ticketsChanged.length > 0) {
+
+						ticketsChanged = JSON.stringify(ticketsChanged);
+
 						// options for saving tickets to server
 						var saveLocalTicketsToServerOptions = {
 							host: hostConstant,
 							path: '/TicketSystem/TicketView/SaveTicketsAndReturnTickets',
 							method: 'POST',
 							headers: {
-								'Content-Type': 'application/json;charset=UTF-8',
+								'Content-Type': 'application/json',
 								'Content-Length': Buffer.byteLength(saveLocalTicketsToServerOptions)
 							}
 						};
@@ -1093,8 +1157,10 @@ app.post('/SyncCollection', function (req, res) {
 								chunks += chunk;
 							}).on('end', function () {
 								// Get tickets from server to save locally
+								console.log(chunks);
+
 								var options = {
-									host: 'meticket.briangreenedev.com',
+									host: hostConstant,
 									path: '/TicketSystem/TicketView/GetTickets',
 									method: 'GET'
 								};
@@ -1127,7 +1193,7 @@ app.post('/SyncCollection', function (req, res) {
 									});
 								});
 							})
-						}).write(JSON.stringify(ticketsWithoutId));
+						}).write(ticketsChanged);
 					} else {
 						// Get tickets from server to save locally
 						var options = {

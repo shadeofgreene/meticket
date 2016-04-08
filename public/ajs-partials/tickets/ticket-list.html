@@ -27,7 +27,7 @@
 					<tbody>
 						<tr data-ng-repeat="ticket in ticketsForCurrentUser | filter:searchTicket">
 							<td>
-                                <a data-ng-if="ticket._id && !ticket.ticketId" href="{{baseUrl}}content/Tickets/Generated/{{ticket._id}}.pdf">{{ticket.workTicketNumber}}</a> <span data-ng-if="!ticket.ticketId" class="label label-info">Local</span>
+                                <a data-ng-if="ticket._id && !ticket.ticketId" href="{{baseUrl}}content/Tickets/Generated/{{ticket._id}}.pdf">{{ticket.workTicketNumber}}</a> <a data-ng-click="saveThisTicketOnServer(ticket)" data-ng-if="!ticket.ticketId" class="btn btn-sm btn-info">Local</a>
                                 <a data-ng-if="ticket.ticketId" href="http://meticket.briangreenedev.com/Goodies/Tickets/Generated/ticket-{{ticket.ticketId}}.pdf">{{ticket.workTicketNumber}}</a></td>
 							<td>{{ ticket.customerName }}</td>
 							<td>{{ ticket.jobDescription }}</td>
