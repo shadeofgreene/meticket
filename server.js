@@ -948,16 +948,20 @@ app.post('/SaveTicketOnServer', function (req, res) {
 	var hostConstant = 'meticket.briangreenedev.com';
 	var ticket = req.body;
 	if (ticket._id) {
+		var t_id = JSON.parse(JSON.stringify(ticket._id));
+		delete ticket._id;
+		delete ticket.ticketNumber;
+		delete ticket.ticketId;
 		console.log(ticket);
 
 		// remove freight value so that another ticket item doesn't get created.
-		ticket.freight = null;
+		delete ticket.freight;
 		var saveTicketOnServerOptions = {
 			host: hostConstant,
-			path: '/TicketSystem/TicketView/SaveTicketAndReturnTicket',
+			path: '/TicketSystem/TicketView/CreateTicketAndReturnTicket',
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json;charset=UTF-8',
+				'Content-Type': 'application/x-www-form-urlencoded',
 				'Content-Length': Buffer.byteLength(ticket)
 			}
 		}
@@ -968,15 +972,52 @@ app.post('/SaveTicketOnServer', function (req, res) {
 				chunks += chunk;
 			}).on('end', function () {
 				var tickets = db.collection('Ticket');
-				console.log(ticket._id);
-				tickets.remove({ '_id': ticket._id }, function(err) {
+
+				var serverTicket = JSON.parse(chunks);
+
+				tickets.findAndModify({
+					query: {
+						_id: t_id
+					},
+					update: {
+						_id: null,
+						serverTicket: serverTicket.ticketId
+					},
+					new: false
+				}, function (err, doc, lastErrorObject) {
+					if (!err) {
+						// update ticket items with new ticketId
+						var ticketItems = db.collection('TicketItem');
+						ticketItems.update({
+							_ticketId: t_id
+						}, {
+							$set: {
+								ticketId: ticket.ticketId
+							}
+						}, {
+							multi: true
+						}, function (err, ticketItems) {
+							if(!err) {
+								doc.ticketItems = ticketItems;
+								res.json(doc);
+							} else {
+								res.status(500).send(err);
+							}
+						});
+					} else {
+						res.status(500).send(err);
+					}
+				});
+
+				tickets.remove({
+					'_id': ticket._id
+				}, function (err) {
 					console.log('YES!');
 				});
 			});
 		}).write(querystring.stringify(ticket));
 	}
 });
-
 
 // SYNC DATA
 app.post('/SyncCollection', function (req, res) {
@@ -1092,193 +1133,110 @@ app.post('/SyncCollection', function (req, res) {
 					});
 				});
 			});
-		} else if (request.collection === 'Ticket') {
+			//		} else if (request.collection === 'Ticket') {
+			//
+			//			///////// GET TICKETS /////////////
+			//			///////////////////////////////////	
+			//			// TODO!
+			//			if (request.ticketChangedFromLocalToServer) {
+			//				// update local with server tickets
+			//				var tickets = db.collection('Ticket');
+			//				tickets.find(function (err, lTickets) {
+			//					if (!err) {
+			//						// get local tickets: get tickets for this user that have not been saved to the server yet (those without a ticketId)
+			//						var ticketsWithoutId = _.filter(lTickets, function (lTicket) {
+			//							return !lTicket.ticketId
+			//						});
+			//						var ticketsChanged = _.each(ticketsWithoutId, function (twi) {
+			//							twi._id = null;
+			//						});
+			//
+			//						// Get tickets from server to save locally
+			//						var options = {
+			//							host: 'meticket.briangreenedev.com',
+			//							path: '/TicketSystem/TicketView/GetTickets',
+			//							method: 'GET'
+			//						};
+			//						http.get(options, function (sResponse) {
+			//							var chunks = '';
+			//							sResponse.setEncoding('utf8');
+			//							sResponse.on('data', function (chunk) {
+			//								chunks += chunk;
+			//							}).on('end', function (data) {
+			//								var tickets = db.collection('Ticket');
+			//								tickets.remove({}, function (err) {
+			//									console.log('there were NOT local tickets to be saved');
+			//									if (!err) {
+			//										// get records from server
+			//										var sTickets = JSON.parse(chunks); //-*
+			//
+			//										// update local with server records
+			//										_.each(sTickets, function (sTicket) { //-*
+			//											tickets.save(sTicket); //-*
+			//										});
+			//										res.status(200).json({
+			//											message: request.collection + ' was synced.'
+			//										});
+			//									} else {
+			//										res.status(500).json({
+			//											message: request.collection + ' was NOT synced.'
+			//										});
+			//									}
+			//								});
+			//							});
+			//						});
+			//					} else {
+			//						res.status(500).json({
+			//							'message': 'There was a problem'
+			//						});
+			//					}
+			//
+			//				});
+			//			}
 
-			///////// GET TICKETS /////////////
-			///////////////////////////////////	
 
-			// update server with local tickets
-			var tickets = db.collection('Ticket');
-			tickets.find(function (err, lTickets) {
-				if (!err) {
-					// get tickets for this user that have not been saved to the server yet (those without a ticketId)
-					var ticketsWithoutId = _.filter(lTickets, function (lTicket) {
-						return !lTicket.ticketId
-					});
-					var ticketsChanged = _.each(ticketsWithoutId, function (twi) {
-						twi._id = null;
-					});
-
-					var ticketsChanged = [];
-					_.each(ticketsWithoutId, function (twi) {
-						var newTicket = {
-							officeId: twi.officeId,
-							officeName: twi.officeName,
-							customerName: twi.customerName,
-							customerPhone: twi.customerPhone,
-							customerAddress: twi.customerAddress,
-							customerAddress2: twi.customerAddress2,
-							customerCity: twi.customerCity,
-							customerState: twi.customerState,
-							customerZip: twi.customerZip,
-							userId: twi.userId,
-							priceRuleGeneralId: twi.priceRuleGeneralId,
-							locationNumber: twi.locationNumber,
-							rigNumber: twi.rigNumber,
-							customerPo: twi.customerPo,
-							freight: twi.freight,
-							taxCategoryId: twi.taxCategoryId,
-							ticketCreationDate: twi.ticketCreationDate,
-							grandTotal: twi.grandTotal
-						}
-						ticketsChanged.push(newTicket);
-					});
-
-					console.log(ticketsChanged);
-
-					if (ticketsChanged.length > 0) {
-
-						ticketsChanged = JSON.stringify(ticketsChanged);
-
-						// options for saving tickets to server
-						var saveLocalTicketsToServerOptions = {
-							host: hostConstant,
-							path: '/TicketSystem/TicketView/SaveTicketsAndReturnTickets',
-							method: 'POST',
-							headers: {
-								'Content-Type': 'application/json',
-								'Content-Length': Buffer.byteLength(saveLocalTicketsToServerOptions)
-							}
-						};
-						// post request for saving tickets to server
-						var chunks = '';
-						http.request(saveLocalTicketsToServerOptions, function (tRes) {
-							tRes.on('data', function (chunk) {
-								chunks += chunk;
-							}).on('end', function () {
-								// Get tickets from server to save locally
-								console.log(chunks);
-
-								var options = {
-									host: hostConstant,
-									path: '/TicketSystem/TicketView/GetTickets',
-									method: 'GET'
-								};
-								http.get(options, function (sResponse) {
-									var chunks = '';
-									sResponse.setEncoding('utf8');
-									sResponse.on('data', function (chunk) {
-										chunks += chunk;
-									}).on('end', function (data) {
-										var tickets = db.collection('Ticket');
-										tickets.remove({}, function (err) {
-											console.log('there were local tickets to be saved');
-											if (!err) {
-												// get records from server
-												var sTickets = JSON.parse(chunks); //-*
-
-												// update local with server records
-												_.each(sTickets, function (sTicket) { //-*
-													tickets.save(sTicket); //-*
-												});
-												res.status(200).json({
-													message: request.collection + ' was synced.'
-												});
-											} else {
-												res.status(500).json({
-													message: request.collection + ' was NOT synced.'
-												});
-											}
-										});
-									});
-								});
-							})
-						}).write(ticketsChanged);
-					} else {
-						// Get tickets from server to save locally
-						var options = {
-							host: 'meticket.briangreenedev.com',
-							path: '/TicketSystem/TicketView/GetTickets',
-							method: 'GET'
-						};
-						http.get(options, function (sResponse) {
-							var chunks = '';
-							sResponse.setEncoding('utf8');
-							sResponse.on('data', function (chunk) {
-								chunks += chunk;
-							}).on('end', function (data) {
-								var tickets = db.collection('Ticket');
-								tickets.remove({}, function (err) {
-									console.log('there were NOT local tickets to be saved');
-									if (!err) {
-										// get records from server
-										var sTickets = JSON.parse(chunks); //-*
-
-										// update local with server records
-										_.each(sTickets, function (sTicket) { //-*
-											tickets.save(sTicket); //-*
-										});
-										res.status(200).json({
-											message: request.collection + ' was synced.'
-										});
-									} else {
-										res.status(500).json({
-											message: request.collection + ' was NOT synced.'
-										});
-									}
-								});
-							});
-						});
-					}
-				} else {
-					res.status(500).json({
-						'message': 'There was a problem'
-					});
-				}
-
-			});
-		} else if (request.collection === 'TicketItem') {
-			///////// GET TICKET ITEMS ///////////
-			//////////////////////////////////////
-			var ticketItemOptions = { //-*
-				host: hostConstant,
-				path: '/TicketSystem/TicketView/GetTicketItems', //-*
-				method: 'GET' //-*
-			}
-			http.get(ticketItemOptions, function (sResponse) { //-*
-				var chunks = '';
-				sResponse.setEncoding('utf8');
-				sResponse.on('data', function (chunk) {
-					chunks += chunk;
-				}).on('error', function () {
-					res.status(500).json({
-						'message': 'There was a problem trying to get the ticket items.'
-					});
-				});
-				sResponse.on('end', function () {
-					var ticketItems = db.collection('TicketItem'); //-*
-					ticketItems.find(function (err, lTicketItems) { //-*
-						if (!err) {
-							// get records from server
-							var sTicketItems = JSON.parse(chunks); //-*
-
-							// update local with server records
-							_.each(sTicketItems, function (sTicketItem) { //-*
-								var existingLocalRecord = _.find(lTicketItems, function (lTicketItem) { //-*
-									return parseInt(sTicketItem.ticketItemId) === parseInt(lTicketItem.ticketItemId); //-*
-								})
-								if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
-									// save record to local
-									ticketItems.save(sTicketItems); //-*
-								}
-							});
-						}
-					});
-					res.status(200).json({
-						message: request.collection + ' was synced.'
-					});
-				});
-			});
+			//		} else if (request.collection === 'TicketItem') {
+			//			///////// GET TICKET ITEMS ///////////
+			//			//////////////////////////////////////
+			//			var ticketItemOptions = { //-*
+			//				host: hostConstant,
+			//				path: '/TicketSystem/TicketView/GetTicketItems', //-*
+			//				method: 'GET' //-*
+			//			}
+			//			http.get(ticketItemOptions, function (sResponse) { //-*
+			//				var chunks = '';
+			//				sResponse.setEncoding('utf8');
+			//				sResponse.on('data', function (chunk) {
+			//					chunks += chunk;
+			//				}).on('error', function () {
+			//					res.status(500).json({
+			//						'message': 'There was a problem trying to get the ticket items.'
+			//					});
+			//				});
+			//				sResponse.on('end', function () {
+			//					var ticketItems = db.collection('TicketItem'); //-*
+			//					ticketItems.find(function (err, lTicketItems) { //-*
+			//						if (!err) {
+			//							// get records from server
+			//							var sTicketItems = JSON.parse(chunks); //-*
+			//
+			//							// update local with server records
+			//							_.each(sTicketItems, function (sTicketItem) { //-*
+			//								var existingLocalRecord = _.find(lTicketItems, function (lTicketItem) { //-*
+			//									return parseInt(sTicketItem.ticketItemId) === parseInt(lTicketItem.ticketItemId); //-*
+			//								})
+			//								if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
+			//									// save record to local
+			//									ticketItems.save(sTicketItems); //-*
+			//								}
+			//							});
+			//						}
+			//					});
+			//					res.status(200).json({
+			//						message: request.collection + ' was synced.'
+			//					});
+			//				});
+			//			});
 		} else if (request.collection === 'MaterialProduct') {
 			///////// GET PRODUCTS BY 1005 ///////
 			//////////////////////////////////////

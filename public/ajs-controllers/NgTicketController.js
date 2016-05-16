@@ -786,13 +786,15 @@ app.controller('NgTicketController', [
         };
 		
 		$scope.saveThisTicketOnServer = function(ticket) {
+			debugger;
 			var url = '/SaveTicketOnServer';
 			if(ticket) {
 				$http.post(url, ticket).success(function(ticket) {
+					debugger;
 					toastr.success('Ticket was synced with server');
 					$scope.getTicketList();
 				}).error(function(error, err) {
-					
+					debugger;
 				}).finally(function() {
 					
 				});
