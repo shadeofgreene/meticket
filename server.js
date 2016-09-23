@@ -946,8 +946,8 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
 
 
 app.post('/SaveTicketOnServer', function (req, res) {
-    var hostConstant = 'http://meticket.briangreenedev.com/';
-    //var hostConstant = 'http://localhost:3390';
+    //var hostConstant = 'http://meticket.briangreenedev.com/';
+    var hostConstant = 'http://localhost:3390';
 
     var ticket = req.body;
     if (ticket._id) {
@@ -980,15 +980,15 @@ app.post('/SaveTicketOnServer', function (req, res) {
             console.log(newServerTicket);
             var tickets = db.collection('Ticket');
             var serverTicket = newServerTicket;
+            console.log(t_id);
             tickets.findAndModify({
                 query: {
-                    _id: t_id
+                    _id: mongojs.ObjectId(t_id)
                 },
                 update: {
-                    _id: null,
-                    ticketId: serverTicket.ticketId
+                    $set: {ticketId: serverTicket.ticketId}
                 },
-                new: false
+                new: true
             }, function (err, doc, lastErrorObject) {
                 console.log('---------------------------------');
                 console.log(doc);
@@ -1003,7 +1003,7 @@ app.post('/SaveTicketOnServer', function (req, res) {
                             _ticketId: null,
                             ticketId: doc.ticketId
                         },
-                        new: false
+                        new: true
                     }, function (err, ticketItems, lastTicketItems) {
                         if (!err) {
                             res.json(doc);
