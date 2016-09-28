@@ -997,11 +997,13 @@ app.post('/SaveTicketOnServer', function (req, res) {
                     var ticketItems = db.collection('TicketItem');
                     ticketItems.findAndModify({
                         query: {
-                            _ticketId: t_id
+                            _ticketId: mongojs.ObjectId(t_id)
                         },
                         update: {
-                            _ticketId: null,
-                            ticketId: doc.ticketId
+                            $set: {
+                                _ticketId: null,
+                                ticketId: doc.ticketId
+                            }
                         },
                         new: true
                     }, function (err, ticketItems, lastTicketItems) {
