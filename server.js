@@ -507,7 +507,7 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
     var user = request.user;
 
     if (newTicket) {
-        // first generate new work ticket number (BJG150006)
+        // first generate new work ticket number (ex: BJG150006)
         var newWorkTicketNumber = '';
         tickets.find({
             'userId': user.userId
@@ -607,7 +607,7 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
                                 });
 
                                 doc.fontSize(defaultFontSize + 3);
-                                doc.fillColor('#56abc0');
+                                doc.fillColor('#9f0000');
                                 // work ticket number
                                 doc.text(ticket.workTicketNumber, 425, 65, {
                                     lineBreak: false
@@ -629,7 +629,7 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
                                     lineBreak: false
                                 });
 
-                                doc.fillColor('#56abc0');
+                                doc.fillColor('#9f0000');
 
                                 // ticket to:
                                 doc.text('TICKET TO:', 25, 145, {
@@ -668,7 +668,7 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
                                 if (newTicket.locationNumber) {
                                     currentCustomerInfoSpot += 20;
                                     // location:
-                                    doc.fillColor('#56abc0');
+                                    doc.fillColor('#9f0000');
                                     doc.text('LOCATION:', 25, currentCustomerInfoSpot, {
                                         lineBreak: false
                                     });
@@ -682,7 +682,7 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
                                 if (newTicket.rigNumber) {
                                     currentCustomerInfoSpot += 20;
                                     // rig:
-                                    doc.fillColor('#56abc0');
+                                    doc.fillColor('#9f0000');
                                     doc.text('RIG:', 25, currentCustomerInfoSpot, {
                                         lineBreak: false
                                     });
@@ -693,7 +693,7 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
                                     });
                                 }
 
-                                doc.fillColor('#56abc0');
+                                doc.fillColor('#9f0000');
                                 // job description:
                                 doc.text('JOB DESCRIPTION:', 325, 145, {
                                     lineBreak: false
@@ -769,7 +769,7 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
                                         });
 
                                         doc.fontSize(defaultFontSize + 3);
-                                        doc.fillColor('#56abc0');
+                                        doc.fillColor('#9f0000');
                                         // work ticket number
                                         doc.text(ticket.workTicketNumber, 425, 65, {
                                             lineBreak: false
@@ -831,7 +831,7 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
                                     });
 
                                     doc.fontSize(defaultFontSize + 3);
-                                    doc.fillColor('#56abc0');
+                                    doc.fillColor('#9f0000');
                                     // work ticket number
                                     doc.text(ticket.workTicketNumber, 425, 65, {
                                         lineBreak: false
@@ -958,15 +958,15 @@ app.post('/SaveTicketOnServer', function (req, res) {
 
         // remove freight value so that another ticket item doesn't get created.
         delete ticket.freight;
-        
+
         ticket.ticketItemObjects = [];
-        ticket.ticketItemObjects = _.each(ticket.ticketItems, function(ti) {
+        ticket.ticketItemObjects = _.each(ticket.ticketItems, function (ti) {
             delete ti._ticketId;
             ticket.ticketItemObjects.push(ti);
         });
-        
-        console.log( '-----ticket-----')
-        console.log(ticket);
+
+        //console.log( '-----ticket-----')
+        //console.log(ticket);
 
         var opts = {
             uri: hostConstant + '/TicketSystem/TicketView/CreateTicketAndReturnTicket',
@@ -976,8 +976,8 @@ app.post('/SaveTicketOnServer', function (req, res) {
         }
         request(opts).then(function (newServerTicket) {
             // succeeded
-            console.log( '-----NewServerTicket-----')
-            console.log(newServerTicket);
+            //console.log( '-----NewServerTicket-----')
+            //console.log(newServerTicket);
             var tickets = db.collection('Ticket');
             var serverTicket = newServerTicket;
             console.log(t_id);
@@ -986,7 +986,9 @@ app.post('/SaveTicketOnServer', function (req, res) {
                     _id: mongojs.ObjectId(t_id)
                 },
                 update: {
-                    $set: {ticketId: serverTicket.ticketId}
+                    $set: {
+                        ticketId: serverTicket.ticketId
+                    }
                 },
                 new: true
             }, function (err, doc, lastErrorObject) {
@@ -995,24 +997,23 @@ app.post('/SaveTicketOnServer', function (req, res) {
                 if (!err) {
                     // update ticket items with new ticketId
                     var ticketItems = db.collection('TicketItem');
-                    ticketItems.findAndModify({
-                        query: {
+                    ticketItems.update({
                             _ticketId: mongojs.ObjectId(t_id)
-                        },
-                        update: {
+                        }, {
                             $set: {
                                 _ticketId: null,
                                 ticketId: doc.ticketId
                             }
+                        }, {
+                            multi: true
                         },
-                        new: true
-                    }, function (err, ticketItems, lastTicketItems) {
-                        if (!err) {
-                            res.json(doc);
-                        } else {
-                            res.status(500).send(err);
-                        }
-                    });
+                        function (err, ticketItems, lastTicketItems) {
+                            if (!err) {
+                                res.json(doc);
+                            } else {
+                                res.status(500).send(err);
+                            }
+                        });
                 } else {
                     res.status(500).send(err);
                 }
