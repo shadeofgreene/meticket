@@ -1,38 +1,38 @@
 app.controller('NgTicketController', [
     '$scope', '$sce', '$window', 'Auth', 'Alert', '$location', '$http', 'GlobalUser',
-    function($scope, $sce, $window, Auth, Alert, $location, $http, GlobalUser) {
+    function ($scope, $sce, $window, Auth, Alert, $location, $http, GlobalUser) {
         $scope.baseUrl = helper.baseUrl;
         $scope.tickets = [];
         $scope.ticketsForCurrentUser = [];
-        $scope.getTicketList = function() {
+        $scope.getTicketList = function () {
             debugger;
             var url = '/GetTickets';
-            $http.get(url).success(function(tickets) {
+            $http.get(url).success(function (tickets) {
                 debugger;
                 $scope.tickets = tickets;
                 // get ticket items
                 var url = '/GetTicketItems';
-                $http.get(url).success(function(items) {
+                $http.get(url).success(function (items) {
                     debugger;
                     $scope.ticketItems = items;
                     // filter tickets by user
                     var user = JSON.parse(localStorage.getItem('user'));
                     if (user) {
-                        var userTickets = _.filter(tickets, function(ticket) {
+                        var userTickets = _.filter(tickets, function (ticket) {
                             return parseInt(ticket.userId) === parseInt(user.userId);
                         });
-                        _.each(userTickets, function(userTicket) {
+                        _.each(userTickets, function (userTicket) {
                             debugger;
                             userTicket.ticketItems = [];
                             if (userTicket.ticketId) {
-                                _.each(items, function(item) {
+                                _.each(items, function (item) {
                                     debugger;
                                     if (userTicket.ticketId === item.ticketId) {
                                         userTicket.ticketItems.push(item);
                                     }
                                 });
                             } else if (userTicket._id) {
-                                _.each(items, function(item) {
+                                _.each(items, function (item) {
                                     debugger;
                                     if (userTicket._id === item._ticketId) {
                                         userTicket.ticketItems.push(item);
@@ -47,7 +47,7 @@ app.controller('NgTicketController', [
                     //                        var ticketItemsForThisTicket = $scope.getTicketItemsForTicket(ticket.ticketId, ticket._id);
                     //                        ticket.ticketItems = ticketItemsForThisTicket;
                     //                    });
-                }).error(function(error, err) {
+                }).error(function (error, err) {
 
                 });
 
@@ -79,14 +79,14 @@ app.controller('NgTicketController', [
                 //
                 //                    });
                 //                });
-            }).error(function(error, err) {
+            }).error(function (error, err) {
 
             });
         }
-        $scope.initializeTicketsForCurrentUser = function(tickets, cb) {
+        $scope.initializeTicketsForCurrentUser = function (tickets, cb) {
             var user = JSON.parse(localStorage.getItem('user'));
             if (user) {
-                $scope.ticketsForCurrentUser = _.filter(tickets, function(userTicket) {
+                $scope.ticketsForCurrentUser = _.filter(tickets, function (userTicket) {
                     return userTicket.userId === user.userId;
                 });
             }
@@ -102,7 +102,7 @@ app.controller('NgTicketController', [
             title: 'Title'
         };
 
-        $scope.updateUnitAndPrice = function(currentTicketItem) {
+        $scope.updateUnitAndPrice = function (currentTicketItem) {
 
             if (currentTicketItem.ticketItemUnitType.toLowerCase() === 'hr') {
                 currentTicketItem.pricePerUnit = currentTicketItem.productCost;
@@ -116,30 +116,30 @@ app.controller('NgTicketController', [
         }
 
         $scope.ticketItems = [];
-        $scope.getTicketItems = function() {
+        $scope.getTicketItems = function () {
             var url = '/GetTicketItems';
-            $http.get(url).success(function(items) {
+            $http.get(url).success(function (items) {
                 $scope.ticketItems = items;
-            }).error(function(error, err) {
+            }).error(function (error, err) {
 
             });
         }
 
         $scope.getTicketItems();
 
-        $scope.getTicketItemsForTicket = function(ticketId, _ticketId) {
+        $scope.getTicketItemsForTicket = function (ticketId, _ticketId) {
             if (ticketId) {
-                return _.filter($scope.ticketItems, function(item) {
+                return _.filter($scope.ticketItems, function (item) {
                     return parseInt(item.ticketId) === parseInt(ticketId);
                 });
             } else if (_ticketId) {
-                return _.filter($scope.ticketItems, function(item) {
+                return _.filter($scope.ticketItems, function (item) {
                     return parseInt(item._ticketId) === parseInt(_ticketId);
                 });
             }
         }
 
-        $scope.getTotalPrice = function(ticket) {
+        $scope.getTotalPrice = function (ticket) {
             debugger;
             var materialTotal = 0.00;
             var materialTax = 0.00;
@@ -161,7 +161,7 @@ app.controller('NgTicketController', [
             // iterate through all ticket items
             ticket.ticketItems = [];
             //ticket.ticketItems = $scope.getTicketItemsForTicket(ticket.ticketId);
-            angular.forEach($scope.ticketItems, function(item) {
+            angular.forEach($scope.ticketItems, function (item) {
                 debugger;
                 if (ticket.ticketId) {
                     if (parseInt(ticket.ticketId) === parseInt(item.ticketId)) {
@@ -175,7 +175,7 @@ app.controller('NgTicketController', [
 
             });
             debugger;
-            _.each(ticket.ticketItems, function(item) {
+            _.each(ticket.ticketItems, function (item) {
                 var subtotal = parseInt(item.qtyUnits) * parseFloat(item.ticketItemRate);
 
                 if (parseInt(item.productTypeId) === 1 || parseInt(item.productTypeId) === 1006) {
@@ -197,11 +197,11 @@ app.controller('NgTicketController', [
             return grandTotal;
         }
 
-        $scope.getTotalForTicket = function(ticketId, _ticketId) {
+        $scope.getTotalForTicket = function (ticketId, _ticketId) {
             var items = $scope.getTicketItemsForTicket(ticketId, _ticketId);
             if (items) {
                 var total = 0;
-                _.each(items, function(item) {
+                _.each(items, function (item) {
                     var itemTotal = item.ticketItemRate * item.qtyUnits;
                     total += itemTotal;
                 });
@@ -300,7 +300,7 @@ app.controller('NgTicketController', [
             }
             return 0;
         };
-        $scope.updateTotalPrices = function() {
+        $scope.updateTotalPrices = function () {
 
             var materialTotal = 0;
             var materialTax = 0;
@@ -320,7 +320,7 @@ app.controller('NgTicketController', [
             }
 
             // iterate through all ticket items
-            _.each($scope.ticket.ticketItems, function(item) {
+            _.each($scope.ticket.ticketItems, function (item) {
                 debugger;
                 var subtotal = Number(item.qtyUnits) * parseFloat(item.pricePerUnit);
 
@@ -348,23 +348,23 @@ app.controller('NgTicketController', [
         }
 
         $scope.productTypes = [];
-        $scope.getProductTypes = function() {
+        $scope.getProductTypes = function () {
             var url = '/GetProductTypes';
-            $http.get(url).success(function(productTypes) {
+            $http.get(url).success(function (productTypes) {
                 $scope.productTypes = productTypes;
-            }).error(function(error, err) {
+            }).error(function (error, err) {
 
             });
         }
 
-        $scope.updateTicketOfficeId = function(obj) {
+        $scope.updateTicketOfficeId = function (obj) {
             debugger;
             var office = obj.originalObject;
             $scope.ticket.officeId = office.officeId;
             $scope.updateCustomerInfo();
         }
 
-        $scope.updateATicket = function() {
+        $scope.updateATicket = function () {
             debugger;
             Alert.showLoading();
             var postObject = {
@@ -374,7 +374,7 @@ app.controller('NgTicketController', [
             $scope.ticket.ticketItemObjects = $scope.ticket.ticketItems;
             $scope.updateTotalPrices();
 
-            $http.post('/EditTicketAndReturnTicket', $scope.ticket).success(function(ticket) {
+            $http.post('/EditTicketAndReturnTicket', $scope.ticket).success(function (ticket) {
                 $scope.ticket = {};
                 $scope.ticket.ticketItems = [];
                 Alert.hideLoading();
@@ -385,54 +385,69 @@ app.controller('NgTicketController', [
                 //$window.location.href = helper.baseUrl + 'Goodies/Content/Goodies/Tickets/Generated/ticket-' + ticket.ticketId + '.pdf';                
                 toastr.success('The ticket was updated successfully', 'Success');
                 $location.path('ticket-list');
-            }).error(function(error, err) {
+            }).error(function (error, err) {
                 Alert.hideLoading();
                 toastr.error('Something went wrong while trying to save', 'Error');
             });
         }
 
-        $scope.createATicket = function() {
+        $scope.createATicket = function (type) {
             Alert.showLoading();
-            var postObject = {
-                Token: GlobalUser.getToken()
-            };
-            $scope.ticket.workTicketNumber = null;
-            $scope.ticket.ticketId = null;
-            $scope.ticket._id = null;
-            $scope.ticket.postObject = postObject;
-            $scope.ticket.userId = $scope.user.userId;
-            $scope.ticket.ticketItemObjects = $scope.ticket.ticketItems;
-            $scope.updateTotalPrices();
-
-            var request = {
-                user: $scope.user,
-                ticket: $scope.ticket,
-                postObject: postObject
+            debugger;
+            var url = '';
+            if (type === 'copy' || type === 'create') {
+                $scope.ticket.workTicketNumber = null;
+                $scope.ticket.ticketId = null;
+                $scope.ticket._id = null;
+                url = '/CreateTicketAndReturnTicket';
+            }
+            // if its type 'edit' and the ticket has not yet been saved to central database
+            if (type === 'edit' && !$scope.ticket.ticketId) {
+                url = '/EditTicketAndReturnTicket';
             }
 
-            $http.post('/CreateTicketAndReturnTicket', request).success(function(ticket) {
-                debugger;
-                //$scope.ticket = {};
-                //$scope.ticket.ticketItems = [];
-                Alert.hideLoading();
+            if (url && url !== '') {
+                var postObject = {
+                    Token: GlobalUser.getToken()
+                };
+                $scope.ticket.postObject = postObject;
+                $scope.ticket.userId = $scope.user.userId;
+                $scope.ticket.ticketItemObjects = $scope.ticket.ticketItems;
+                $scope.updateTotalPrices();
 
-                //$location.path('ticket-list');
-                // local
-                //$window.location.href = helper.baseUrl + 'Goodies/Tickets/Generated/ticket-' + ticket.ticketId + '.pdf';
-                // server
-                //$window.location.href = helper.baseUrl + 'Goodies/Content/Goodies/Tickets/Generated/ticket-' + ticket.ticketId + '.pdf';
-                toastr.success('The ticket was created successfully', 'Success');
-                $location.path('ticket-list');
-            }).error(function(error, err) {
-                Alert.hideLoading();
-                toastr.error('Something went wrong while trying to save', 'Error');
-            });
+                var request = {
+                    user: $scope.user,
+                    ticket: $scope.ticket,
+                    postObject: postObject
+                }
+
+                debugger;
+                $http.post(url, request).success(function (ticket) {
+                    debugger;
+                    //$scope.ticket = {};
+                    //$scope.ticket.ticketItems = [];
+                    Alert.hideLoading();
+
+                    //$location.path('ticket-list');
+                    // local
+                    //$window.location.href = helper.baseUrl + 'Goodies/Tickets/Generated/ticket-' + ticket.ticketId + '.pdf';
+                    // server
+                    //$window.location.href = helper.baseUrl + 'Goodies/Content/Goodies/Tickets/Generated/ticket-' + ticket.ticketId + '.pdf';
+                    if (type === 'edit') toastr.success('The ticket was updated successfully', 'Success');
+                    if (type === 'copy') toastr.success('The ticket was created successfully', 'Success');
+                    $location.path('ticket-list');
+                }).error(function (error, err) {
+                    Alert.hideLoading();
+                    toastr.error('Something went wrong while trying to save', 'Error');
+                });
+            }
+
         };
-        $scope.editTicketItem = function(index) {
+        $scope.editTicketItem = function (index) {
             $scope.currentTicketItem = $scope.ticket.ticketItems[index];
             $('#createTicketItemModal').modal('show');
         };
-        $scope.deleteTicketItem = function(index) {
+        $scope.deleteTicketItem = function (index) {
             $scope.ticket.ticketItems.splice(index, 1);
             $scope.updateTotalPrices();
         }; // create ticket item functions
@@ -440,17 +455,17 @@ app.controller('NgTicketController', [
             ticketId: $scope.ticket.ticketId,
             _ticketId: $scope.ticket._ticketId
         };
-        $scope.updatePriceFromCost = function(currentTicketItem) {
+        $scope.updatePriceFromCost = function (currentTicketItem) {
             $scope.updateUnitAndPrice(currentTicketItem);
             //$scope.currentTicketItem.pricePerUnit = currentTicketItem.productCost * 1.6;
         }
         $scope.currentMaterialProductId = null;
-        $scope.updateCurrentMaterialProduct = function(materialProduct) {
+        $scope.updateCurrentMaterialProduct = function (materialProduct) {
             // if materialProduct is 0, means that this function is being called by a select dropdown, not by the autocomplete functionality.
             debugger;
             if (materialProduct === 0) {
                 materialProduct = {
-                    originalObject: _.find($scope.materialProducts, function(p) {
+                    originalObject: _.find($scope.materialProducts, function (p) {
                         debugger;
                         return p.productId === $scope.currentMaterialProductId;
                     })
@@ -468,7 +483,7 @@ app.controller('NgTicketController', [
             $scope.currentTicketItem.pricePerUnit = $scope.currentTicketItem.productCost * 1.6;
             $scope.currentTicketItem.ticketId = $scope.ticket.ticketId;
 
-            $scope.currentTicketItem.unitType = _.find($scope.unitTypes, function(type) {
+            $scope.currentTicketItem.unitType = _.find($scope.unitTypes, function (type) {
 
                 return materialProduct.originalObject.unitTypeId === type.unitTypeId;
             });
@@ -482,7 +497,7 @@ app.controller('NgTicketController', [
             }
 
         }
-        $scope.openAddTicketItemModal = function(productTypeId) {
+        $scope.openAddTicketItemModal = function (productTypeId) {
             $scope.showMaterialDropdown = false;
             $scope.showEquipmentDropdown = false;
 
@@ -491,14 +506,14 @@ app.controller('NgTicketController', [
             $scope.currentTicketItem = {};
             $scope.currentTicketItem.productTypeId = productTypeId;
 
-            $scope.productTypeForAddTicketItemModal = _.find($scope.productTypes, function(type) {
+            $scope.productTypeForAddTicketItemModal = _.find($scope.productTypes, function (type) {
                 return type.productTypeId === productTypeId;
             }).productTypeName;
             $scope.currentEmployee = {};
             $scope.searchStr = null;
             $('#createTicketItemModal').modal('show');
         };
-        $scope.openAddEmployeeTimeModal = function() {
+        $scope.openAddEmployeeTimeModal = function () {
 
             $('#employeeListAutoComplete_value').val('');
             $scope.currentEmployee = {};
@@ -507,7 +522,7 @@ app.controller('NgTicketController', [
             $scope.currentTicketItem.productTypeId = 1006;
             $('#createEmployeeTimeModal').modal('show');
         }
-        $scope.addNewTicketItem = function() {
+        $scope.addNewTicketItem = function () {
 
             if (typeof $scope.currentEmployee !== 'undefined') {
                 if ($scope.currentEmployee) {
@@ -544,11 +559,11 @@ app.controller('NgTicketController', [
             $('#createTicketItemModal').modal('hide');
             $('#createEmployeeTimeModal').modal('hide');
         };
-        $scope.isUsingProductType = function(productTypeId) {
+        $scope.isUsingProductType = function (productTypeId) {
             return $scope.currentTicketItem.productTypeId === productTypeId;
         }
 
-        $scope.editTicket = function(ticket) {
+        $scope.editTicket = function (ticket) {
             debugger;
             if (ticket.ticketId) {
                 // initialize current ticket and go to ticket edit page
@@ -560,7 +575,7 @@ app.controller('NgTicketController', [
             $location.path('edit-ticket');
         }
 
-        $scope.initiateEditTicket = function() {
+        $scope.initiateEditTicket = function () {
             debugger;
             if (helper.currentTicketId) {
                 debugger;
@@ -568,14 +583,14 @@ app.controller('NgTicketController', [
                 var data = {
                     'ticketId': helper.currentTicketId
                 };
-                $http.post(url, data).success(function(ticket) {
+                $http.post(url, data).success(function (ticket) {
                     debugger;
-                    _.each(ticket.ticketItems, function(item) {
+                    _.each(ticket.ticketItems, function (item) {
                         item.pricePerUnit = item.ticketItemRate;
                         item.productDescription = item.ticketItemDescription;
                     });
 
-                    var tempTickets = _.reject(ticket.ticketItems, function(item) {
+                    var tempTickets = _.reject(ticket.ticketItems, function (item) {
                         return parseInt(item.productTypeId) === 1008;
                     });
 
@@ -591,24 +606,24 @@ app.controller('NgTicketController', [
                     $scope.ticket = ticket;
                     helper.currentTicketId = null;
                     $scope.updateTotalPrices();
-                }).error(function(error, err) {
+                }).error(function (error, err) {
 
                 });
             }
         }
 
         $scope.unitTypes = [];
-        $scope.getUnitTypes = function() {
+        $scope.getUnitTypes = function () {
             var url = '/GetUnitTypes';
-            $http.get(url).success(function(unitTypes) {
+            $http.get(url).success(function (unitTypes) {
                 $scope.unitTypes = unitTypes;
-            }).error(function() {
+            }).error(function () {
 
             });
         }
 
         $scope.user = {};
-        $scope.getUser = function() {
+        $scope.getUser = function () {
             var user = JSON.parse(localStorage.getItem('user'));
             if (user) {
                 $scope.user.userId = user.userId;
@@ -620,19 +635,19 @@ app.controller('NgTicketController', [
 
         $scope.taxCategory = {};
         $scope.taxCategories = [];
-        $scope.getTaxCategories = function() {
+        $scope.getTaxCategories = function () {
             var url = '/GetTaxCategories';
-            $http.get(url).success(function(taxCategories) {
+            $http.get(url).success(function (taxCategories) {
                 $scope.taxCategories = taxCategories;
 
-            }).error(function() {
+            }).error(function () {
 
             });
         }
 
         $scope.currentEmployee = {};
 
-        $scope.updateEmployeeTicketItem = function(employee) {
+        $scope.updateEmployeeTicketItem = function (employee) {
             var emp = employee.originalObject;
             $scope.currentTicketItem.productName = emp.userFirstName + ' ' + emp.userLastName + ' labor';
             $scope.currentTicketItem.pricePerUnit = emp.costNormalTime;
@@ -644,30 +659,30 @@ app.controller('NgTicketController', [
 
         // Employees
         $scope.employeeList = [];
-        $scope.getEmployeeList = function() {
+        $scope.getEmployeeList = function () {
 
-            $http.get('/GetEmployeeList').success(function(employees) {
+            $http.get('/GetEmployeeList').success(function (employees) {
 
                 $scope.employeeList = employees;
-            }).error(function(error, err) {
+            }).error(function (error, err) {
 
             });
         }
 
         // Get Customers for customer dropdown
         $scope.customers = [];
-        $scope.getCustomersAndOffices = function() {
-            $http.get('/GetCustomers').success(function(customers) {
+        $scope.getCustomersAndOffices = function () {
+            $http.get('/GetCustomers').success(function (customers) {
                 $scope.customers = [];
-                $http.get('/GetAllOffices').success(function(offices) {
-                    _.each(customers, function(customer) {
-                        var officesForThisCustomer = _.filter(offices, function(office) {
+                $http.get('/GetAllOffices').success(function (offices) {
+                    _.each(customers, function (customer) {
+                        var officesForThisCustomer = _.filter(offices, function (office) {
                             return office.customerId === customer.customerId;
                         });
                         customer.offices = officesForThisCustomer;
                         $scope.customers.push(customer);
                     });
-                }).error(function(error, err) {
+                }).error(function (error, err) {
 
                 });
                 //_.each(customers, function (customer) {
@@ -677,26 +692,26 @@ app.controller('NgTicketController', [
                 //	debugger;
                 //	$scope.customers.push(customer);
                 //});
-            }).error(function(error, err) {
+            }).error(function (error, err) {
 
             });
         }; // Get offices for customer dropdown
         $scope.offices = [];
-        $scope.getOffices = function() {
-            $http.get('/GetAllOffices').success(function(offices) {
+        $scope.getOffices = function () {
+            $http.get('/GetAllOffices').success(function (offices) {
                 $scope.offices = [];
-                $http.get('/GetCustomers').success(function(customers) {
-                    _.each(offices, function(office) {
-                        var customerForThisOffice = _.find(customers, function(customer) {
+                $http.get('/GetCustomers').success(function (customers) {
+                    _.each(offices, function (office) {
+                        var customerForThisOffice = _.find(customers, function (customer) {
                             return office.customerId === customer.customerId;
                         });
                         office.customer = customerForThisOffice;
                         $scope.offices.push(office);
                     });
-                }).error(function(error, err) {
+                }).error(function (error, err) {
 
                 });
-            }).error(function(error, err) {
+            }).error(function (error, err) {
 
             });
         };
@@ -704,33 +719,33 @@ app.controller('NgTicketController', [
         $scope.products = [];
         $scope.materialProducts = [];
         $scope.equipmentProducts = [];
-        $scope.getEquipmentProducts = function() {
+        $scope.getEquipmentProducts = function () {
             //			var productType = {
             //                'productTypeId': helper.enums.productTypes.Equipment
             //            }
             var url = '/GetEquipmentProducts/';
-            $http.get(url).success(function(data) {
+            $http.get(url).success(function (data) {
                 $scope.equipmentProducts = data;
-            }).error(function() {
+            }).error(function () {
 
             });
         }
-        $scope.getMaterialProducts = function() {
+        $scope.getMaterialProducts = function () {
             //			var productType = {
             //                'productTypeId': helper.enums.productTypes.Item
             //            }
             var url = '/GetMaterialProducts/';
-            $http.get(url).success(function(data) {
+            $http.get(url).success(function (data) {
                 $scope.materialProducts = data;
-            }).error(function() {
+            }).error(function () {
 
             });
         }
 
         // update customer information after clicking a customer in dropdown list
-        $scope.updateCustomerInfo = function() {
+        $scope.updateCustomerInfo = function () {
 
-            var office = _.find($scope.offices, function(thisOffice) {
+            var office = _.find($scope.offices, function (thisOffice) {
 
                 return thisOffice.officeId === parseInt($scope.ticket.officeId);
             });
@@ -746,20 +761,20 @@ app.controller('NgTicketController', [
             }
         };
 
-        $scope.openDialogSpellCheckerForTicketDescription = function() {
+        $scope.openDialogSpellCheckerForTicketDescription = function () {
             $('#ticketDescription').spellCheckInDialog();
         }
 
         $scope.showMaterialDropdown = false;
         $scope.showEquipmentDropdown = false;
-        $scope.showMaterialDropdownButton = function() {
+        $scope.showMaterialDropdownButton = function () {
             $scope.showMaterialDropdown = true;
         }
-        $scope.showEquipmentDropdownButton = function() {
+        $scope.showEquipmentDropdownButton = function () {
             $scope.showEquipmentDropdown = true;
         }
 
-        $scope.openCreateTicketItemModal = function(productType) {
+        $scope.openCreateTicketItemModal = function (productType) {
             $scope.showMaterialDropdown = false;
             $scope.showEquipmentDropdown = false;
             if (productType === 'material') {
@@ -772,35 +787,35 @@ app.controller('NgTicketController', [
                 controller: 'CreateTicketItemModalController',
                 size: size,
                 resolve: {
-                    items: function() {
+                    items: function () {
                         return $scope.items;
                     }
                 }
             });
 
-            modalInstance.result.then(function(selectedItem) {
+            modalInstance.result.then(function (selectedItem) {
                 $scope.selected = selectedItem;
-            }, function() {
+            }, function () {
                 $log.info('Modal dismissed at: ' + new Date());
             });
         };
-		
-		$scope.saveThisTicketOnServer = function(ticket) {
-			debugger;
-			var url = '/SaveTicketOnServer';
-			if(ticket) {
-				$http.post(url, ticket).success(function(ticket) {
-					debugger;
-					toastr.success('Ticket was synced with server');
-					$scope.getTicketList();
-				}).error(function(error, err) {
-					debugger;
-				}).finally(function() {
-					
-				});
-			}
-			
-		}
+
+        $scope.saveThisTicketOnServer = function (ticket) {
+            debugger;
+            var url = '/SaveTicketOnServer';
+            if (ticket) {
+                $http.post(url, ticket).success(function (ticket) {
+                    debugger;
+                    toastr.success('Ticket was synced with server');
+                    $scope.getTicketList();
+                }).error(function (error, err) {
+                    debugger;
+                }).finally(function () {
+
+                });
+            }
+
+        }
 
         function init() {
             $scope.initiateEditTicket();
@@ -819,42 +834,42 @@ app.controller('NgTicketController', [
     }
 ]);
 
-app.controller('ModalInstanceCtrl', function($scope, $modalInstance, items) {
+app.controller('ModalInstanceCtrl', function ($scope, $modalInstance, items) {
 
     $scope.items = items;
     $scope.selected = {
         item: $scope.items[0]
     };
 
-    $scope.ok = function() {
+    $scope.ok = function () {
         $modalInstance.close($scope.selected.item);
     };
 
-    $scope.cancel = function() {
+    $scope.cancel = function () {
         $modalInstance.dismiss('cancel');
     };
 });
 
-app.directive('create-ticket-item-modal', function() {
+app.directive('create-ticket-item-modal', function () {
     return {
         link: function postLink(scope, element, attrs) {
             scope.title = attrs.title;
 
-            scope.$watch(attrs.visible, function(value) {
+            scope.$watch(attrs.visible, function (value) {
                 if (value == true)
                     $(element).modal('show');
                 else
                     $(element).modal('hide');
             });
 
-            $(element).on('shown.bs.modal', function() {
-                scope.$apply(function() {
+            $(element).on('shown.bs.modal', function () {
+                scope.$apply(function () {
                     scope.$parent[attrs.visible] = true;
                 });
             });
 
-            $(element).on('hidden.bs.modal', function() {
-                scope.$apply(function() {
+            $(element).on('hidden.bs.modal', function () {
+                scope.$apply(function () {
                     scope.$parent[attrs.visible] = false;
                 });
             });

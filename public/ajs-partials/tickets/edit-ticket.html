@@ -1,5 +1,5 @@
 
-<!-- Create Employee Time Modal -->
+<!-- Edit Employee Time Modal -->
 <div class="modal fade" id="createEmployeeTimeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
@@ -417,7 +417,8 @@
 								<p data-ng-if="ticket.ticketId" style="color:maroon">This ticket is already saved on the server. You can create a new ticket from this ticket, but you CANNOT update this one.</p>
 								<button data-ng-if="!ticket.ticketId" data-ng-disabled="createNewTicketForm.$invalid || ticket.ticketItems.length === 0" data-ng-click="updateATicket()" class="btn btn-info">Update Ticket</button>
 -->
-								<button data-ng-disabled="createNewTicketForm.$invalid || ticket.ticketItems.length === 0" data-ng-click="createATicket('edit')" class="btn btn-info">Create Ticket</button>
+								<button data-ng-disabled="createNewTicketForm.$invalid || ticket.ticketItems.length === 0" data-ng-click="createATicket('copy')" class="btn btn-info">Create Ticket</button>
+                                <button data-ng-disabled="createNewTicketForm.$invalid || ticket.ticketItems.length === 0" data-ng-click="createATicket('edit')" class="btn btn-info">Edit Ticket</button>
 							</div>
 						</div>
 					</div>

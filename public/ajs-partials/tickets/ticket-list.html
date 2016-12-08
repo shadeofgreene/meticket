@@ -1,67 +1,71 @@
 <div class="row mt">
-	<div class="col-sm-12">
-		<a href="#/create-ticket" class="btn btn-info"><i class="fa fa-plus-circle"></i> Create Ticket</a>
-	</div>
+    <div class="col-sm-12">
+        <a href="#/create-ticket" class="btn btn-info"><i class="fa fa-plus-circle"></i> Create Ticket</a>
+    </div>
 </div>
 <div class="row mt">
-	<div class="col-sm-12">
-		<input class="form-control" data-ng-model="searchTicket" placeholder="Filter Tickets..." />
-	</div>
+    <div class="col-sm-12">
+        <input class="form-control" data-ng-model="searchTicket" placeholder="Filter Tickets..." />
+    </div>
 </div>
 <div id="ticketListContainer" class="row mt">
-	<div class="col-lg-12">
-		<div class="content-panel">
-			<h4><i class="fa fa-angle-right"></i> Ticket List</h4>
-			<section id="unseen">
-				<table class="table table-bordered table-striped table-condensed">
-					<thead>
-						<tr>
-							<th>Work Ticket #</th>
-							<th>Customer</th>
-							<th>Description</th>
-							<th>Ticket Items</th>
-							<th>Total</th>
-							<th></th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr data-ng-repeat="ticket in ticketsForCurrentUser | filter:searchTicket">
-							<td>
+    <div class="col-lg-12">
+        <div class="content-panel">
+            <h4><i class="fa fa-angle-right"></i> Ticket List</h4>
+            <section id="unseen">
+                <table class="table table-bordered table-striped table-condensed">
+                    <thead>
+                        <tr>
+                            <th>Work Ticket #</th>
+                            <th>Customer</th>
+                            <th>Description</th>
+                            <th>Ticket Items</th>
+                            <th>Total</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-repeat="ticket in ticketsForCurrentUser | filter:searchTicket">
+                            <td>
                                 <a data-ng-if="ticket._id && !ticket.ticketId" href="{{baseUrl}}content/Tickets/Generated/{{ticket._id}}.pdf">{{ticket.workTicketNumber}}</a> <a data-ng-click="saveThisTicketOnServer(ticket)" data-ng-if="!ticket.ticketId" class="btn btn-sm btn-info">Local</a>
-                                <a data-ng-if="ticket.ticketId" href="http://meticket.briangreenedev.com/Goodies/Tickets/Generated/ticket-{{ticket.ticketId}}.pdf">{{ticket.workTicketNumber}}</a></td>
-							<td>{{ ticket.customerName }}</td>
-							<td>{{ ticket.jobDescription }}</td>
-							<td>
-								<inspector-gadget data-placement="bottom">
-									<button class="btn btn-default">Ticket Items</button>
-									<inspector-title>
-										Ticket Items
-									</inspector-title>
-									<inspector-content>
-										<div class="col-sm-12">
-											<div class="col-sm-6">Description</div>
-											<div class="col-sm-3">Qty</div>
-											<div class="col-sm-3">Rate</div>
-										</div>
-										<hr/>
-										<div style="border-bottom:1px solid #dddddd" class="col-sm-12" ng-repeat="item in ticket.ticketItems">
-											<div class="col-sm-6">{{item.ticketItemDescription}}</div>
-											<div class="col-sm-3">{{item.qtyUnits}}</div>
-											<div class="col-sm-3">{{item.ticketItemRate}}</div>
-										</div>
-									</inspector-content>
-								</inspector-gadget>
-							</td>
-							<td style="font-size:1.2em; font-weight:bold">
-								{{ ticket.grandTotal | currency }}
-							</td>
-							<td>
-								<a href="javascript:void(0)" data-ng-click="editTicket(ticket)" class="btn btn-success btn-sm"><i class="fa fa-pencil"></i> Copy</a>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</section>
-		</div>
-	</div>
+                                <a data-ng-if="ticket.ticketId && ticket.encryptedName" href="http://meticket.briangreenedev.com/Goodies/Tickets/Generated/ticket-{{ticket.encryptedName}}.pdf">{{ticket.workTicketNumber}}</a>
+                                <a data-ng-if="ticket.ticketId && !ticket.encryptedName" href="http://meticket.briangreenedev.com/Goodies/Tickets/Generated/ticket-{{ticket.ticketId}}.pdf">{{ticket.workTicketNumber}}</a>
+                            </td>
+                            <td>{{ ticket.customerName }}</td>
+                            <td>{{ ticket.jobDescription }}</td>
+                            <td>
+                                <inspector-gadget data-placement="bottom">
+                                    <button class="btn btn-default">Ticket Items</button>
+                                    <inspector-title>
+                                        Ticket Items
+                                    </inspector-title>
+                                    <inspector-content>
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">Description</div>
+                                            <div class="col-sm-2">Qty</div>
+                                            <div class="col-sm-2">Rate</div>
+                                            <div class="col-sm-2">Rate</div>
+                                        </div>
+                                        <hr/>
+                                        <div style="border-bottom:1px solid #dddddd" class="col-sm-12" ng-repeat="item in ticket.ticketItems">
+                                            <div class="col-sm-6">{{item.ticketItemDescription}}</div>
+                                            <div class="col-sm-2">{{item.qtyUnits}}</div>
+                                            <div class="col-sm-2">{{item.ticketItemRate}}</div>
+                                            <div class="col-sm-2" data-ng-bind="item.qtyUnits*item.ticketItemRate"></div>
+                                        </div>
+                                    </inspector-content>
+                                </inspector-gadget>
+                            </td>
+                            <td style="font-size:1.2em; font-weight:bold">
+                                {{ ticket.grandTotal | currency }}
+                            </td>
+                            <td>
+                                <a href="javascript:void(0)" data-ng-click="editTicket(ticket)" class="btn btn-success btn-sm"><i class="fa fa-pencil"></i> Copy</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
 </div>
