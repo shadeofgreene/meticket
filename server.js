@@ -18,13 +18,13 @@ var request = require('request-promise');
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 
-app.post('/TryLoginAndGetUser', function (req, res) {
+app.post('/TryLoginAndGetUser', function(req, res) {
     var user = req.body;
     if (user.userEmail && user.userPassword) {
         db.User.findOne({
             'userEmail': user.userEmail,
             'userPassword': user.userPassword
-        }, function (err, checkUser) {
+        }, function(err, checkUser) {
             if (err) {
                 console.log('error');
                 res.status(500).json({
@@ -50,13 +50,13 @@ app.post('/TryLoginAndGetUser', function (req, res) {
                 console.log(options);
 
                 var userString = '';
-                http.request(options, function (userRes) {
+                http.request(options, function(userRes) {
                     //console.log(userRes);
                     userRes.setEncoding('utf8');
-                    userRes.on('data', function (chunk) {
+                    userRes.on('data', function(chunk) {
                         console.log(chunk);
                         userString += chunk;
-                    }).on('end', function (data) {
+                    }).on('end', function(data) {
                         if (userString) {
                             var userToSave = JSON.parse(userString);
                             console.log(user.userPassword);
@@ -96,9 +96,9 @@ app.post('/TryLoginAndGetUser', function (req, res) {
 //});
 
 // GET CUSTOMERS
-app.get('/GetCustomers', function (req, res) {
+app.get('/GetCustomers', function(req, res) {
     var customers = db.collection('Customer');
-    customers.find(function (err, customers) {
+    customers.find(function(err, customers) {
         if (!err) {
             res.json(customers);
         } else {
@@ -110,9 +110,9 @@ app.get('/GetCustomers', function (req, res) {
 });
 
 // GET ALL OFFICES
-app.get('/GetAllOffices', function (req, res) {
+app.get('/GetAllOffices', function(req, res) {
     var offices = db.collection('Office');
-    offices.find(function (err, offices) {
+    offices.find(function(err, offices) {
         if (!err) {
             res.json(offices);
         } else {
@@ -125,9 +125,9 @@ app.get('/GetAllOffices', function (req, res) {
 
 
 // GET PRODUCTS BY TYPE
-app.get('/GetProductsByType/', function (req, res) {
+app.get('/GetProductsByType/', function(req, res) {
     var products = db.collection('Product');
-    products.find(function (err, products) {
+    products.find(function(err, products) {
         if (!err) {
             res.json(products);
         } else {
@@ -139,9 +139,9 @@ app.get('/GetProductsByType/', function (req, res) {
 });
 
 // GET TICKETS
-app.get('/GetTickets', function (req, res) {
+app.get('/GetTickets', function(req, res) {
     var tickets = db.collection('Ticket');
-    tickets.find(function (err, tickets) {
+    tickets.find(function(err, tickets) {
         if (!err) {
             var sortedTickets = _.sortBy(tickets, 'workTicketNumber');
             res.json(sortedTickets.reverse());
@@ -154,13 +154,13 @@ app.get('/GetTickets', function (req, res) {
 });
 
 // GET TICKET
-app.get('/GetTicket', function (req, res) {
+app.get('/GetTicket', function(req, res) {
     var data = req.body;
     if (data.ticketId) {
         var tickets = db.collection('Ticket');
         tickets.findOne({
             'ticketId': parseInt(data.ticketId)
-        }, function (err, ticket) {
+        }, function(err, ticket) {
             if (err) {
                 console.log('error');
                 res.status(500).json({
@@ -175,9 +175,9 @@ app.get('/GetTicket', function (req, res) {
 });
 
 // GET PRODUCT TYPES
-app.get('/GetProductTypes', function (req, res) {
+app.get('/GetProductTypes', function(req, res) {
     var productTypes = db.collection('ProductType');
-    productTypes.find(function (err, productTypes) {
+    productTypes.find(function(err, productTypes) {
         if (!err) {
             res.json(productTypes);
         } else {
@@ -189,9 +189,9 @@ app.get('/GetProductTypes', function (req, res) {
 });
 
 // GET TICKET ITEMS
-app.get('/GetTicketItems', function (req, res) {
+app.get('/GetTicketItems', function(req, res) {
     var ticketItems = db.collection('TicketItem');
-    ticketItems.find(function (err, ticketItems) {
+    ticketItems.find(function(err, ticketItems) {
         if (!err) {
             res.status(200).json(ticketItems);
         } else {
@@ -203,9 +203,9 @@ app.get('/GetTicketItems', function (req, res) {
 });
 
 // GET EMPLOYEES
-app.get('/GetEmployeeList', function (req, res) {
+app.get('/GetEmployeeList', function(req, res) {
     var employees = db.collection('User');
-    employees.find(function (err, employees) {
+    employees.find(function(err, employees) {
         if (!err) {
             var sortedEmps = _.sortBy(employees, 'userLastName');
             res.status(200).json(sortedEmps);
@@ -218,9 +218,9 @@ app.get('/GetEmployeeList', function (req, res) {
 });
 
 // GET TAX CATEGORIES
-app.get('/GetTaxCategories', function (req, res) {
+app.get('/GetTaxCategories', function(req, res) {
     var taxCats = db.collection('TaxCategory');
-    taxCats.find(function (err, taxCats) {
+    taxCats.find(function(err, taxCats) {
         if (!err) {
             res.status(200).json(taxCats);
         } else {
@@ -232,9 +232,9 @@ app.get('/GetTaxCategories', function (req, res) {
 });
 
 // GET UNIT TYPES
-app.get('/GetUnitTypes', function (req, res) {
+app.get('/GetUnitTypes', function(req, res) {
     var unitTypes = db.collection('UnitType');
-    unitTypes.find(function (err, unitTypes) {
+    unitTypes.find(function(err, unitTypes) {
         if (!err) {
             res.status(200).json(unitTypes);
         } else {
@@ -246,9 +246,9 @@ app.get('/GetUnitTypes', function (req, res) {
 });
 
 // GET EQUIPMENT PRODUCTS
-app.get('/GetEquipmentProducts', function (req, res) {
+app.get('/GetEquipmentProducts', function(req, res) {
     var equipmentProducts = db.collection('EquipmentProduct');
-    equipmentProducts.find(function (err, equipmentProducts) {
+    equipmentProducts.find(function(err, equipmentProducts) {
         if (!err) {
             res.status(200).json(equipmentProducts);
         } else {
@@ -260,9 +260,9 @@ app.get('/GetEquipmentProducts', function (req, res) {
 });
 
 // GET MATERIAL PRODUCTS
-app.get('/GetMaterialProducts', function (req, res) {
+app.get('/GetMaterialProducts', function(req, res) {
     var materialProducts = db.collection('MaterialProduct');
-    materialProducts.find(function (err, materialProducts) {
+    materialProducts.find(function(err, materialProducts) {
         if (!err) {
             res.status(200).json(materialProducts);
         } else {
@@ -274,7 +274,7 @@ app.get('/GetMaterialProducts', function (req, res) {
 });
 
 // GET TICKET (by ticketId)
-app.post('/GetTicket', function (req, res) {
+app.post('/GetTicket', function(req, res) {
     console.log('started');
     console.log('**************************');
     console.log('**************************');
@@ -287,13 +287,13 @@ app.post('/GetTicket', function (req, res) {
             var tickets = db.collection('Ticket');
             tickets.findOne({
                 'ticketId': ticketId
-            }, function (err, ticket) {
+            }, function(err, ticket) {
                 //console.log(ticket);
                 if (!err && ticket) {
                     var ticketItems = db.collection('TicketItem');
                     ticketItems.find({
                         'ticketId': ticket.ticketId
-                    }, function (err, ticketItems) {
+                    }, function(err, ticketItems) {
                         if (!err) {
                             ticket.ticketItems = ticketItems;
                             res.status(200).json(ticket);
@@ -304,13 +304,13 @@ app.post('/GetTicket', function (req, res) {
                     var newObjectIdObject = new ObjectId.createFromHexString(ticketId);
                     tickets.findOne({
                         '_id': newObjectIdObject
-                    }, function (err, ticket) {
+                    }, function(err, ticket) {
                         //console.log(ticket);
                         if (!err && ticket) {
                             var ticketItems = db.collection('TicketItem');
                             ticketItems.find({
                                 '_ticketId': ticket._id
-                            }, function (err, ticketItems) {
+                            }, function(err, ticketItems) {
                                 if (!err) {
                                     ticket.ticketItems = ticketItems;
                                     res.status(200).json(ticket);
@@ -336,13 +336,12 @@ app.post('/GetTicket', function (req, res) {
     }
 });
 
-// TODO: EDIT AND RETURN TICKET
-app.post('/EditTicketAndReturnTicket', function (req, res) {
+app.post('/EditTicketAndReturnTicket', function(req, res) {
     var tickets = db.collection('Ticket');
     var ticketItems = db.collection('TicketItem');
     var body = req.body;
     var ticket = body.ticket;
-    var user = body.user
+    var user = body.user;
 
     if (ticket) {
         if (ticket.ticketId) {
@@ -369,12 +368,12 @@ app.post('/EditTicketAndReturnTicket', function (req, res) {
                     jobDescription: ticket.jobDescription
                 },
                 new: true
-            }, function (err, updatedTicket, lastErrorObject) {
+            }, function(err, updatedTicket, lastErrorObject) {
                 if (!err) {
                     // delete ticket items
                     ticketItems.remove({
                         'ticketId': updatedTicket.ticketId
-                    }, function (err, removedTicketItems) {
+                    }, function(err, removedTicketItems) {
                         if (!err) {
                             // create new of these items
                             var newTicketItemsToSave = [];
@@ -390,7 +389,7 @@ app.post('/EditTicketAndReturnTicket', function (req, res) {
                                     ticketItemUnitType: 'E'
                                 });
                             }
-                            _.each(updatedTicket.ticketItems, function (ticketItem) {
+                            _.each(updatedTicket.ticketItems, function(ticketItem) {
                                 if (parseInt(ticketItem.productTypeId) === 1008) {
                                     ticketItem.ticketId = updatedTicket.ticketId;
                                     newTicketItemsToSave.push(ticketItem);
@@ -410,7 +409,7 @@ app.post('/EditTicketAndReturnTicket', function (req, res) {
                                 }
                             });
                             // insert list of ticket items
-                            ticketItems.insert(newTicketItemsToSave, function (err, savedTicketItems) {
+                            ticketItems.insert(newTicketItemsToSave, function(err, savedTicketItems) {
                                 if (!err) {
                                     updatedTicket.ticketItems = savedTicketItems;
                                     res.status(200).json(updatedTicket);
@@ -426,30 +425,32 @@ app.post('/EditTicketAndReturnTicket', function (req, res) {
                     ticketId: ticket._id
                 },
                 update: {
-                    officeId: ticket.officeId,
-                    customerName: ticket.customerName,
-                    customerPhone: ticket.customerPhone,
-                    customerAddress1: ticket.customerAddress1,
-                    customerAddress2: ticket.customerAddress2,
-                    customerCity: ticket.customerCity,
-                    customerOfficeId: ticket.customerOfficeId,
-                    customerState: ticket.customerState,
-                    customerZip: ticket.customerZip,
-                    userId: ticket.userId,
-                    locationNumber: ticket.locationNumber,
-                    rigNumber: ticket.rigNumber,
-                    customerPo: ticket.customerPo,
-                    freight: ticket.freight,
-                    taxCategory: ticket.taxCategory,
-                    jobDescription: ticket.jobDescription
+                    $set: {
+                         officeId: ticket.officeId,
+                        customerName: ticket.customerName,
+                        customerPhone: ticket.customerPhone,
+                        customerAddress1: ticket.customerAddress1,
+                        customerAddress2: ticket.customerAddress2,
+                        customerCity: ticket.customerCity,
+                        customerOfficeId: ticket.customerOfficeId,
+                        customerState: ticket.customerState,
+                        customerZip: ticket.customerZip,
+                        userId: ticket.userId,
+                        locationNumber: ticket.locationNumber,
+                        rigNumber: ticket.rigNumber,
+                        customerPo: ticket.customerPo,
+                        freight: ticket.freight,
+                        taxCategory: ticket.taxCategory,
+                        jobDescription: ticket.jobDescription
+                    }
                 },
                 new: true
-            }, function (err, updatedTicket, lastErrorObject) {
+            }, function(err, updatedTicket, lastErrorObject) {
                 if (!err) {
                     // delete ticket items
                     ticketItems.remove({
                         '_ticketId': updatedTicket._id
-                    }, function (err, ticketItemsRemoved) {
+                    }, function(err, ticketItemsRemoved) {
                         if (!err) {
                             // create new of these items
                             var newTicketItemsToSave = [];
@@ -465,7 +466,7 @@ app.post('/EditTicketAndReturnTicket', function (req, res) {
                                     ticketItemUnitType: 'E'
                                 });
                             }
-                            _.each(updatedTicket.ticketItems, function (ticketItem) {
+                            _.each(updatedTicket.ticketItems, function(ticketItem) {
                                 if (parseInt(ticketItem.productTypeId) === 1008) {
                                     ticketItem._ticketId = updatedTicket._id;
                                     newTicketItemsToSave.push(ticketItem);
@@ -485,7 +486,7 @@ app.post('/EditTicketAndReturnTicket', function (req, res) {
                                 }
                             });
                             // insert list of ticket items
-                            ticketItems.insert(newTicketItemsToSave, function (err, savedTicketItems) {
+                            ticketItems.insert(newTicketItemsToSave, function(err, savedTicketItems) {
                                 if (!err) {
                                     updatedTicket.ticketItems = savedTicketItems;
                                     res.status(200).json(updatedTicket);
@@ -499,9 +500,9 @@ app.post('/EditTicketAndReturnTicket', function (req, res) {
     }
 });
 
-
+// TODO !!
 // CREATE AND RETURN TICKET
-app.post('/CreateTicketAndReturnTicket', function (req, res) {
+app.post('/CreateTicketAndReturnTicket', function(req, res) {
     var tickets = db.collection('Ticket');
     var ticketItems = db.collection('TicketItem');
     var request = req.body;
@@ -516,10 +517,10 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
         if (editMode) {
             console.log('edit mode');
             var newTicketItemsToSave = newTicket.ticketItemObjects;
-            
+
             // if user specifies a freight amount
-            if(newTicket.freight && parseInt(newTicket.freight) !== 0) {
-                // remove freight item or items (in case somehow there was two) from the ticketItemObjects list so that you can add the correct freight item.
+            if (newTicket.freight && parseInt(newTicket.freight) !== 0) {
+                // remove freight item or items (in case some how there was two) from the ticketItemObjects list so that you can add the correct freight item.
                 var allItemsExceptFreightItems = _.filter(newTicketItemsToSave, function(i) {
                     return i.productTypeId !== 1008;
                 });
@@ -536,239 +537,60 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
 
             // get current date
             var dateTime = new Date();
-            
+
             var newTicketItems = newTicketItemsToSave;
             newTicket.ticketItems = null;
             newTicket.ticketItemObjects = null;
 
-            // set grand total
+            // Total is calculated correctly now
             newTicket.grandTotal = newTicket.totalSection.grandTotal;
-            
+
             tickets.findAndModify({
-                _id: newTicket._id
-            }, {
-                officeName: newTicket.officeName,
-                customerName: newTicket.customerName,
-                customerPhone: newTicket.customerPhone,
-                customerAddress1: newTicket.customerAddress1,
-                customerAddress2: newTicket.customerAddress2,
-                customerCity: newTicket.customerCity,
-                customerState: newTicket.customerState,
-                customerZip: newTicket.customerZip,
-                userId: newTicket.userId,
-                priceRuleGeneralId: newTicket.priceRuleGeneralId,
-                locationNumber: newTicket.locationNumber,
-                rigNumber: newTicket.rigNumber,
-                customerPo: newTicket.customerPo,
-                freight: newTicket.freight,
-                taxCategoryId: newTicket.taxCategoryId,
-                jobDescription: newTicket.jobDescription,
-                workTicketNumber: newTicket.workTicketNumber,
-                grandTotal: newTicket.grandTotal,
-            })
-
-
-            // Save ticket and ticket items
-            tickets.save(newTicket, function (err, ticket) {
+                query: {
+                    _id: newTicket._id
+                },
+                update: {
+                    officeName: newTicket.officeName,
+                    customerName: newTicket.customerName,
+                    customerPhone: newTicket.customerPhone,
+                    customerAddress1: newTicket.customerAddress1,
+                    customerAddress2: newTicket.customerAddress2,
+                    customerCity: newTicket.customerCity,
+                    customerState: newTicket.customerState,
+                    customerZip: newTicket.customerZip,
+                    userId: newTicket.userId,
+                    priceRuleGeneralId: newTicket.priceRuleGeneralId,
+                    locationNumber: newTicket.locationNumber,
+                    rigNumber: newTicket.rigNumber,
+                    customerPo: newTicket.customerPo,
+                    freight: newTicket.freight,
+                    taxCategoryId: newTicket.taxCategoryId,
+                    jobDescription: newTicket.jobDescription,
+                    workTicketNumber: newTicket.workTicketNumber,
+                    grandTotal: newTicket.grandTotal,
+                },
+                new: true
+            }, function(err, updatedTicket) {
                 if (!err) {
-                    // assign ticket items to this ticket and add ticketItemDescription and ticketItemName
+                    // TODO save ticket items to this updated ticket
+                    // first remove all existing ticket items to this ticket
+                    console.log(updatedTicket._id);
 
-                    _.each(newTicketItems, function (ticketItem) {
-                        if (parseInt(ticketItem.productTypeId) === 1008) {
-                            ticketItem._ticketId = ticket._id;
-                            newTicketItemsToSave.push(ticketItem);
-                        } else {
-                            var newTicketItem = {
-                                ticketItemDescription: ticketItem.productDescription,
-                                productTypeId: ticketItem.productTypeId,
-                                productId: ticketItem.productId,
-                                userId: user.userId,
-                                ticketItemRate: parseFloat(ticketItem.pricePerUnit),
-                                ticketItemName: ticketItem.productDescription,
-                                qtyUnits: parseInt(ticketItem.qtyUnits),
-                                _ticketId: ticket._id,
-                                ticketItemUnitType: ticketItem.ticketItemUnitType
-                            }
-                            newTicketItemsToSave.push(newTicketItem);
-                        }
-                    });
-
-
-                    ticketItems.insert(newTicketItemsToSave, function (err, savedTicketItems) {
+                    ticketItems.remove({ _ticketId: updatedTicket._id }, function(err, data) {
                         if (!err) {
-                            // create PDF
-                            var doc = new Pdf({
-                                margin: 25
-                            });
-                            var defaultFontSize = 12;
-                            var contentWidth = doc.page.width - 50;
-
-                            doc.fillColor('#4f4f4f');
-                            doc.fontSize(defaultFontSize);
-
-                            doc.pipe(fs.createWriteStream(serverPathToSiteRoot + 'content/Tickets/Generated/' + ticket._id.toHexString() + '.pdf'));
-
-                            doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template.jpg', {
-                                width: contentWidth
-                            });
-
-                            doc.fontSize(defaultFontSize + 3);
-                            doc.fillColor('#9f0000');
-                            // work ticket number
-                            doc.text(ticket.workTicketNumber, 425, 65, {
-                                lineBreak: false
-                            });
-
-                            doc.fillColor('#4f4f4f');
-                            doc.fontSize(defaultFontSize);
-
-                            // po number
-                            if (ticket.customerPo) {
-                                doc.text('PO #' + ticket.customerPo, 425, 90, {
-                                    lineBreak: false
-                                });
-                            }
-                            // creation date
-                            console.log(ticket.ticketCreationDate);
-                            var formattedDate = moment(ticket.ticketCreationDate).format('M/D/YYYY');
-                            doc.text(formattedDate, 425, 105, {
-                                lineBreak: false
-                            });
-
-                            doc.fillColor('#9f0000');
-
-                            // ticket to:
-                            doc.text('TICKET TO:', 25, 145, {
-                                lineBreak: false
-                            });
-
-                            doc.fillColor('#4f4f4f');
-
-                            // customer info
-                            var currentCustomerInfoSpot = 160;
-                            doc.text(ticket.customerName, 25, currentCustomerInfoSpot);
-                            currentCustomerInfoSpot += 15;
-
-                            doc.fontSize(defaultFontSize - 2);
-
-                            doc.text(newTicket.customerAddress1, 25, currentCustomerInfoSpot);
-                            if (newTicket.customerAddress2) {
-                                currentCustomerInfoSpot += 13;
-                                doc.text(newTicket.customerAddress2, 25, currentCustomerInfoSpot);
-                            }
-
-                            currentCustomerInfoSpot += 13;
-                            if (!newTicket.customerZip) {
-                                newTicket.customerZip = '';
-                            }
-                            if (!newTicket.customerState) {
-                                newTicket.customerState = '';
-                            }
-                            if (newTicket.customerState === '' && newTicket.customerZip === '') {
-                                doc.text(newTicket.customerCity, 25, currentCustomerInfoSpot);
-                            } else {
-                                doc.text(newTicket.customerCity + ', ' + newTicket.customerState + ' ' + newTicket.customerZip, 25, currentCustomerInfoSpot);
-                            }
-
-                            doc.fontSize(defaultFontSize);
-                            if (newTicket.locationNumber) {
-                                currentCustomerInfoSpot += 20;
-                                // location:
-                                doc.fillColor('#9f0000');
-                                doc.text('LOCATION:', 25, currentCustomerInfoSpot, {
-                                    lineBreak: false
-                                });
-                                // location
-                                doc.fillColor('#4f4f4f');
-                                doc.text(newTicket.locationNumber, 95, currentCustomerInfoSpot, {
-                                    lineBreak: false
-                                });
-                            }
-
-                            if (newTicket.rigNumber) {
-                                currentCustomerInfoSpot += 20;
-                                // rig:
-                                doc.fillColor('#9f0000');
-                                doc.text('RIG:', 25, currentCustomerInfoSpot, {
-                                    lineBreak: false
-                                });
-                                // rig
-                                doc.fillColor('#4f4f4f');
-                                doc.text(newTicket.rigNumber, 58, currentCustomerInfoSpot, {
-                                    lineBreak: false
-                                });
-                            }
-
-                            doc.fillColor('#9f0000');
-                            // job description:
-                            doc.text('JOB DESCRIPTION:', 325, 145, {
-                                lineBreak: false
-                            });
-
-                            var currentJobDescriptionSpot = 160;
-
-                            doc.fillColor('#4f4f4f');
-                            doc.fontSize(defaultFontSize - 2);
-
-                            // description
-                            doc.text(ticket.jobDescription, 325, 160, {
-                                lineBreak: false,
-                                width: contentWidth - 325
-                            });
-
-                            currentJobDescriptionSpot = doc.y;
-
-                            var currentSpotTicketItems;
-                            if (currentJobDescriptionSpot > currentCustomerInfoSpot) {
-                                currentSpotTicketItems = currentJobDescriptionSpot;
-                            } else {
-                                currentSpotTicketItems = currentCustomerInfoSpot;
-                            }
-
-                            currentSpotTicketItems += 16;
-
-                            // ticket item header
-                            doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-itemheading.jpg', 25, currentSpotTicketItems, {
-                                width: contentWidth
-                            });
-
-                            currentSpotTicketItems += 30;
-
-                            var laborItems = _.filter(savedTicketItems, function (sti) {
-                                return parseInt(sti.productTypeId) === 1006;
-                            });
-                            var otherItems = _.reject(savedTicketItems, function (sti) {
-                                return parseInt(sti.productTypeId) === 1006;
-                            });
-                            var startOfTicketItems = currentSpotTicketItems;
-
-                            if (laborItems.length > 0) {
-                                _.each(laborItems, function (ti) {
-                                    doc.text(ti.ticketItemDescription, 25, startOfTicketItems, {
-                                        width: 280
+                            ticketItems.insert(newTicketItemsToSave, function(err, savedTicketItems) {
+                                if (!err) {
+                                    // create PDF
+                                    var doc = new Pdf({
+                                        margin: 25
                                     });
-                                    doc.text(accounting.formatMoney(ti.ticketItemRate), 25 + 280, startOfTicketItems, {
-                                        width: 103
-                                    });
-                                    doc.text(ti.qtyUnits, 25 + 280 + 103, startOfTicketItems, {
-                                        width: 80
-                                    });
-                                    doc.text(accounting.formatMoney(parseFloat(ti.ticketItemRate) * parseInt(ti.qtyUnits)), 25 + 280 + 103 + 80, startOfTicketItems, {
-                                        width: 100
-                                    });
-                                    startOfTicketItems += 20;
-                                });
+                                    var defaultFontSize = 12;
+                                    var contentWidth = doc.page.width - 50;
 
-                                startOfTicketItems += 20;
-                            }
-
-                            _.each(otherItems, function (ti) {
-                                var endOfPage = 750;
-
-                                if (startOfTicketItems > endOfPage - 30) {
-                                    doc.addPage();
                                     doc.fillColor('#4f4f4f');
                                     doc.fontSize(defaultFontSize);
+
+                                    doc.pipe(fs.createWriteStream(serverPathToSiteRoot + 'content/Tickets/Generated/' + ticket._id.toHexString() + '.pdf'));
 
                                     doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template.jpg', {
                                         width: contentWidth
@@ -797,360 +619,181 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
                                         lineBreak: false
                                     });
 
-                                    doc.fillColor('#4f4f4f');
-                                    doc.fontSize(defaultFontSize);
+                                    doc.fillColor('#9f0000');
 
-                                    var startOfItemHeadingImage = 145;
+                                    // ticket to:
+                                    doc.text('TICKET TO:', 25, 145, {
+                                        lineBreak: false
+                                    });
+
+                                    doc.fillColor('#4f4f4f');
+
+                                    // customer info
+                                    var currentCustomerInfoSpot = 160;
+                                    doc.text(ticket.customerName, 25, currentCustomerInfoSpot);
+                                    currentCustomerInfoSpot += 15;
+
+                                    doc.fontSize(defaultFontSize - 2);
+
+                                    doc.text(newTicket.customerAddress1, 25, currentCustomerInfoSpot);
+                                    if (newTicket.customerAddress2) {
+                                        currentCustomerInfoSpot += 13;
+                                        doc.text(newTicket.customerAddress2, 25, currentCustomerInfoSpot);
+                                    }
+
+                                    currentCustomerInfoSpot += 13;
+                                    if (!newTicket.customerZip) {
+                                        newTicket.customerZip = '';
+                                    }
+                                    if (!newTicket.customerState) {
+                                        newTicket.customerState = '';
+                                    }
+                                    if (newTicket.customerState === '' && newTicket.customerZip === '') {
+                                        doc.text(newTicket.customerCity, 25, currentCustomerInfoSpot);
+                                    } else {
+                                        doc.text(newTicket.customerCity + ', ' + newTicket.customerState + ' ' + newTicket.customerZip, 25, currentCustomerInfoSpot);
+                                    }
+
+                                    doc.fontSize(defaultFontSize);
+                                    if (newTicket.locationNumber) {
+                                        currentCustomerInfoSpot += 20;
+                                        // location:
+                                        doc.fillColor('#9f0000');
+                                        doc.text('LOCATION:', 25, currentCustomerInfoSpot, {
+                                            lineBreak: false
+                                        });
+                                        // location
+                                        doc.fillColor('#4f4f4f');
+                                        doc.text(newTicket.locationNumber, 95, currentCustomerInfoSpot, {
+                                            lineBreak: false
+                                        });
+                                    }
+
+                                    if (newTicket.rigNumber) {
+                                        currentCustomerInfoSpot += 20;
+                                        // rig:
+                                        doc.fillColor('#9f0000');
+                                        doc.text('RIG:', 25, currentCustomerInfoSpot, {
+                                            lineBreak: false
+                                        });
+                                        // rig
+                                        doc.fillColor('#4f4f4f');
+                                        doc.text(newTicket.rigNumber, 58, currentCustomerInfoSpot, {
+                                            lineBreak: false
+                                        });
+                                    }
+
+                                    doc.fillColor('#9f0000');
+                                    // job description:
+                                    doc.text('JOB DESCRIPTION:', 325, 145, {
+                                        lineBreak: false
+                                    });
+
+                                    var currentJobDescriptionSpot = 160;
+
+                                    doc.fillColor('#4f4f4f');
+                                    doc.fontSize(defaultFontSize - 2);
+
+                                    // description
+                                    doc.text(ticket.jobDescription, 325, 160, {
+                                        lineBreak: false,
+                                        width: contentWidth - 325
+                                    });
+
+                                    currentJobDescriptionSpot = doc.y;
+
+                                    var currentSpotTicketItems;
+                                    if (currentJobDescriptionSpot > currentCustomerInfoSpot) {
+                                        currentSpotTicketItems = currentJobDescriptionSpot;
+                                    } else {
+                                        currentSpotTicketItems = currentCustomerInfoSpot;
+                                    }
+
+                                    currentSpotTicketItems += 16;
 
                                     // ticket item header
-                                    doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-itemheading.jpg', 25, 145, {
+                                    doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-itemheading.jpg', 25, currentSpotTicketItems, {
                                         width: contentWidth
                                     });
-                                    startOfItemHeadingImage += 35;
 
-                                    startOfTicketItems = startOfItemHeadingImage;
-                                }
-                                doc.text(ti.ticketItemDescription, 25, startOfTicketItems, {
-                                    width: 280
-                                });
-                                doc.text(accounting.formatMoney(ti.ticketItemRate), 25 + 280, startOfTicketItems, {
-                                    width: 103
-                                });
-                                doc.text(ti.qtyUnits, 25 + 280 + 103, startOfTicketItems, {
-                                    width: 80
-                                });
-                                doc.text(accounting.formatMoney(parseFloat(ti.ticketItemRate) * parseInt(ti.qtyUnits)), 25 + 280 + 103 + 80, startOfTicketItems, {
-                                    width: 100
-                                });
-                                startOfTicketItems += 20;
-                            });
+                                    currentSpotTicketItems += 30;
 
-
-                            var startOfTotalSection = 595;
-                            if (startOfTicketItems > startOfTotalSection - 30) {
-                                doc.addPage();
-                                doc.fillColor('#4f4f4f');
-                                doc.fontSize(defaultFontSize);
-
-                                doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template.jpg', {
-                                    width: contentWidth
-                                });
-
-                                doc.fontSize(defaultFontSize + 3);
-                                doc.fillColor('#9f0000');
-                                // work ticket number
-                                doc.text(ticket.workTicketNumber, 425, 65, {
-                                    lineBreak: false
-                                });
-
-                                doc.fillColor('#4f4f4f');
-                                doc.fontSize(defaultFontSize);
-
-                                // po number
-                                if (ticket.customerPo) {
-                                    doc.text('PO #' + ticket.customerPo, 425, 90, {
-                                        lineBreak: false
+                                    var laborItems = _.filter(savedTicketItems, function(sti) {
+                                        return parseInt(sti.productTypeId) === 1006;
                                     });
-                                }
-                                // creation date
-                                console.log(ticket.ticketCreationDate);
-                                var formattedDate = moment(ticket.ticketCreationDate).format('M/D/YYYY');
-                                doc.text(formattedDate, 425, 105, {
-                                    lineBreak: false
-                                });
-
-                                doc.fillColor('#4f4f4f');
-                                doc.fontSize(defaultFontSize);
-                            }
-
-                            doc.fontSize(defaultFontSize);
-
-                            // total section
-                            doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-totalsection.jpg', 275, 595, {
-                                width: contentWidth - 250
-                            });
-
-                            var incrementAmount = 26;
-                            var yStart = 618;
-                            doc.text(accounting.formatMoney(newTicket.totalSection.materialSubTotal), 460, yStart);
-                            doc.text(accounting.formatMoney(newTicket.totalSection.laborAndEquipmentSubTotal), 460, yStart + incrementAmount);
-                            doc.text(accounting.formatMoney(newTicket.freight), 460, yStart + incrementAmount + incrementAmount);
-                            doc.text(accounting.formatMoney(newTicket.totalSection.totalTaxes), 460, yStart + incrementAmount + incrementAmount + incrementAmount);
-
-                            doc.fontSize(defaultFontSize + 4);
-
-                            doc.text(accounting.formatMoney(newTicket.totalSection.grandTotal), 460, yStart + incrementAmount + incrementAmount + incrementAmount + incrementAmount - 2);
-                            doc.text(accounting.formatMoney(newTicket.totalSection.grandTotal), 460, yStart + incrementAmount + incrementAmount + incrementAmount + incrementAmount - 2);
-                            doc.text(accounting.formatMoney(newTicket.totalSection.grandTotal), 460, yStart + incrementAmount + incrementAmount + incrementAmount + incrementAmount - 2);
-
-                            //                                var values = [
-                            //                                    50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
-                            //                                ];
-                            //                                var vals = [
-                            //                                    50, 100, 150, 200, 250, 300, 350, 400, 450, 500
-                            //                                ];
-                            //
-                            //                                doc.fillColor('red');
-                            //                                _.each(values, function(v) {
-                            //                                    doc.text(v, 0, v, {
-                            //                                        lineBreak: false
-                            //                                    });
-                            //                                });
-                            //                                doc.fillColor('green');
-                            //                                _.each(vals, function(x) {
-                            //                                    doc.text(x, x, 0, {
-                            //                                        lineBreak: false
-                            //                                    });
-                            //                                });
-
-                            doc.end();
-
-                            res.status(200).json('Ticket has been saved!');
-                        } else {
-                            res.status(201).json('Ticket was saved, but ticket items were not saved');
-                        }
-                    })
-                } else {
-                    console.log(err);
-                }
-            });
-        }
-        // END EDIT MODE
-        
-        // CREATE MODE
-        else {
-            console.log('create mode');
-            // first generate new work ticket number (ex: BJG150006)
-        var newWorkTicketNumber = '';
-        tickets.find({
-            'userId': user.userId
-        }, function (err, ticketsForThisUser) {
-            if (!err) {
-                if (ticketsForThisUser && ticketsForThisUser.length > 0) {
-                    var numberPattern = /\d+/g;
-                    var highTicketNumber = 0;
-                    var counter = 1;
-                    _.each(ticketsForThisUser, function (ticket) {
-                        if (ticket.workTicketNumber) {
-                            var ticketNumber = ticket.workTicketNumber.match(numberPattern);
-                            if (ticketNumber) {
-
-                                if (parseInt(ticketNumber) > highTicketNumber) {
-                                    highTicketNumber = parseInt(ticketNumber);
-                                }
-                            }
-                            counter++;
-                        }
-                    });
-                    var newTicketNumber = highTicketNumber + 1;
-                    newWorkTicketNumber = user.workTicketCode + String(newTicketNumber);
-                } else {
-                    newWorkTicketNumber = user.workTicketCode + '150000';
-                }
-                newTicket.workTicketNumber = newWorkTicketNumber;
-
-                var newTicketItemsToSave = [];
-
-                // create new ticket item if freight exists
-                if (newTicket.freight && parseInt(newTicket.freight) !== 0) {
-                    newTicket.ticketItems.push({
-                        ticketItemDescription: 'Freight charge',
-                        productTypeId: 1008,
-                        userId: user.userId,
-                        ticketItemRate: parseFloat(newTicket.freight),
-                        ticketItemName: 'Freight charge',
-                        qtyUnits: 1,
-                        ticketItemUnitType: 'E'
-                    });
-                }
-
-                // get current date
-                var dateTime = new Date();
-                newTicket.ticketCreationDate = dateTime;
-                var newTicketItems = newTicket.ticketItems;
-                newTicket.ticketItems = null;
-                newTicket.ticketItemObjects = null;
-
-                // set grand total
-                newTicket.grandTotal = newTicket.totalSection.grandTotal;
-
-
-                // Save ticket and ticket items
-                tickets.save(newTicket, function (err, ticket) {
-                    if (!err) {
-                        // assign ticket items to this ticket and add ticketItemDescription and ticketItemName
-
-                        _.each(newTicketItems, function (ticketItem) {
-                            if (parseInt(ticketItem.productTypeId) === 1008) {
-                                ticketItem._ticketId = ticket._id;
-                                newTicketItemsToSave.push(ticketItem);
-                            } else {
-                                var newTicketItem = {
-                                    ticketItemDescription: ticketItem.productDescription,
-                                    productTypeId: ticketItem.productTypeId,
-                                    productId: ticketItem.productId,
-                                    userId: user.userId,
-                                    ticketItemRate: parseFloat(ticketItem.pricePerUnit),
-                                    ticketItemName: ticketItem.productDescription,
-                                    qtyUnits: parseInt(ticketItem.qtyUnits),
-                                    _ticketId: ticket._id,
-                                    ticketItemUnitType: ticketItem.ticketItemUnitType
-                                }
-                                newTicketItemsToSave.push(newTicketItem);
-                            }
-                        });
-
-
-                        ticketItems.insert(newTicketItemsToSave, function (err, savedTicketItems) {
-                            if (!err) {
-                                // create PDF
-                                var doc = new Pdf({
-                                    margin: 25
-                                });
-                                var defaultFontSize = 12;
-                                var contentWidth = doc.page.width - 50;
-
-                                doc.fillColor('#4f4f4f');
-                                doc.fontSize(defaultFontSize);
-
-                                doc.pipe(fs.createWriteStream(serverPathToSiteRoot + 'content/Tickets/Generated/' + ticket._id.toHexString() + '.pdf'));
-
-                                doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template.jpg', {
-                                    width: contentWidth
-                                });
-
-                                doc.fontSize(defaultFontSize + 3);
-                                doc.fillColor('#9f0000');
-                                // work ticket number
-                                doc.text(ticket.workTicketNumber, 425, 65, {
-                                    lineBreak: false
-                                });
-
-                                doc.fillColor('#4f4f4f');
-                                doc.fontSize(defaultFontSize);
-
-                                // po number
-                                if (ticket.customerPo) {
-                                    doc.text('PO #' + ticket.customerPo, 425, 90, {
-                                        lineBreak: false
+                                    var otherItems = _.reject(savedTicketItems, function(sti) {
+                                        return parseInt(sti.productTypeId) === 1006;
                                     });
-                                }
-                                // creation date
-                                console.log(ticket.ticketCreationDate);
-                                var formattedDate = moment(ticket.ticketCreationDate).format('M/D/YYYY');
-                                doc.text(formattedDate, 425, 105, {
-                                    lineBreak: false
-                                });
+                                    var startOfTicketItems = currentSpotTicketItems;
 
-                                doc.fillColor('#9f0000');
+                                    if (laborItems.length > 0) {
+                                        _.each(laborItems, function(ti) {
+                                            doc.text(ti.ticketItemDescription, 25, startOfTicketItems, {
+                                                width: 280
+                                            });
+                                            doc.text(accounting.formatMoney(ti.ticketItemRate), 25 + 280, startOfTicketItems, {
+                                                width: 103
+                                            });
+                                            doc.text(ti.qtyUnits, 25 + 280 + 103, startOfTicketItems, {
+                                                width: 80
+                                            });
+                                            doc.text(accounting.formatMoney(parseFloat(ti.ticketItemRate) * parseInt(ti.qtyUnits)), 25 + 280 + 103 + 80, startOfTicketItems, {
+                                                width: 100
+                                            });
+                                            startOfTicketItems += 20;
+                                        });
 
-                                // ticket to:
-                                doc.text('TICKET TO:', 25, 145, {
-                                    lineBreak: false
-                                });
+                                        startOfTicketItems += 20;
+                                    }
 
-                                doc.fillColor('#4f4f4f');
+                                    _.each(otherItems, function(ti) {
+                                        var endOfPage = 750;
 
-                                // customer info
-                                var currentCustomerInfoSpot = 160;
-                                doc.text(ticket.customerName, 25, currentCustomerInfoSpot);
-                                currentCustomerInfoSpot += 15;
+                                        if (startOfTicketItems > endOfPage - 30) {
+                                            doc.addPage();
+                                            doc.fillColor('#4f4f4f');
+                                            doc.fontSize(defaultFontSize);
 
-                                doc.fontSize(defaultFontSize - 2);
+                                            doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template.jpg', {
+                                                width: contentWidth
+                                            });
 
-                                doc.text(newTicket.customerAddress1, 25, currentCustomerInfoSpot);
-                                if (newTicket.customerAddress2) {
-                                    currentCustomerInfoSpot += 13;
-                                    doc.text(newTicket.customerAddress2, 25, currentCustomerInfoSpot);
-                                }
+                                            doc.fontSize(defaultFontSize + 3);
+                                            doc.fillColor('#9f0000');
+                                            // work ticket number
+                                            doc.text(ticket.workTicketNumber, 425, 65, {
+                                                lineBreak: false
+                                            });
 
-                                currentCustomerInfoSpot += 13;
-                                if (!newTicket.customerZip) {
-                                    newTicket.customerZip = '';
-                                }
-                                if (!newTicket.customerState) {
-                                    newTicket.customerState = '';
-                                }
-                                if (newTicket.customerState === '' && newTicket.customerZip === '') {
-                                    doc.text(newTicket.customerCity, 25, currentCustomerInfoSpot);
-                                } else {
-                                    doc.text(newTicket.customerCity + ', ' + newTicket.customerState + ' ' + newTicket.customerZip, 25, currentCustomerInfoSpot);
-                                }
+                                            doc.fillColor('#4f4f4f');
+                                            doc.fontSize(defaultFontSize);
 
-                                doc.fontSize(defaultFontSize);
-                                if (newTicket.locationNumber) {
-                                    currentCustomerInfoSpot += 20;
-                                    // location:
-                                    doc.fillColor('#9f0000');
-                                    doc.text('LOCATION:', 25, currentCustomerInfoSpot, {
-                                        lineBreak: false
-                                    });
-                                    // location
-                                    doc.fillColor('#4f4f4f');
-                                    doc.text(newTicket.locationNumber, 95, currentCustomerInfoSpot, {
-                                        lineBreak: false
-                                    });
-                                }
+                                            // po number
+                                            if (ticket.customerPo) {
+                                                doc.text('PO #' + ticket.customerPo, 425, 90, {
+                                                    lineBreak: false
+                                                });
+                                            }
+                                            // creation date
+                                            console.log(ticket.ticketCreationDate);
+                                            var formattedDate = moment(ticket.ticketCreationDate).format('M/D/YYYY');
+                                            doc.text(formattedDate, 425, 105, {
+                                                lineBreak: false
+                                            });
 
-                                if (newTicket.rigNumber) {
-                                    currentCustomerInfoSpot += 20;
-                                    // rig:
-                                    doc.fillColor('#9f0000');
-                                    doc.text('RIG:', 25, currentCustomerInfoSpot, {
-                                        lineBreak: false
-                                    });
-                                    // rig
-                                    doc.fillColor('#4f4f4f');
-                                    doc.text(newTicket.rigNumber, 58, currentCustomerInfoSpot, {
-                                        lineBreak: false
-                                    });
-                                }
+                                            doc.fillColor('#4f4f4f');
+                                            doc.fontSize(defaultFontSize);
 
-                                doc.fillColor('#9f0000');
-                                // job description:
-                                doc.text('JOB DESCRIPTION:', 325, 145, {
-                                    lineBreak: false
-                                });
+                                            var startOfItemHeadingImage = 145;
 
-                                var currentJobDescriptionSpot = 160;
+                                            // ticket item header
+                                            doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-itemheading.jpg', 25, 145, {
+                                                width: contentWidth
+                                            });
+                                            startOfItemHeadingImage += 35;
 
-                                doc.fillColor('#4f4f4f');
-                                doc.fontSize(defaultFontSize - 2);
-
-                                // description
-                                doc.text(ticket.jobDescription, 325, 160, {
-                                    lineBreak: false,
-                                    width: contentWidth - 325
-                                });
-
-                                currentJobDescriptionSpot = doc.y;
-
-                                var currentSpotTicketItems;
-                                if (currentJobDescriptionSpot > currentCustomerInfoSpot) {
-                                    currentSpotTicketItems = currentJobDescriptionSpot;
-                                } else {
-                                    currentSpotTicketItems = currentCustomerInfoSpot;
-                                }
-
-                                currentSpotTicketItems += 16;
-
-                                // ticket item header
-                                doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-itemheading.jpg', 25, currentSpotTicketItems, {
-                                    width: contentWidth
-                                });
-
-                                currentSpotTicketItems += 30;
-
-                                var laborItems = _.filter(savedTicketItems, function (sti) {
-                                    return parseInt(sti.productTypeId) === 1006;
-                                });
-                                var otherItems = _.reject(savedTicketItems, function (sti) {
-                                    return parseInt(sti.productTypeId) === 1006;
-                                });
-                                var startOfTicketItems = currentSpotTicketItems;
-
-                                if (laborItems.length > 0) {
-                                    _.each(laborItems, function (ti) {
+                                            startOfTicketItems = startOfItemHeadingImage;
+                                        }
                                         doc.text(ti.ticketItemDescription, 25, startOfTicketItems, {
                                             width: 280
                                         });
@@ -1166,13 +809,9 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
                                         startOfTicketItems += 20;
                                     });
 
-                                    startOfTicketItems += 20;
-                                }
 
-                                _.each(otherItems, function (ti) {
-                                    var endOfPage = 750;
-
-                                    if (startOfTicketItems > endOfPage - 30) {
+                                    var startOfTotalSection = 595;
+                                    if (startOfTicketItems > startOfTotalSection - 30) {
                                         doc.addPage();
                                         doc.fillColor('#4f4f4f');
                                         doc.fontSize(defaultFontSize);
@@ -1206,38 +845,166 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
 
                                         doc.fillColor('#4f4f4f');
                                         doc.fontSize(defaultFontSize);
-
-                                        var startOfItemHeadingImage = 145;
-
-                                        // ticket item header
-                                        doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-itemheading.jpg', 25, 145, {
-                                            width: contentWidth
-                                        });
-                                        startOfItemHeadingImage += 35;
-
-                                        startOfTicketItems = startOfItemHeadingImage;
                                     }
-                                    doc.text(ti.ticketItemDescription, 25, startOfTicketItems, {
-                                        width: 280
+
+                                    doc.fontSize(defaultFontSize);
+
+                                    // total section
+                                    doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-totalsection.jpg', 275, 595, {
+                                        width: contentWidth - 250
                                     });
-                                    doc.text(accounting.formatMoney(ti.ticketItemRate), 25 + 280, startOfTicketItems, {
-                                        width: 103
-                                    });
-                                    doc.text(ti.qtyUnits, 25 + 280 + 103, startOfTicketItems, {
-                                        width: 80
-                                    });
-                                    doc.text(accounting.formatMoney(parseFloat(ti.ticketItemRate) * parseInt(ti.qtyUnits)), 25 + 280 + 103 + 80, startOfTicketItems, {
-                                        width: 100
-                                    });
-                                    startOfTicketItems += 20;
-                                });
+
+                                    var incrementAmount = 26;
+                                    var yStart = 618;
+                                    doc.text(accounting.formatMoney(newTicket.totalSection.materialSubTotal), 460, yStart);
+                                    doc.text(accounting.formatMoney(newTicket.totalSection.laborAndEquipmentSubTotal), 460, yStart + incrementAmount);
+                                    doc.text(accounting.formatMoney(newTicket.freight), 460, yStart + incrementAmount + incrementAmount);
+                                    doc.text(accounting.formatMoney(newTicket.totalSection.totalTaxes), 460, yStart + incrementAmount + incrementAmount + incrementAmount);
+
+                                    doc.fontSize(defaultFontSize + 4);
+
+                                    doc.text(accounting.formatMoney(newTicket.totalSection.grandTotal), 460, yStart + incrementAmount + incrementAmount + incrementAmount + incrementAmount - 2);
+                                    doc.text(accounting.formatMoney(newTicket.totalSection.grandTotal), 460, yStart + incrementAmount + incrementAmount + incrementAmount + incrementAmount - 2);
+                                    doc.text(accounting.formatMoney(newTicket.totalSection.grandTotal), 460, yStart + incrementAmount + incrementAmount + incrementAmount + incrementAmount - 2);
+
+                                    //                                var values = [
+                                    //                                    50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+                                    //                                ];
+                                    //                                var vals = [
+                                    //                                    50, 100, 150, 200, 250, 300, 350, 400, 450, 500
+                                    //                                ];
+                                    //
+                                    //                                doc.fillColor('red');
+                                    //                                _.each(values, function(v) {
+                                    //                                    doc.text(v, 0, v, {
+                                    //                                        lineBreak: false
+                                    //                                    });
+                                    //                                });
+                                    //                                doc.fillColor('green');
+                                    //                                _.each(vals, function(x) {
+                                    //                                    doc.text(x, x, 0, {
+                                    //                                        lineBreak: false
+                                    //                                    });
+                                    //                                });
+
+                                    doc.end();
+
+                                    res.status(200).json('Ticket has been saved!');
+                                } else {
+                                    res.status(201).json('Ticket was saved, but ticket items were not saved');
+                                }
+                            });
+                        } else {
+                            console.log('error on removing existing ticket items.');
+                        }
+                    });
+
+                    // second save ticket items with this ticket's _id (as _ticketId)
+
+                } else {
+                    console.log(err);
+                }
+            });
+        }
+        // END EDIT MODE
+
+        // CREATE MODE
+        else {
+            console.log('create mode');
+            // first generate new work ticket number (ex: BJG150006)
+            var newWorkTicketNumber = '';
+            tickets.find({
+                'userId': user.userId
+            }, function(err, ticketsForThisUser) {
+                if (!err) {
+                    if (ticketsForThisUser && ticketsForThisUser.length > 0) {
+                        var numberPattern = /\d+/g;
+                        var highTicketNumber = 0;
+                        var counter = 1;
+                        _.each(ticketsForThisUser, function(ticket) {
+                            if (ticket.workTicketNumber) {
+                                var ticketNumber = ticket.workTicketNumber.match(numberPattern);
+                                if (ticketNumber) {
+
+                                    if (parseInt(ticketNumber) > highTicketNumber) {
+                                        highTicketNumber = parseInt(ticketNumber);
+                                    }
+                                }
+                                counter++;
+                            }
+                        });
+                        var newTicketNumber = highTicketNumber + 1;
+                        newWorkTicketNumber = user.workTicketCode + String(newTicketNumber);
+                    } else {
+                        newWorkTicketNumber = user.workTicketCode + '150000';
+                    }
+                    newTicket.workTicketNumber = newWorkTicketNumber;
+
+                    var newTicketItemsToSave = [];
+
+                    // create new ticket item if freight exists
+                    if (newTicket.freight && parseInt(newTicket.freight) !== 0) {
+                        newTicket.ticketItems.push({
+                            ticketItemDescription: 'Freight charge',
+                            productTypeId: 1008,
+                            userId: user.userId,
+                            ticketItemRate: parseFloat(newTicket.freight),
+                            ticketItemName: 'Freight charge',
+                            qtyUnits: 1,
+                            ticketItemUnitType: 'E'
+                        });
+                    }
+
+                    // get current date
+                    var dateTime = new Date();
+                    newTicket.ticketCreationDate = dateTime;
+                    var newTicketItems = newTicket.ticketItems;
+                    newTicket.ticketItems = null;
+                    newTicket.ticketItemObjects = null;
+
+                    // set grand total
+                    newTicket.grandTotal = newTicket.totalSection.grandTotal;
 
 
-                                var startOfTotalSection = 595;
-                                if (startOfTicketItems > startOfTotalSection - 30) {
-                                    doc.addPage();
+                    // Save ticket and ticket items
+                    tickets.save(newTicket, function(err, ticket) {
+                        if (!err) {
+                            // assign ticket items to this ticket and add ticketItemDescription and ticketItemName
+
+                            _.each(newTicketItems, function(ticketItem) {
+                                if (parseInt(ticketItem.productTypeId) === 1008) {
+                                    ticketItem._ticketId = ticket._id;
+                                    newTicketItemsToSave.push(ticketItem);
+                                } else {
+                                    var newTicketItem = {
+                                        ticketItemDescription: ticketItem.productDescription,
+                                        productTypeId: ticketItem.productTypeId,
+                                        productId: ticketItem.productId,
+                                        userId: user.userId,
+                                        ticketItemRate: parseFloat(ticketItem.pricePerUnit),
+                                        ticketItemName: ticketItem.productDescription,
+                                        qtyUnits: parseInt(ticketItem.qtyUnits),
+                                        _ticketId: ticket._id,
+                                        ticketItemUnitType: ticketItem.ticketItemUnitType
+                                    }
+                                    newTicketItemsToSave.push(newTicketItem);
+                                }
+                            });
+
+
+                            ticketItems.insert(newTicketItemsToSave, function(err, savedTicketItems) {
+                                if (!err) {
+                                    // create PDF
+                                    var doc = new Pdf({
+                                        margin: 25
+                                    });
+                                    var defaultFontSize = 12;
+                                    var contentWidth = doc.page.width - 50;
+
                                     doc.fillColor('#4f4f4f');
                                     doc.fontSize(defaultFontSize);
+
+                                    doc.pipe(fs.createWriteStream(serverPathToSiteRoot + 'content/Tickets/Generated/' + ticket._id.toHexString() + '.pdf'));
 
                                     doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template.jpg', {
                                         width: contentWidth
@@ -1266,67 +1033,291 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
                                         lineBreak: false
                                     });
 
+                                    doc.fillColor('#9f0000');
+
+                                    // ticket to:
+                                    doc.text('TICKET TO:', 25, 145, {
+                                        lineBreak: false
+                                    });
+
                                     doc.fillColor('#4f4f4f');
+
+                                    // customer info
+                                    var currentCustomerInfoSpot = 160;
+                                    doc.text(ticket.customerName, 25, currentCustomerInfoSpot);
+                                    currentCustomerInfoSpot += 15;
+
+                                    doc.fontSize(defaultFontSize - 2);
+
+                                    doc.text(newTicket.customerAddress1, 25, currentCustomerInfoSpot);
+                                    if (newTicket.customerAddress2) {
+                                        currentCustomerInfoSpot += 13;
+                                        doc.text(newTicket.customerAddress2, 25, currentCustomerInfoSpot);
+                                    }
+
+                                    currentCustomerInfoSpot += 13;
+                                    if (!newTicket.customerZip) {
+                                        newTicket.customerZip = '';
+                                    }
+                                    if (!newTicket.customerState) {
+                                        newTicket.customerState = '';
+                                    }
+                                    if (newTicket.customerState === '' && newTicket.customerZip === '') {
+                                        doc.text(newTicket.customerCity, 25, currentCustomerInfoSpot);
+                                    } else {
+                                        doc.text(newTicket.customerCity + ', ' + newTicket.customerState + ' ' + newTicket.customerZip, 25, currentCustomerInfoSpot);
+                                    }
+
                                     doc.fontSize(defaultFontSize);
+                                    if (newTicket.locationNumber) {
+                                        currentCustomerInfoSpot += 20;
+                                        // location:
+                                        doc.fillColor('#9f0000');
+                                        doc.text('LOCATION:', 25, currentCustomerInfoSpot, {
+                                            lineBreak: false
+                                        });
+                                        // location
+                                        doc.fillColor('#4f4f4f');
+                                        doc.text(newTicket.locationNumber, 95, currentCustomerInfoSpot, {
+                                            lineBreak: false
+                                        });
+                                    }
+
+                                    if (newTicket.rigNumber) {
+                                        currentCustomerInfoSpot += 20;
+                                        // rig:
+                                        doc.fillColor('#9f0000');
+                                        doc.text('RIG:', 25, currentCustomerInfoSpot, {
+                                            lineBreak: false
+                                        });
+                                        // rig
+                                        doc.fillColor('#4f4f4f');
+                                        doc.text(newTicket.rigNumber, 58, currentCustomerInfoSpot, {
+                                            lineBreak: false
+                                        });
+                                    }
+
+                                    doc.fillColor('#9f0000');
+                                    // job description:
+                                    doc.text('JOB DESCRIPTION:', 325, 145, {
+                                        lineBreak: false
+                                    });
+
+                                    var currentJobDescriptionSpot = 160;
+
+                                    doc.fillColor('#4f4f4f');
+                                    doc.fontSize(defaultFontSize - 2);
+
+                                    // description
+                                    doc.text(ticket.jobDescription, 325, 160, {
+                                        lineBreak: false,
+                                        width: contentWidth - 325
+                                    });
+
+                                    currentJobDescriptionSpot = doc.y;
+
+                                    var currentSpotTicketItems;
+                                    if (currentJobDescriptionSpot > currentCustomerInfoSpot) {
+                                        currentSpotTicketItems = currentJobDescriptionSpot;
+                                    } else {
+                                        currentSpotTicketItems = currentCustomerInfoSpot;
+                                    }
+
+                                    currentSpotTicketItems += 16;
+
+                                    // ticket item header
+                                    doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-itemheading.jpg', 25, currentSpotTicketItems, {
+                                        width: contentWidth
+                                    });
+
+                                    currentSpotTicketItems += 30;
+
+                                    var laborItems = _.filter(savedTicketItems, function(sti) {
+                                        return parseInt(sti.productTypeId) === 1006;
+                                    });
+                                    var otherItems = _.reject(savedTicketItems, function(sti) {
+                                        return parseInt(sti.productTypeId) === 1006;
+                                    });
+                                    var startOfTicketItems = currentSpotTicketItems;
+
+                                    if (laborItems.length > 0) {
+                                        _.each(laborItems, function(ti) {
+                                            doc.text(ti.ticketItemDescription, 25, startOfTicketItems, {
+                                                width: 280
+                                            });
+                                            doc.text(accounting.formatMoney(ti.ticketItemRate), 25 + 280, startOfTicketItems, {
+                                                width: 103
+                                            });
+                                            doc.text(ti.qtyUnits, 25 + 280 + 103, startOfTicketItems, {
+                                                width: 80
+                                            });
+                                            doc.text(accounting.formatMoney(parseFloat(ti.ticketItemRate) * parseInt(ti.qtyUnits)), 25 + 280 + 103 + 80, startOfTicketItems, {
+                                                width: 100
+                                            });
+                                            startOfTicketItems += 20;
+                                        });
+
+                                        startOfTicketItems += 20;
+                                    }
+
+                                    _.each(otherItems, function(ti) {
+                                        var endOfPage = 750;
+
+                                        if (startOfTicketItems > endOfPage - 30) {
+                                            doc.addPage();
+                                            doc.fillColor('#4f4f4f');
+                                            doc.fontSize(defaultFontSize);
+
+                                            doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template.jpg', {
+                                                width: contentWidth
+                                            });
+
+                                            doc.fontSize(defaultFontSize + 3);
+                                            doc.fillColor('#9f0000');
+                                            // work ticket number
+                                            doc.text(ticket.workTicketNumber, 425, 65, {
+                                                lineBreak: false
+                                            });
+
+                                            doc.fillColor('#4f4f4f');
+                                            doc.fontSize(defaultFontSize);
+
+                                            // po number
+                                            if (ticket.customerPo) {
+                                                doc.text('PO #' + ticket.customerPo, 425, 90, {
+                                                    lineBreak: false
+                                                });
+                                            }
+                                            // creation date
+                                            console.log(ticket.ticketCreationDate);
+                                            var formattedDate = moment(ticket.ticketCreationDate).format('M/D/YYYY');
+                                            doc.text(formattedDate, 425, 105, {
+                                                lineBreak: false
+                                            });
+
+                                            doc.fillColor('#4f4f4f');
+                                            doc.fontSize(defaultFontSize);
+
+                                            var startOfItemHeadingImage = 145;
+
+                                            // ticket item header
+                                            doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-itemheading.jpg', 25, 145, {
+                                                width: contentWidth
+                                            });
+                                            startOfItemHeadingImage += 35;
+
+                                            startOfTicketItems = startOfItemHeadingImage;
+                                        }
+                                        doc.text(ti.ticketItemDescription, 25, startOfTicketItems, {
+                                            width: 280
+                                        });
+                                        doc.text(accounting.formatMoney(ti.ticketItemRate), 25 + 280, startOfTicketItems, {
+                                            width: 103
+                                        });
+                                        doc.text(ti.qtyUnits, 25 + 280 + 103, startOfTicketItems, {
+                                            width: 80
+                                        });
+                                        doc.text(accounting.formatMoney(parseFloat(ti.ticketItemRate) * parseInt(ti.qtyUnits)), 25 + 280 + 103 + 80, startOfTicketItems, {
+                                            width: 100
+                                        });
+                                        startOfTicketItems += 20;
+                                    });
+
+
+                                    var startOfTotalSection = 595;
+                                    if (startOfTicketItems > startOfTotalSection - 30) {
+                                        doc.addPage();
+                                        doc.fillColor('#4f4f4f');
+                                        doc.fontSize(defaultFontSize);
+
+                                        doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template.jpg', {
+                                            width: contentWidth
+                                        });
+
+                                        doc.fontSize(defaultFontSize + 3);
+                                        doc.fillColor('#9f0000');
+                                        // work ticket number
+                                        doc.text(ticket.workTicketNumber, 425, 65, {
+                                            lineBreak: false
+                                        });
+
+                                        doc.fillColor('#4f4f4f');
+                                        doc.fontSize(defaultFontSize);
+
+                                        // po number
+                                        if (ticket.customerPo) {
+                                            doc.text('PO #' + ticket.customerPo, 425, 90, {
+                                                lineBreak: false
+                                            });
+                                        }
+                                        // creation date
+                                        console.log(ticket.ticketCreationDate);
+                                        var formattedDate = moment(ticket.ticketCreationDate).format('M/D/YYYY');
+                                        doc.text(formattedDate, 425, 105, {
+                                            lineBreak: false
+                                        });
+
+                                        doc.fillColor('#4f4f4f');
+                                        doc.fontSize(defaultFontSize);
+                                    }
+
+                                    doc.fontSize(defaultFontSize);
+
+                                    // total section
+                                    doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-totalsection.jpg', 275, 595, {
+                                        width: contentWidth - 250
+                                    });
+
+                                    var incrementAmount = 26;
+                                    var yStart = 618;
+                                    doc.text(accounting.formatMoney(newTicket.totalSection.materialSubTotal), 460, yStart);
+                                    doc.text(accounting.formatMoney(newTicket.totalSection.laborAndEquipmentSubTotal), 460, yStart + incrementAmount);
+                                    doc.text(accounting.formatMoney(newTicket.freight), 460, yStart + incrementAmount + incrementAmount);
+                                    doc.text(accounting.formatMoney(newTicket.totalSection.totalTaxes), 460, yStart + incrementAmount + incrementAmount + incrementAmount);
+
+                                    doc.fontSize(defaultFontSize + 4);
+
+                                    doc.text(accounting.formatMoney(newTicket.totalSection.grandTotal), 460, yStart + incrementAmount + incrementAmount + incrementAmount + incrementAmount - 2);
+                                    doc.text(accounting.formatMoney(newTicket.totalSection.grandTotal), 460, yStart + incrementAmount + incrementAmount + incrementAmount + incrementAmount - 2);
+                                    doc.text(accounting.formatMoney(newTicket.totalSection.grandTotal), 460, yStart + incrementAmount + incrementAmount + incrementAmount + incrementAmount - 2);
+
+                                    //                                var values = [
+                                    //                                    50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
+                                    //                                ];
+                                    //                                var vals = [
+                                    //                                    50, 100, 150, 200, 250, 300, 350, 400, 450, 500
+                                    //                                ];
+                                    //
+                                    //                                doc.fillColor('red');
+                                    //                                _.each(values, function(v) {
+                                    //                                    doc.text(v, 0, v, {
+                                    //                                        lineBreak: false
+                                    //                                    });
+                                    //                                });
+                                    //                                doc.fillColor('green');
+                                    //                                _.each(vals, function(x) {
+                                    //                                    doc.text(x, x, 0, {
+                                    //                                        lineBreak: false
+                                    //                                    });
+                                    //                                });
+
+                                    doc.end();
+
+                                    res.status(200).json('Ticket has been saved!');
+                                } else {
+                                    res.status(201).json('Ticket was saved, but ticket items were not saved');
                                 }
-
-                                doc.fontSize(defaultFontSize);
-
-                                // total section
-                                doc.image(serverPathToSiteRoot + 'content/Tickets/Templates/me-ticket-template-totalsection.jpg', 275, 595, {
-                                    width: contentWidth - 250
-                                });
-
-                                var incrementAmount = 26;
-                                var yStart = 618;
-                                doc.text(accounting.formatMoney(newTicket.totalSection.materialSubTotal), 460, yStart);
-                                doc.text(accounting.formatMoney(newTicket.totalSection.laborAndEquipmentSubTotal), 460, yStart + incrementAmount);
-                                doc.text(accounting.formatMoney(newTicket.freight), 460, yStart + incrementAmount + incrementAmount);
-                                doc.text(accounting.formatMoney(newTicket.totalSection.totalTaxes), 460, yStart + incrementAmount + incrementAmount + incrementAmount);
-
-                                doc.fontSize(defaultFontSize + 4);
-
-                                doc.text(accounting.formatMoney(newTicket.totalSection.grandTotal), 460, yStart + incrementAmount + incrementAmount + incrementAmount + incrementAmount - 2);
-                                doc.text(accounting.formatMoney(newTicket.totalSection.grandTotal), 460, yStart + incrementAmount + incrementAmount + incrementAmount + incrementAmount - 2);
-                                doc.text(accounting.formatMoney(newTicket.totalSection.grandTotal), 460, yStart + incrementAmount + incrementAmount + incrementAmount + incrementAmount - 2);
-
-                                //                                var values = [
-                                //                                    50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950
-                                //                                ];
-                                //                                var vals = [
-                                //                                    50, 100, 150, 200, 250, 300, 350, 400, 450, 500
-                                //                                ];
-                                //
-                                //                                doc.fillColor('red');
-                                //                                _.each(values, function(v) {
-                                //                                    doc.text(v, 0, v, {
-                                //                                        lineBreak: false
-                                //                                    });
-                                //                                });
-                                //                                doc.fillColor('green');
-                                //                                _.each(vals, function(x) {
-                                //                                    doc.text(x, x, 0, {
-                                //                                        lineBreak: false
-                                //                                    });
-                                //                                });
-
-                                doc.end();
-
-                                res.status(200).json('Ticket has been saved!');
-                            } else {
-                                res.status(201).json('Ticket was saved, but ticket items were not saved');
-                            }
-                        })
-                    } else {
-                        console.log(err);
-                    }
-                });
-            } else {
-                res.status(500).json({
-                    error: 'There was a problem.'
-                })
-            }
-        });
+                            })
+                        } else {
+                            console.log(err);
+                        }
+                    });
+                } else {
+                    res.status(500).json({
+                        error: 'There was a problem.'
+                    })
+                }
+            });
         }
         // END CREATE MODE
     }
@@ -1349,10 +1340,10 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
 //            }
 //        })
 //    } else {
-//		res.status(500).json({
-//			error: 'Problem getting products'
-//		})
-//	}
+//      res.status(500).json({
+//          error: 'Problem getting products'
+//      })
+//  }
 //})
 
 
@@ -1360,7 +1351,7 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
 
 
 
-app.post('/SaveTicketOnServer', function (req, res) {
+app.post('/SaveTicketOnServer', function(req, res) {
     //var hostConstant = 'http://meticket.briangreenedev.com/';
     var hostConstant = 'http://localhost:3390';
 
@@ -1375,7 +1366,7 @@ app.post('/SaveTicketOnServer', function (req, res) {
         delete ticket.freight;
 
         ticket.ticketItemObjects = [];
-        ticket.ticketItemObjects = _.each(ticket.ticketItems, function (ti) {
+        ticket.ticketItemObjects = _.each(ticket.ticketItems, function(ti) {
             delete ti._ticketId;
             ticket.ticketItemObjects.push(ti);
         });
@@ -1389,7 +1380,7 @@ app.post('/SaveTicketOnServer', function (req, res) {
             body: ticket,
             json: true
         }
-        request(opts).then(function (newServerTicket) {
+        request(opts).then(function(newServerTicket) {
             // succeeded
             //console.log( '-----NewServerTicket-----')
             //console.log(newServerTicket);
@@ -1406,7 +1397,7 @@ app.post('/SaveTicketOnServer', function (req, res) {
                     }
                 },
                 new: true
-            }, function (err, doc, lastErrorObject) {
+            }, function(err, doc, lastErrorObject) {
                 console.log('---------------------------------');
                 console.log(doc);
                 if (!err) {
@@ -1422,7 +1413,7 @@ app.post('/SaveTicketOnServer', function (req, res) {
                         }, {
                             multi: true
                         },
-                        function (err, ticketItems, lastTicketItems) {
+                        function(err, ticketItems, lastTicketItems) {
                             if (!err) {
                                 res.json(doc);
                             } else {
@@ -1433,7 +1424,7 @@ app.post('/SaveTicketOnServer', function (req, res) {
                     res.status(500).send(err);
                 }
             });
-        }).catch(function (err) {
+        }).catch(function(err) {
             console.log('--------------');
             console.log('err');
             res.status(500).send(err);
@@ -1442,7 +1433,7 @@ app.post('/SaveTicketOnServer', function (req, res) {
 });
 
 // SYNC DATA
-app.post('/SyncCollection', function (req, res) {
+app.post('/SyncCollection', function(req, res) {
     console.log('#############################################################')
     console.log('#############################################################')
     console.log('#############################################################')
@@ -1465,29 +1456,29 @@ app.post('/SyncCollection', function (req, res) {
                 method: 'GET' //-*
             }
 
-            http.get(officeOptions, function (sResponse) { //-*
+            http.get(officeOptions, function(sResponse) { //-*
                 console.log('start');
                 var chunks = '';
                 sResponse.setEncoding('utf8');
-                sResponse.on('data', function (chunk) {
+                sResponse.on('data', function(chunk) {
                     chunks += chunk;
-                }).on('error', function () {
+                }).on('error', function() {
                     res.status(500).json({
                         'message': 'There was a problem trying to get the customer offices.'
                     });
-                }).on('end', function () {
+                }).on('end', function() {
                     var offices = db.collection('Office');
-                    offices.remove({}, function (err) {
+                    offices.remove({}, function(err) {
                         if (!err) {
                             // get records from server
                             var sOffices = JSON.parse(chunks); //-*
-                            var brianGreene = _.find(sOffices, function (off) {
+                            var brianGreene = _.find(sOffices, function(off) {
                                 return off.officeId === 108;
                             });
                             console.log(brianGreene);
 
                             // update local with server records
-                            _.each(sOffices, function (sOffice) { //-*
+                            _.each(sOffices, function(sOffice) { //-*
                                 offices.save(sOffice); //-*
                             });
                             res.status(200).json({
@@ -1509,22 +1500,22 @@ app.post('/SyncCollection', function (req, res) {
                 path: '/TicketSystem/TicketView/GetEmployeeList',
                 method: 'POST'
             }
-            http.get(employeeOptions, function (sResponse) { //-*
+            http.get(employeeOptions, function(sResponse) { //-*
                 var chunks = '';
                 sResponse.setEncoding('utf8');
-                sResponse.on('data', function (chunk) {
+                sResponse.on('data', function(chunk) {
                     chunks += chunk;
                 });
-                sResponse.on('end', function () {
+                sResponse.on('end', function() {
                     var users = db.collection('User');
                     var me = users.find({
                         'userId': request.user.userId
-                    }, function (err, myUsers) {
+                    }, function(err, myUsers) {
                         if (!err) {
-                            var myUser = _.find(myUsers, function (u) {
+                            var myUser = _.find(myUsers, function(u) {
                                 return u.userPassword !== null;
                             });
-                            users.remove({}, function (err) {
+                            users.remove({}, function(err) {
                                 if (!err) {
                                     console.log(myUser);
 
@@ -1532,7 +1523,7 @@ app.post('/SyncCollection', function (req, res) {
                                     var sUsers = JSON.parse(chunks); //-*
 
                                     // update local with server records
-                                    _.each(sUsers, function (sUser) { //-*
+                                    _.each(sUsers, function(sUser) { //-*
                                         console.log(sUser.userId + ' : ' + myUser.userId)
                                         if (sUser.userId === myUser.userId) {
                                             console.log('sUser password = ' + myUser.userPassword);
@@ -1555,110 +1546,110 @@ app.post('/SyncCollection', function (req, res) {
                     });
                 });
             });
-            //		} else if (request.collection === 'Ticket') {
+            //      } else if (request.collection === 'Ticket') {
             //
-            //			///////// GET TICKETS /////////////
-            //			///////////////////////////////////	
-            //			// TODO!
-            //			if (request.ticketChangedFromLocalToServer) {
-            //				// update local with server tickets
-            //				var tickets = db.collection('Ticket');
-            //				tickets.find(function (err, lTickets) {
-            //					if (!err) {
-            //						// get local tickets: get tickets for this user that have not been saved to the server yet (those without a ticketId)
-            //						var ticketsWithoutId = _.filter(lTickets, function (lTicket) {
-            //							return !lTicket.ticketId
-            //						});
-            //						var ticketsChanged = _.each(ticketsWithoutId, function (twi) {
-            //							twi._id = null;
-            //						});
+            //          ///////// GET TICKETS /////////////
+            //          /////////////////////////////////// 
+            //          // TODO!
+            //          if (request.ticketChangedFromLocalToServer) {
+            //              // update local with server tickets
+            //              var tickets = db.collection('Ticket');
+            //              tickets.find(function (err, lTickets) {
+            //                  if (!err) {
+            //                      // get local tickets: get tickets for this user that have not been saved to the server yet (those without a ticketId)
+            //                      var ticketsWithoutId = _.filter(lTickets, function (lTicket) {
+            //                          return !lTicket.ticketId
+            //                      });
+            //                      var ticketsChanged = _.each(ticketsWithoutId, function (twi) {
+            //                          twi._id = null;
+            //                      });
             //
-            //						// Get tickets from server to save locally
-            //						var options = {
-            //							host: 'meticket.briangreenedev.com',
-            //							path: '/TicketSystem/TicketView/GetTickets',
-            //							method: 'GET'
-            //						};
-            //						http.get(options, function (sResponse) {
-            //							var chunks = '';
-            //							sResponse.setEncoding('utf8');
-            //							sResponse.on('data', function (chunk) {
-            //								chunks += chunk;
-            //							}).on('end', function (data) {
-            //								var tickets = db.collection('Ticket');
-            //								tickets.remove({}, function (err) {
-            //									console.log('there were NOT local tickets to be saved');
-            //									if (!err) {
-            //										// get records from server
-            //										var sTickets = JSON.parse(chunks); //-*
+            //                      // Get tickets from server to save locally
+            //                      var options = {
+            //                          host: 'meticket.briangreenedev.com',
+            //                          path: '/TicketSystem/TicketView/GetTickets',
+            //                          method: 'GET'
+            //                      };
+            //                      http.get(options, function (sResponse) {
+            //                          var chunks = '';
+            //                          sResponse.setEncoding('utf8');
+            //                          sResponse.on('data', function (chunk) {
+            //                              chunks += chunk;
+            //                          }).on('end', function (data) {
+            //                              var tickets = db.collection('Ticket');
+            //                              tickets.remove({}, function (err) {
+            //                                  console.log('there were NOT local tickets to be saved');
+            //                                  if (!err) {
+            //                                      // get records from server
+            //                                      var sTickets = JSON.parse(chunks); //-*
             //
-            //										// update local with server records
-            //										_.each(sTickets, function (sTicket) { //-*
-            //											tickets.save(sTicket); //-*
-            //										});
-            //										res.status(200).json({
-            //											message: request.collection + ' was synced.'
-            //										});
-            //									} else {
-            //										res.status(500).json({
-            //											message: request.collection + ' was NOT synced.'
-            //										});
-            //									}
-            //								});
-            //							});
-            //						});
-            //					} else {
-            //						res.status(500).json({
-            //							'message': 'There was a problem'
-            //						});
-            //					}
+            //                                      // update local with server records
+            //                                      _.each(sTickets, function (sTicket) { //-*
+            //                                          tickets.save(sTicket); //-*
+            //                                      });
+            //                                      res.status(200).json({
+            //                                          message: request.collection + ' was synced.'
+            //                                      });
+            //                                  } else {
+            //                                      res.status(500).json({
+            //                                          message: request.collection + ' was NOT synced.'
+            //                                      });
+            //                                  }
+            //                              });
+            //                          });
+            //                      });
+            //                  } else {
+            //                      res.status(500).json({
+            //                          'message': 'There was a problem'
+            //                      });
+            //                  }
             //
-            //				});
-            //			}
+            //              });
+            //          }
 
 
-            //		} else if (request.collection === 'TicketItem') {
-            //			///////// GET TICKET ITEMS ///////////
-            //			//////////////////////////////////////
-            //			var ticketItemOptions = { //-*
-            //				host: hostConstant,
-            //				path: '/TicketSystem/TicketView/GetTicketItems', //-*
-            //				method: 'GET' //-*
-            //			}
-            //			http.get(ticketItemOptions, function (sResponse) { //-*
-            //				var chunks = '';
-            //				sResponse.setEncoding('utf8');
-            //				sResponse.on('data', function (chunk) {
-            //					chunks += chunk;
-            //				}).on('error', function () {
-            //					res.status(500).json({
-            //						'message': 'There was a problem trying to get the ticket items.'
-            //					});
-            //				});
-            //				sResponse.on('end', function () {
-            //					var ticketItems = db.collection('TicketItem'); //-*
-            //					ticketItems.find(function (err, lTicketItems) { //-*
-            //						if (!err) {
-            //							// get records from server
-            //							var sTicketItems = JSON.parse(chunks); //-*
+            //      } else if (request.collection === 'TicketItem') {
+            //          ///////// GET TICKET ITEMS ///////////
+            //          //////////////////////////////////////
+            //          var ticketItemOptions = { //-*
+            //              host: hostConstant,
+            //              path: '/TicketSystem/TicketView/GetTicketItems', //-*
+            //              method: 'GET' //-*
+            //          }
+            //          http.get(ticketItemOptions, function (sResponse) { //-*
+            //              var chunks = '';
+            //              sResponse.setEncoding('utf8');
+            //              sResponse.on('data', function (chunk) {
+            //                  chunks += chunk;
+            //              }).on('error', function () {
+            //                  res.status(500).json({
+            //                      'message': 'There was a problem trying to get the ticket items.'
+            //                  });
+            //              });
+            //              sResponse.on('end', function () {
+            //                  var ticketItems = db.collection('TicketItem'); //-*
+            //                  ticketItems.find(function (err, lTicketItems) { //-*
+            //                      if (!err) {
+            //                          // get records from server
+            //                          var sTicketItems = JSON.parse(chunks); //-*
             //
-            //							// update local with server records
-            //							_.each(sTicketItems, function (sTicketItem) { //-*
-            //								var existingLocalRecord = _.find(lTicketItems, function (lTicketItem) { //-*
-            //									return parseInt(sTicketItem.ticketItemId) === parseInt(lTicketItem.ticketItemId); //-*
-            //								})
-            //								if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
-            //									// save record to local
-            //									ticketItems.save(sTicketItems); //-*
-            //								}
-            //							});
-            //						}
-            //					});
-            //					res.status(200).json({
-            //						message: request.collection + ' was synced.'
-            //					});
-            //				});
-            //			});
+            //                          // update local with server records
+            //                          _.each(sTicketItems, function (sTicketItem) { //-*
+            //                              var existingLocalRecord = _.find(lTicketItems, function (lTicketItem) { //-*
+            //                                  return parseInt(sTicketItem.ticketItemId) === parseInt(lTicketItem.ticketItemId); //-*
+            //                              })
+            //                              if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
+            //                                  // save record to local
+            //                                  ticketItems.save(sTicketItems); //-*
+            //                              }
+            //                          });
+            //                      }
+            //                  });
+            //                  res.status(200).json({
+            //                      message: request.collection + ' was synced.'
+            //                  });
+            //              });
+            //          });
         } else if (request.collection === 'MaterialProduct') {
             ///////// GET PRODUCTS BY 1005 ///////
             //////////////////////////////////////
@@ -1667,27 +1658,27 @@ app.post('/SyncCollection', function (req, res) {
                 path: '/TicketSystem/ProductView/GetProductsByType/1005', //-*
                 method: 'GET' //-*
             }
-            http.get(product1005Options, function (sResponse) { //-*
+            http.get(product1005Options, function(sResponse) { //-*
                 var chunks = '';
                 sResponse.setEncoding('utf8');
-                sResponse.on('data', function (chunk) {
+                sResponse.on('data', function(chunk) {
                     chunks += chunk;
-                }).on('error', function () {
+                }).on('error', function() {
                     res.status(500).json({
                         'message': 'There was a problem trying to get the products.'
                     });
                 });
-                sResponse.on('end', function () {
+                sResponse.on('end', function() {
                     var products = db.collection('MaterialProduct');
-                    products.find(function (err, lProducts) { //-*
+                    products.find(function(err, lProducts) { //-*
                         if (!err) {
                             // get records from server
                             if (chunks) {
                                 var sProducts = JSON.parse(chunks); //-*
 
                                 // update local with server records
-                                _.each(sProducts, function (sProduct) { //-*
-                                    var existingLocalRecord = _.find(lProducts, function (lProduct) { //-*
+                                _.each(sProducts, function(sProduct) { //-*
+                                    var existingLocalRecord = _.find(lProducts, function(lProduct) { //-*
                                         return parseInt(sProduct.productId) === parseInt(lProduct.productId); //-*
                                     })
                                     if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
@@ -1715,26 +1706,26 @@ app.post('/SyncCollection', function (req, res) {
                 path: '/TicketSystem/ProductView/GetProductsByType/1', //-*
                 method: 'GET' //-*
             }
-            http.get(product1Options, function (sResponse) { //-*
+            http.get(product1Options, function(sResponse) { //-*
                 var chunks = '';
                 sResponse.setEncoding('utf8');
-                sResponse.on('data', function (chunk) {
+                sResponse.on('data', function(chunk) {
                     chunks += chunk;
-                }).on('error', function () {
+                }).on('error', function() {
                     res.status(500).json({
                         'message': 'There was a problem trying to get the products.'
                     });
                 });
-                sResponse.on('end', function () {
+                sResponse.on('end', function() {
                     var products = db.collection('EquipmentProduct');
-                    products.find(function (err, lProducts) { //-*
+                    products.find(function(err, lProducts) { //-*
                         if (!err) {
                             // get records from server
                             var sProducts = JSON.parse(chunks); //-*
 
                             // update local with server records
-                            _.each(sProducts, function (sProduct) { //-*
-                                var existingLocalRecord = _.find(lProducts, function (lProduct) { //-*
+                            _.each(sProducts, function(sProduct) { //-*
+                                var existingLocalRecord = _.find(lProducts, function(lProduct) { //-*
                                     return parseInt(sProduct.productId) === parseInt(lProduct.productId); //-*
                                 })
                                 if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
@@ -1758,26 +1749,26 @@ app.post('/SyncCollection', function (req, res) {
                 path: '/TicketSystem/TicketView/GetTaxCategories', //-*
                 method: 'GET' //-*
             }
-            http.get(taxCatOptions, function (sResponse) { //-*
+            http.get(taxCatOptions, function(sResponse) { //-*
                 var chunks = '';
                 sResponse.setEncoding('utf8');
-                sResponse.on('data', function (chunk) {
+                sResponse.on('data', function(chunk) {
                     chunks += chunk;
-                }).on('error', function () {
+                }).on('error', function() {
                     res.status(500).json({
                         'message': 'There was a problem trying to get the tax categories.'
                     });
                 });
-                sResponse.on('end', function () {
+                sResponse.on('end', function() {
                     var taxCategories = db.collection('TaxCategory');
-                    taxCategories.find(function (err, lTaxCats) { //-*
+                    taxCategories.find(function(err, lTaxCats) { //-*
                         if (!err) {
                             // get records from server
                             var sTaxCats = JSON.parse(chunks); //-*
 
                             // update local with server records
-                            _.each(sTaxCats, function (sTaxCat) { //-*
-                                var existingLocalRecord = _.find(lTaxCats, function (lTaxCat) { //-*
+                            _.each(sTaxCats, function(sTaxCat) { //-*
+                                var existingLocalRecord = _.find(lTaxCats, function(lTaxCat) { //-*
                                     return parseInt(sTaxCat.taxCategoryId) === parseInt(lTaxCat.taxCategoryId); //-*
                                 })
                                 if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
@@ -1801,25 +1792,25 @@ app.post('/SyncCollection', function (req, res) {
                 path: '/TicketSystem/ProductView/GetUnitTypes', //-*
                 method: 'GET' //-*
             }
-            http.get(unitTypeOptions, function (sResponse) { //-*
+            http.get(unitTypeOptions, function(sResponse) { //-*
                 var chunks = '';
                 sResponse.setEncoding('utf8');
-                sResponse.on('data', function (chunk) {
+                sResponse.on('data', function(chunk) {
                     chunks += chunk;
-                }).on('error', function () {
+                }).on('error', function() {
                     res.status(500).json({
                         'message': 'There was a problem trying to get the unit types.'
                     });
                 });
-                sResponse.on('end', function () {
+                sResponse.on('end', function() {
                     var unitTypes = db.collection('UnitType');
-                    unitTypes.find(function (err, lUnitTypes) { //-*
+                    unitTypes.find(function(err, lUnitTypes) { //-*
                         if (!err) {
                             // get records from server
                             var sUnitTypes = JSON.parse(chunks); //-*
                             // update local with server records
-                            _.each(sUnitTypes, function (sUnitType) { //-*
-                                var existingLocalRecord = _.find(lUnitTypes, function (lUnitType) { //-*
+                            _.each(sUnitTypes, function(sUnitType) { //-*
+                                var existingLocalRecord = _.find(lUnitTypes, function(lUnitType) { //-*
                                     return parseInt(sUnitType.unitTypeId) === parseInt(lUnitType.unitTypeId); //-*
                                 })
                                 if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
@@ -1845,27 +1836,27 @@ app.post('/SyncCollection', function (req, res) {
                 path: '/TicketSystem/CustomerView/GetCustomers', //-*
                 method: 'GET' //-*
             }
-            http.get(customerOptions, function (sResponse) { //-*
+            http.get(customerOptions, function(sResponse) { //-*
                 console.log('http start');
                 var chunks = '';
                 sResponse.setEncoding('utf8');
-                sResponse.on('data', function (chunk) {
+                sResponse.on('data', function(chunk) {
                     chunks += chunk;
-                }).on('error', function () {
+                }).on('error', function() {
                     res.status(500).json({
                         'message': 'There was a problem trying to get the customers.'
                     });
-                }).on('end', function () {
+                }).on('end', function() {
                     var customers = db.collection('Customer');
-                    customers.find(function (err, lCustomers) { //-*
+                    customers.find(function(err, lCustomers) { //-*
                         if (!err) {
                             // get records from server
                             var sCustomers = JSON.parse(chunks); //-*
                             console.log(sCustomers);
                             // update local with server records
                             console.log('sCustomer length: ' + sCustomers.length);
-                            _.each(sCustomers, function (sCustomer) { //-*
-                                var existingLocalRecord = _.find(lCustomers, function (lCustomer) { //-*
+                            _.each(sCustomers, function(sCustomer) { //-*
+                                var existingLocalRecord = _.find(lCustomers, function(lCustomer) { //-*
                                     return parseInt(sCustomer.customerId) === parseInt(lCustomer.customerId); //-*
                                 })
                                 if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
@@ -1889,26 +1880,26 @@ app.post('/SyncCollection', function (req, res) {
                 path: '/TicketSystem/ProductView/GetProductTypes', //-*
                 method: 'GET' //-*
             }
-            http.get(productTypeOptions, function (sResponse) { //-*
+            http.get(productTypeOptions, function(sResponse) { //-*
                 var chunks = '';
                 sResponse.setEncoding('utf8');
-                sResponse.on('data', function (chunk) {
+                sResponse.on('data', function(chunk) {
                     chunks += chunk;
-                }).on('error', function () {
+                }).on('error', function() {
                     res.status(500).json({
                         'message': 'There was a problem trying to get the product types.'
                     });
                 });
-                sResponse.on('end', function () {
+                sResponse.on('end', function() {
                     var productTypes = db.collection('ProductType');
-                    productTypes.find(function (err, lProductTypes) { //-*
+                    productTypes.find(function(err, lProductTypes) { //-*
                         if (!err) {
                             // get records from server
                             var sProductTypes = JSON.parse(chunks); //-*
 
                             // update local with server records
-                            _.each(sProductTypes, function (sProductType) { //-*
-                                var existingLocalRecord = _.find(lProductTypes, function (lProductType) { //-*
+                            _.each(sProductTypes, function(sProductType) { //-*
+                                var existingLocalRecord = _.find(lProductTypes, function(lProductType) { //-*
                                     return parseInt(sProductType.productTypeId) === parseInt(lProductType.productTypeId); //-*
                                 })
                                 if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {

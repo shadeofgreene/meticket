@@ -561,7 +561,7 @@ app.controller('NgTicketController', [
         };
         $scope.isUsingProductType = function (productTypeId) {
             return $scope.currentTicketItem.productTypeId === productTypeId;
-        }
+        };
 
         $scope.editTicket = function (ticket) {
             debugger;
@@ -573,7 +573,7 @@ app.controller('NgTicketController', [
                 helper.currentTicketId = ticket._id;
             }
             $location.path('edit-ticket');
-        }
+        };
 
         $scope.initiateEditTicket = function () {
             debugger;
@@ -590,6 +590,15 @@ app.controller('NgTicketController', [
                         item.productDescription = item.ticketItemDescription;
                     });
 
+                    var freightItem = _.find(ticket.ticketItems, function(item) {
+                        return parseInt(item.productTypeId) === 1008;
+                    });
+
+                    if(freightItem) {
+                        ticket.freight = parseFloat(freightItem.ticketItemRate) * parseInt(freightItem.qtyUnits);
+                    }
+
+
                     var tempTickets = _.reject(ticket.ticketItems, function (item) {
                         return parseInt(item.productTypeId) === 1008;
                     });
@@ -601,7 +610,7 @@ app.controller('NgTicketController', [
                         laborAndEquipmentSubTotal: '0.00',
                         totalTaxes: '0.00',
                         grandTotal: '0.00'
-                    }
+                    };
 
                     $scope.ticket = ticket;
                     helper.currentTicketId = null;
@@ -610,7 +619,7 @@ app.controller('NgTicketController', [
 
                 });
             }
-        }
+        };
 
         $scope.unitTypes = [];
         $scope.getUnitTypes = function () {
