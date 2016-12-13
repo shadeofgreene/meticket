@@ -135,7 +135,7 @@ app.get('/GetProductsByType/', function(req, res) {
                 error: 'Problem getting products'
             });
         }
-    })
+    });
 });
 
 // GET TICKETS
@@ -148,9 +148,9 @@ app.get('/GetTickets', function(req, res) {
         } else {
             res.status(500).json({
                 error: 'Problem getting tickets'
-            })
+            });
         }
-    })
+    });
 });
 
 // GET TICKET
@@ -183,9 +183,9 @@ app.get('/GetProductTypes', function(req, res) {
         } else {
             res.status(500).json({
                 error: 'Problem getting product types'
-            })
+            });
         }
-    })
+    });
 });
 
 // GET TICKET ITEMS
@@ -197,9 +197,9 @@ app.get('/GetTicketItems', function(req, res) {
         } else {
             res.status(500).json({
                 error: 'Problem getting ticket items'
-            })
+            });
         }
-    })
+    });
 });
 
 // GET EMPLOYEES
@@ -212,9 +212,9 @@ app.get('/GetEmployeeList', function(req, res) {
         } else {
             res.status(500).json({
                 error: 'Problem getting employees'
-            })
+            });
         }
-    })
+    });
 });
 
 // GET TAX CATEGORIES
@@ -226,9 +226,9 @@ app.get('/GetTaxCategories', function(req, res) {
         } else {
             res.status(500).json({
                 error: 'Problem getting tax categories'
-            })
+            });
         }
-    })
+    });
 });
 
 // GET UNIT TYPES
@@ -240,9 +240,9 @@ app.get('/GetUnitTypes', function(req, res) {
         } else {
             res.status(500).json({
                 error: 'Problem getting unit types'
-            })
+            });
         }
-    })
+    });
 });
 
 // GET EQUIPMENT PRODUCTS
@@ -254,9 +254,9 @@ app.get('/GetEquipmentProducts', function(req, res) {
         } else {
             res.status(500).json({
                 error: 'Problem getting equipment products.'
-            })
+            });
         }
-    })
+    });
 });
 
 // GET MATERIAL PRODUCTS
@@ -268,9 +268,9 @@ app.get('/GetMaterialProducts', function(req, res) {
         } else {
             res.status(500).json({
                 error: 'Problem getting material products.'
-            })
+            });
         }
-    })
+    });
 });
 
 // GET TICKET (by ticketId)
@@ -319,7 +319,7 @@ app.post('/GetTicket', function(req, res) {
                         } else {
                             res.status(500).json({
                                 error: 'There was a problem'
-                            })
+                            });
                         }
                     });
                 }
@@ -327,12 +327,12 @@ app.post('/GetTicket', function(req, res) {
         } else {
             res.status(500).json({
                 error: 'There was a problem'
-            })
+            });
         }
     } else {
         res.status(500).json({
             error: 'There was a problem'
-        })
+        });
     }
 });
 
@@ -372,7 +372,7 @@ app.post('/EditTicketAndReturnTicket', function(req, res) {
                 if (!err) {
                     // delete ticket items
                     ticketItems.remove({
-                        'ticketId': updatedTicket.ticketId
+                        '_ticketId': updatedTicket._id
                     }, function(err, removedTicketItems) {
                         if (!err) {
                             // create new of these items
@@ -404,7 +404,7 @@ app.post('/EditTicketAndReturnTicket', function(req, res) {
                                         qtyUnits: parseInt(ticketItem.qtyUnits),
                                         ticketId: updatedTicket.ticketId,
                                         ticketItemUnitType: ticketItem.ticketItemUnitType
-                                    }
+                                    };
                                     newTicketItemsToSave.push(newTicketItem);
                                 }
                             });
@@ -416,7 +416,7 @@ app.post('/EditTicketAndReturnTicket', function(req, res) {
                                 }
                             });
                         }
-                    })
+                    });
                 }
             });
         } else if (ticket._id) {
@@ -481,7 +481,7 @@ app.post('/EditTicketAndReturnTicket', function(req, res) {
                                         qtyUnits: parseInt(ticketItem.qtyUnits),
                                         _ticketId: updatedTicket._id,
                                         ticketItemUnitType: ticketItem.ticketItemUnitType
-                                    }
+                                    };
                                     newTicketItemsToSave.push(newTicketItem);
                                 }
                             });
@@ -493,7 +493,7 @@ app.post('/EditTicketAndReturnTicket', function(req, res) {
                                 }
                             });
                         }
-                    })
+                    });
                 }
             });
         }
@@ -511,12 +511,17 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
 
     if (newTicket) {
         var editMode = false;
-        if (newTicket._id) editMode = true;
+        if (newTicket._id && request.mode === 'edit') {
+            editMode = true;
+        } else {
+            delete newTicket._id;
+        }
 
         // EDIT MODE
         if (editMode) {
             console.log('edit mode');
-            var newTicketItemsToSave = newTicket.ticketItemObjects;
+            var newTicketItemsToSave = newTicket.ticketItems;
+
 
             // if user specifies a freight amount
             if (newTicket.freight && parseInt(newTicket.freight) !== 0) {
@@ -524,6 +529,7 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                 var allItemsExceptFreightItems = _.filter(newTicketItemsToSave, function(i) {
                     return i.productTypeId !== 1008;
                 });
+                newTicketItemsToSave = allItemsExceptFreightItems;
                 newTicketItemsToSave.push({
                     ticketItemDescription: 'Freight charge',
                     productTypeId: 1008,
@@ -535,19 +541,26 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                 });
             }
 
+            _.each(newTicketItemsToSave, function(ti) {
+                ti._ticketId = newTicket._id;
+                if(!ti.ticketItemRate && ti.pricePerUnit) ti.ticketItemRate = ti.pricePerUnit;
+                if(!ti.ticketItemName && ti.productName) ti.ticketItemName = ti.productName;
+                if(!ti.ticketItemDescription && ti.productDescription) ti.ticketItemDescription = ti.productDescription;
+            });
+
             // get current date
             var dateTime = new Date();
 
             var newTicketItems = newTicketItemsToSave;
-            newTicket.ticketItems = null;
-            newTicket.ticketItemObjects = null;
+            newTicket.ticketItems = newTicketItems;
+            newTicket.ticketItemObjects = newTicketItems;
 
             // Total is calculated correctly now
             newTicket.grandTotal = newTicket.totalSection.grandTotal;
 
             tickets.findAndModify({
                 query: {
-                    _id: newTicket._id
+                    _id: ObjectId(newTicket._id)
                 },
                 update: {
                     officeName: newTicket.officeName,
@@ -568,15 +581,24 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                     jobDescription: newTicket.jobDescription,
                     workTicketNumber: newTicket.workTicketNumber,
                     grandTotal: newTicket.grandTotal,
+                    ticketCreationDate: new Date()
                 },
                 new: true
             }, function(err, updatedTicket) {
                 if (!err) {
                     // TODO save ticket items to this updated ticket
                     // first remove all existing ticket items to this ticket
+
+                    var ticket = updatedTicket;
                     console.log(updatedTicket._id);
 
-                    ticketItems.remove({ _ticketId: updatedTicket._id }, function(err, data) {
+                    ticketItems.find({ 
+                        query: {_ticketId: updatedTicket._id}
+                    }).remove(function(err, data) {
+                        console.log('--------------------------');
+                        console.log(err);
+                        console.log(data);
+                        console.log('--------------------------');
                         if (!err) {
                             ticketItems.insert(newTicketItemsToSave, function(err, savedTicketItems) {
                                 if (!err) {
@@ -986,7 +1008,7 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                                         qtyUnits: parseInt(ticketItem.qtyUnits),
                                         _ticketId: ticket._id,
                                         ticketItemUnitType: ticketItem.ticketItemUnitType
-                                    }
+                                    };
                                     newTicketItemsToSave.push(newTicketItem);
                                 }
                             });
@@ -1307,7 +1329,7 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                                 } else {
                                     res.status(201).json('Ticket was saved, but ticket items were not saved');
                                 }
-                            })
+                            });
                         } else {
                             console.log(err);
                         }
@@ -1315,7 +1337,7 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                 } else {
                     res.status(500).json({
                         error: 'There was a problem.'
-                    })
+                    });
                 }
             });
         }
@@ -1379,7 +1401,7 @@ app.post('/SaveTicketOnServer', function(req, res) {
             method: 'POST',
             body: ticket,
             json: true
-        }
+        };
         request(opts).then(function(newServerTicket) {
             // succeeded
             //console.log( '-----NewServerTicket-----')
@@ -1434,18 +1456,18 @@ app.post('/SaveTicketOnServer', function(req, res) {
 
 // SYNC DATA
 app.post('/SyncCollection', function(req, res) {
-    console.log('#############################################################')
-    console.log('#############################################################')
-    console.log('#############################################################')
-    console.log('#############################################################')
-    console.log('#############################################################')
+    console.log('#############################################################');
+    console.log('#############################################################');
+    console.log('#############################################################');
+    console.log('#############################################################');
+    console.log('#############################################################');
 
     var hostConstant = 'meticket.briangreenedev.com';
 
     var request = req.body;
     if (request.user.userId && request.collection) {
         console.log('userId: ' + request.user.userId);
-        console.log('collection: ' + request.collection)
+        console.log('collection: ' + request.collection);
 
         if (request.collection === 'Office') {
             ///////// GET OFFICES ///////////
@@ -1454,7 +1476,7 @@ app.post('/SyncCollection', function(req, res) {
                 host: hostConstant,
                 path: '/TicketSystem/CustomerView/GetAllOffices', //-*
                 method: 'GET' //-*
-            }
+            };
 
             http.get(officeOptions, function(sResponse) { //-*
                 console.log('start');
@@ -1499,7 +1521,7 @@ app.post('/SyncCollection', function(req, res) {
                 host: hostConstant,
                 path: '/TicketSystem/TicketView/GetEmployeeList',
                 method: 'POST'
-            }
+            };
             http.get(employeeOptions, function(sResponse) { //-*
                 var chunks = '';
                 sResponse.setEncoding('utf8');
@@ -1524,7 +1546,7 @@ app.post('/SyncCollection', function(req, res) {
 
                                     // update local with server records
                                     _.each(sUsers, function(sUser) { //-*
-                                        console.log(sUser.userId + ' : ' + myUser.userId)
+                                        console.log(sUser.userId + ' : ' + myUser.userId);
                                         if (sUser.userId === myUser.userId) {
                                             console.log('sUser password = ' + myUser.userPassword);
                                             sUser.userPassword = myUser.userPassword;
@@ -1657,7 +1679,7 @@ app.post('/SyncCollection', function(req, res) {
                 host: hostConstant,
                 path: '/TicketSystem/ProductView/GetProductsByType/1005', //-*
                 method: 'GET' //-*
-            }
+            };
             http.get(product1005Options, function(sResponse) { //-*
                 var chunks = '';
                 sResponse.setEncoding('utf8');
@@ -1680,7 +1702,7 @@ app.post('/SyncCollection', function(req, res) {
                                 _.each(sProducts, function(sProduct) { //-*
                                     var existingLocalRecord = _.find(lProducts, function(lProduct) { //-*
                                         return parseInt(sProduct.productId) === parseInt(lProduct.productId); //-*
-                                    })
+                                    });
                                     if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
                                         // save record to local
                                         products.save(sProduct); //-*
@@ -1705,7 +1727,7 @@ app.post('/SyncCollection', function(req, res) {
                 host: hostConstant,
                 path: '/TicketSystem/ProductView/GetProductsByType/1', //-*
                 method: 'GET' //-*
-            }
+            };
             http.get(product1Options, function(sResponse) { //-*
                 var chunks = '';
                 sResponse.setEncoding('utf8');
@@ -1727,7 +1749,7 @@ app.post('/SyncCollection', function(req, res) {
                             _.each(sProducts, function(sProduct) { //-*
                                 var existingLocalRecord = _.find(lProducts, function(lProduct) { //-*
                                     return parseInt(sProduct.productId) === parseInt(lProduct.productId); //-*
-                                })
+                                });
                                 if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
                                     // save record to local
                                     products.save(sProduct); //-*
@@ -1748,7 +1770,7 @@ app.post('/SyncCollection', function(req, res) {
                 host: hostConstant,
                 path: '/TicketSystem/TicketView/GetTaxCategories', //-*
                 method: 'GET' //-*
-            }
+            };
             http.get(taxCatOptions, function(sResponse) { //-*
                 var chunks = '';
                 sResponse.setEncoding('utf8');
@@ -1770,7 +1792,7 @@ app.post('/SyncCollection', function(req, res) {
                             _.each(sTaxCats, function(sTaxCat) { //-*
                                 var existingLocalRecord = _.find(lTaxCats, function(lTaxCat) { //-*
                                     return parseInt(sTaxCat.taxCategoryId) === parseInt(lTaxCat.taxCategoryId); //-*
-                                })
+                                });
                                 if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
                                     // save record to local
                                     taxCategories.save(sTaxCat); //-*
@@ -1791,7 +1813,7 @@ app.post('/SyncCollection', function(req, res) {
                 host: hostConstant,
                 path: '/TicketSystem/ProductView/GetUnitTypes', //-*
                 method: 'GET' //-*
-            }
+            };
             http.get(unitTypeOptions, function(sResponse) { //-*
                 var chunks = '';
                 sResponse.setEncoding('utf8');
@@ -1812,7 +1834,7 @@ app.post('/SyncCollection', function(req, res) {
                             _.each(sUnitTypes, function(sUnitType) { //-*
                                 var existingLocalRecord = _.find(lUnitTypes, function(lUnitType) { //-*
                                     return parseInt(sUnitType.unitTypeId) === parseInt(lUnitType.unitTypeId); //-*
-                                })
+                                });
                                 if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
                                     // save record to local
                                     unitTypes.save(sUnitType); //-*
@@ -1835,7 +1857,7 @@ app.post('/SyncCollection', function(req, res) {
                 host: hostConstant,
                 path: '/TicketSystem/CustomerView/GetCustomers', //-*
                 method: 'GET' //-*
-            }
+            };
             http.get(customerOptions, function(sResponse) { //-*
                 console.log('http start');
                 var chunks = '';
@@ -1858,7 +1880,7 @@ app.post('/SyncCollection', function(req, res) {
                             _.each(sCustomers, function(sCustomer) { //-*
                                 var existingLocalRecord = _.find(lCustomers, function(lCustomer) { //-*
                                     return parseInt(sCustomer.customerId) === parseInt(lCustomer.customerId); //-*
-                                })
+                                });
                                 if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
                                     // save record to local
                                     customers.save(sCustomer); //-*
@@ -1879,7 +1901,7 @@ app.post('/SyncCollection', function(req, res) {
                 host: hostConstant,
                 path: '/TicketSystem/ProductView/GetProductTypes', //-*
                 method: 'GET' //-*
-            }
+            };
             http.get(productTypeOptions, function(sResponse) { //-*
                 var chunks = '';
                 sResponse.setEncoding('utf8');
@@ -1901,7 +1923,7 @@ app.post('/SyncCollection', function(req, res) {
                             _.each(sProductTypes, function(sProductType) { //-*
                                 var existingLocalRecord = _.find(lProductTypes, function(lProductType) { //-*
                                     return parseInt(sProductType.productTypeId) === parseInt(lProductType.productTypeId); //-*
-                                })
+                                });
                                 if (typeof existingLocalRecord === 'undefined' || !existingLocalRecord) {
                                     // save record to local
                                     productTypes.save(sProductType); //-*
@@ -1917,7 +1939,7 @@ app.post('/SyncCollection', function(req, res) {
         } else {
             res.status(500).json({
                 error: request.collection + ' collection does not exist.'
-            })
+            });
         }
     } else {
         res.status(500).json({
