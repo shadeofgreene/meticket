@@ -593,8 +593,9 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                     console.log(updatedTicket._id);
 
                     ticketItems.remove({
-                        _ticketId: updatedTicket._id
-                    }, function(err, data) {
+                        query: {
+                        _ticketId: ObjectId(updatedTicket._id)
+                    }}, false, function(err, data) {
                         console.log('--------------------------');
                         console.log(err);
                         console.log(data);
