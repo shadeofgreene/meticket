@@ -590,15 +590,14 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                     // first remove all existing ticket items to this ticket
 
                     var ticket = updatedTicket;
-                    console.log(updatedTicket._id);
+                    var updatedTicketId = updatedTicket._id.toString();
+                    console.log(updatedTicketId);
 
                     ticketItems.remove({
-                        query: {
-                        _ticketId: ObjectId(updatedTicket._id)
-                    }}, false, function(err, data) {
+                            '_ticketId': updatedTicketId}, function(err, data) {
+                        console.log(data);
                         console.log('--------------------------');
                         console.log(err);
-                        console.log(data);
                         console.log('--------------------------');
                         if (!err) {
                             ticketItems.insert(newTicketItemsToSave, function(err, savedTicketItems) {
@@ -996,7 +995,7 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
 
                             _.each(newTicketItems, function(ticketItem) {
                                 if (parseInt(ticketItem.productTypeId) === 1008) {
-                                    ticketItem._ticketId = ticket._id;
+                                    ticketItem._ticketId = ticket._id.toString();
                                     newTicketItemsToSave.push(ticketItem);
                                 } else {
                                     var newTicketItem = {
@@ -1007,7 +1006,7 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
                                         ticketItemRate: parseFloat(ticketItem.pricePerUnit),
                                         ticketItemName: ticketItem.productDescription,
                                         qtyUnits: parseInt(ticketItem.qtyUnits),
-                                        _ticketId: ticket._id,
+                                        _ticketId: ticket._id.toString(),
                                         ticketItemUnitType: ticketItem.ticketItemUnitType
                                     };
                                     newTicketItemsToSave.push(newTicketItem);

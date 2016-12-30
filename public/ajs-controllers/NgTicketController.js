@@ -811,7 +811,6 @@ app.controller('NgTicketController', [
         };
 
         $scope.saveThisTicketOnServer = function(ticket) {
-            
             var url = '/SaveTicketOnServer';
             if (ticket) {
                 $http.post(url, ticket).success(function(ticket) {
