@@ -1374,8 +1374,8 @@ app.post('/CreateTicketAndReturnTicket', function(req, res) {
 
 
 app.post('/SaveTicketOnServer', function(req, res) {
-    //var hostConstant = 'http://meticket.briangreenedev.com/';
-    var hostConstant = 'http://localhost:3390';
+    var hostConstant = 'http://meticket.briangreenedev.com/';
+    //var hostConstant = 'http://localhost:3390';
 
     var ticket = req.body;
     if (ticket._id) {
