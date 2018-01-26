@@ -814,7 +814,6 @@ app.controller('NgTicketController', [
             var url = '/SaveTicketOnServer';
             if (ticket) {
                 $http.post(url, ticket).success(function(ticket) {
-                    
                     toastr.success('Ticket was synced with server');
                     $scope.getTicketList();
                 }).error(function(error, err) {

@@ -1,13 +1,23 @@
-INSTRUCTIONS
+***************************************
+INSTRUCTIONS for using web application
+***************************************
 
-(1) Run the file called "start-application.cmd"
+The ticket software is now located at C:\CodeNode\meticket. The only time you will need to go there is to initiate the app startup. By initiating the startup, it will launch a few console windows, of which you can minimize (do not close them or the app will not work anymore). Please follow the instructions to start up the app.
+
+(1) Open File Explorer and go to C:\CodeNode\meticket
+(2) Double click the file called "start-application.cmd" (three console windows will popup)
+(3) DO NOT CLOSE the console windows, but minimize them so you they do not bother you or so they don't accidentally get closed. If they accidentally get closed and the app is not working, just follow steps 1-3 again.
+(4) Open up Chrome browser and type in address http://localhost:3000
+
+Note: You will follow these intructions anytime you want to start or restart the web application.
 
 
 
 
 
-
+***************************************
 IMPORTANT LINKS
+***************************************
 
 http://cp.briangreenedev.com/Content/2zAOSw64pkzvikH1maky/mortonelectric-ticket.zip
 

@@ -1,0 +1,29 @@
+{
+  "name": "meticket",
+  "version": "1.0.0",
+  "description": "Invoicing system that allows user to store invoices on local database, and then upload them to a central server.",
+  "main": "server.js",
+  "dependencies": {
+    "accounting": "^0.4.1",
+    "body-parser": "^1.14.2",
+    "express": "^4.13.3",
+    "fs": "^0.0.2",
+    "moment": "^2.11.1",
+    "mongojs": "^2.2.2",
+    "pdfkit": "^0.7.2",
+    "querystring": "^0.2.0",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://briangreenedev@bitbucket.org/briangreenedev/meticketnode.git"
+  },
+  "author": "Brian Greene",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/briangreenedev/meticketnode#readme"
+}

@@ -15,6 +15,12 @@ var moment = require('moment');
 var accounting = require('accounting');
 var request = require('request-promise');
 
+//var serverUrl = 'http://meticket.briangreenedev.com/'
+var serverUrl = 'http://localhost:3390'
+
+//var serverUri = 'meticket.briangreenedev.com'
+var serverUri = 'localhost:3390'
+
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 
@@ -39,7 +45,7 @@ app.post('/TryLoginAndGetUser', function (req, res) {
                 });
                 console.log(data);
                 var options = {
-                    host: 'meticket.briangreenedev.com',
+                    host: serverUri,
                     path: '/TicketSystem/LoginView/TryLoginAndGetUser',
                     method: 'POST',
                     headers: {
@@ -1385,8 +1391,7 @@ app.post('/CreateTicketAndReturnTicket', function (req, res) {
 
 
 app.post('/SaveTicketOnServer', function(req, res) {
-    var hostConstant = 'http://meticket.briangreenedev.com/';
-    //var hostConstant = 'http://localhost:3390';
+    var hostConstant = serverUrl;
 
     var ticket = req.body;
     if (ticket._id) {
@@ -1435,9 +1440,10 @@ app.post('/SaveTicketOnServer', function(req, res) {
                 console.log(doc);
                 if (!err) {
                     // update ticket items with new ticketId
+                    console.log('successfully saved ticket to MongoDB. Now save ticket items')
                     var ticketItems = db.collection('TicketItem');
                     ticketItems.update({
-                            _ticketId: mongojs.ObjectId(t_id)
+                            _ticketId: t_id
                         }, {
                             $set: {
                                 _ticketId: null,
@@ -1448,8 +1454,13 @@ app.post('/SaveTicketOnServer', function(req, res) {
                         },
                         function (err, ticketItems, lastTicketItems) {
                             if (!err) {
+                                console.log('ticketItems')
+								console.log(ticketItems)
+								console.log('lastTicketItems')
+								console.log(lastTicketItems)
                                 res.json(doc);
                             } else {
+                                console.log(err)
                                 res.status(500).send(err);
                             }
                         });
@@ -1473,7 +1484,7 @@ app.post('/SyncCollection', function (req, res) {
     console.log('#############################################################');
     console.log('#############################################################');
 
-    var hostConstant = 'meticket.briangreenedev.com';
+    var hostConstant = serverUri;
 
     var request = req.body;
     if (request.user.userId && request.collection) {
@@ -1601,7 +1612,7 @@ app.post('/SyncCollection', function (req, res) {
             //
             //                      // Get tickets from server to save locally
             //                      var options = {
-            //                          host: 'meticket.briangreenedev.com',
+            //                          host: serverUri,
             //                          path: '/TicketSystem/TicketView/GetTickets',
             //                          method: 'GET'
             //                      };
